@@ -6,3 +6,5 @@ database/spartan.db-wal
 *.log
 .DS_Store
 Thumbs.db
+spartan_theme.wav
+video_assets/
