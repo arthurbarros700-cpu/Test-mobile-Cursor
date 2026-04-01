@@ -1,9 +1,11 @@
 {
-  "name": "workspace",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "spartan-roleplay-panel",
+  "version": "2.0.0",
+  "description": "Painel de login profissional para o servidor Spartan Roleplay",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
@@ -12,13 +14,9 @@
     "type": "git",
     "url": "git+https://github.com/arthurbarros700-cpu/Test-mobile-Cursor.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["fivem", "roleplay", "login", "painel", "spartan"],
+  "author": "Spartan Roleplay",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/arthurbarros700-cpu/Test-mobile-Cursor/issues"
-  },
-  "homepage": "https://github.com/arthurbarros700-cpu/Test-mobile-Cursor#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.8.0",

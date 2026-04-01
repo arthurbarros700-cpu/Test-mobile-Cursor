@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: spartan-roleplay-panel
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/server/status
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: SESSION_EXPIRES_IN
+        value: 24h
+      - key: REFRESH_EXPIRES_IN
+        value: 7d
+    disk:
+      name: spartan-data
+      mountPath: /app/database
+      sizeGB: 1
