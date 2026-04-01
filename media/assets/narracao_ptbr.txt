@@ -1,0 +1,19 @@
+Olá. Este é o Royal Match Auto Bot.
+
+Uma solução construída com arquitetura modular para automação avançada de partidas no celular.
+
+No painel principal, você ativa o bot, ajusta o intervalo entre jogadas e define o limiar de confiança da tomada de decisão.
+
+Em seguida, o serviço de acessibilidade entra em ação, captura a tela e analisa a grade do jogo em tempo real.
+
+A camada de visão computacional mapeia as peças em uma matriz oito por oito, usando leitura heurística para classificar cores e padrões.
+
+Com a grade estruturada, o Match três Solver simula trocas válidas, estima pontuações e seleciona a melhor jogada disponível em cada ciclo.
+
+Depois da decisão, o planejador de gestos converte a estratégia em swipes precisos, executados diretamente na tela.
+
+O resultado é um loop contínuo de captura, análise, decisão e ação, com foco em estabilidade, fluidez e performance.
+
+Toda a base foi organizada para evolução profissional, permitindo calibrar o parser, melhorar heurísticas e integrar inteligência artificial leve no futuro.
+
+Royal Match Auto Bot. Automação elegante, técnica e pronta para escalar.
