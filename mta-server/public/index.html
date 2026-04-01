@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTA:SA — Server Control Panel</title>
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2300d4ff' fill-opacity='.15'/><path d='M8 12L16 7L24 12V20L16 25L8 20V12Z' stroke='%2300d4ff' stroke-width='1.8' fill='none'/><circle cx='16' cy='16' r='3.5' fill='%2300d4ff'/></svg>" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="#00d4ff" fill-opacity=".12"/>
+      <path d="M7 10L14 6L21 10V18L14 22L7 18V10Z" stroke="#00d4ff" stroke-width="1.5" fill="none"/>
+      <circle cx="14" cy="14" r="3" fill="#00d4ff" fill-opacity=".8"/>
+    </svg>
+    <span>MTA<span class="hl-cyan">:SA</span> Control Panel</span>
+  </div>
+
+  <div class="hdr-stats">
+    <div class="hdr-stat">
+      <div class="badge-online"><div class="pulse" id="ws-dot"></div><span id="ws-label">CONECTANDO</span></div>
+    </div>
+    <div class="hdr-stat"><span>Jogadores</span><strong id="hdr-players">—/100</strong></div>
+    <div class="hdr-stat"><span>Uptime</span><strong id="hdr-uptime">—</strong></div>
+    <div class="hdr-stat"><span>CPU</span><strong id="hdr-cpu">—</strong></div>
+    <div class="hdr-stat"><span>RAM</span><strong id="hdr-ram">—</strong></div>
+    <div class="hdr-stat"><span>Ping méd.</span><strong id="hdr-ping">—</strong></div>
+  </div>
+
+  <div class="hdr-actions">
+    <button class="btn-icon" title="Notificações" onclick="showToast('Nenhuma notificação nova','info')">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 01-2-2h4a2 2 0 01-2 2z"/></svg>
+    </button>
+    <button class="btn-icon" title="Configurações" onclick="navigate('settings')">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Visão Geral</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="monitor" onclick="navigate('monitor')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/></svg>
+        <span>Monitor</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Gestão</div>
+      <div class="nav-item" data-page="players" onclick="navigate('players')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        <span>Jogadores</span>
+        <span class="nav-badge green" id="nav-player-count">0</span>
+      </div>
+      <div class="nav-item" data-page="resources" onclick="navigate('resources')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+        <span>Recursos</span>
+        <span class="nav-badge" id="nav-res-count">0</span>
+      </div>
+      <div class="nav-item" data-page="bans" onclick="navigate('bans')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+        <span>Banimentos</span>
+        <span class="nav-badge red" id="nav-ban-count">0</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Ferramentas</div>
+      <div class="nav-item" data-page="console" onclick="navigate('console')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        <span>Console</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="navigate('settings')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        <span>Configurações</span>
+      </div>
+    </div>
+
+    <footer><span id="sidebar-ver">v2.1.0 · MTA:SA 1.6.1</span></footer>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="main">
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/></svg>
+        Dashboard
+        <span class="page-sub">Visão geral do servidor em tempo real</span>
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card c1">
+          <div class="sc-label">Jogadores Online</div>
+          <div class="sc-value hl-cyan" id="sc-players">—</div>
+          <div class="sc-sub" id="sc-players-sub">de 100 slots</div>
+          <div class="sc-trend up" id="sc-players-trend">● Ao vivo</div>
+          <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <div class="stat-card c2">
+          <div class="sc-label">CPU do Servidor</div>
+          <div class="sc-value hl-purple" id="sc-cpu">—</div>
+          <div class="sc-sub">4 núcleos virtuais</div>
+          <div class="sc-trend" id="sc-cpu-trend">▼ estável</div>
+          <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/></svg>
+        </div>
+        <div class="stat-card c3">
+          <div class="sc-label">Memória RAM</div>
+          <div class="sc-value hl-green" id="sc-ram">—</div>
+          <div class="sc-sub">de 4096 MB total</div>
+          <div class="sc-trend" id="sc-ram-trend">▲ normal</div>
+          <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        </div>
+        <div class="stat-card c4">
+          <div class="sc-label">Uptime</div>
+          <div class="sc-value hl-yellow" id="sc-uptime" style="font-size:1.3rem">—</div>
+          <div class="sc-sub">desde última reinicialização</div>
+          <div class="sc-trend">● Estável</div>
+          <svg class="sc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot"></div>Jogadores — Últimos 60s
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap"><canvas id="chart-players" height="120"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot" style="background:var(--accent2)"></div>CPU / RAM em tempo real
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap"><canvas id="chart-cpuram" height="120"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot" style="background:var(--accent3)"></div>Recursos do Sistema</div>
+          <div class="panel-body" id="gauges-panel">
+            <div class="gauge-row">
+              <div class="gauge-label"><span>CPU</span><span id="g-cpu">—</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-cpu" style="background:var(--accent2)"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>RAM</span><span id="g-ram">—</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-ram" style="background:var(--accent3)"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Download ↓</span><span id="g-dl">—</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-dl" style="background:var(--accent)"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Upload ↑</span><span id="g-ul">—</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-ul" style="background:var(--accent4)"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Recursos ativos</span><span id="g-res">—</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-res" style="background:var(--accent4)"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot" style="background:var(--accent4)"></div>Atividade Recente</div>
+          <div class="panel-body" id="activity-feed" style="max-height:220px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MONITOR -->
+    <section id="page-monitor" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/></svg>
+        Monitor de Performance
+        <span class="page-sub">Análise detalhada de recursos</span>
+      </div>
+      <div class="monitor-rings">
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-cpu" cx="50" cy="50" r="42" fill="none" stroke="var(--accent2)" stroke-width="8"
+              stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke-linecap="round"
+              style="transition:stroke-dashoffset 1s;transform:rotate(-90deg);transform-origin:50% 50%"/>
+          </svg>
+          <div class="ring-label"><strong id="rv-cpu">0%</strong>CPU</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-ram" cx="50" cy="50" r="42" fill="none" stroke="var(--accent3)" stroke-width="8"
+              stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke-linecap="round"
+              style="transition:stroke-dashoffset 1s;transform:rotate(-90deg);transform-origin:50% 50%"/>
+          </svg>
+          <div class="ring-label"><strong id="rv-ram">0%</strong>RAM</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-pl" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke-linecap="round"
+              style="transition:stroke-dashoffset 1s;transform:rotate(-90deg);transform-origin:50% 50%"/>
+          </svg>
+          <div class="ring-label"><strong id="rv-pl">0%</strong>Slots</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-ping" cx="50" cy="50" r="42" fill="none" stroke="var(--accent4)" stroke-width="8"
+              stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke-linecap="round"
+              style="transition:stroke-dashoffset 1s;transform:rotate(-90deg);transform-origin:50% 50%"/>
+          </svg>
+          <div class="ring-label"><strong id="rv-ping">0ms</strong>Ping</div>
+        </div>
+        <div class="panel" style="flex:1;min-width:200px">
+          <div class="panel-header"><div class="ph-dot"></div>Info do Servidor</div>
+          <div class="panel-body srv-info">
+            <div><span>Nome</span><strong id="mi-name">—</strong></div>
+            <div><span>IP:Porta</span><strong>127.0.0.1:<span id="mi-port">—</span></strong></div>
+            <div><span>Versão MTA</span><strong>1.6.1-rc-22442</strong></div>
+            <div><span>Game Mode</span><strong id="mi-mode">—</strong></div>
+            <div><span>Mapa</span><strong>San Andreas</strong></div>
+            <div><span>Max Slots</span><strong id="mi-slots">—</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-header"><div class="ph-dot"></div>CPU — Histórico 60s</div>
+        <div class="panel-body"><div class="chart-wrap" style="height:160px"><canvas id="chart-cpu-full" height="160"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot" style="background:var(--accent3)"></div>RAM — Histórico 60s</div>
+        <div class="panel-body"><div class="chart-wrap" style="height:160px"><canvas id="chart-ram-full" height="160"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="page-players" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        Jogadores Online
+        <span class="page-sub" id="players-subtitle">Carregando...</span>
+      </div>
+      <div class="filter-bar">
+        <input id="player-search" placeholder="Buscar por nome, serial ou IP..." oninput="filterPlayers()"/>
+        <select id="player-role-filter" onchange="filterPlayers()">
+          <option value="">Todos os níveis</option>
+          <option value="admin">Admin</option>
+          <option value="mod">Moderador</option>
+          <option value="player">Jogador</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-broadcast')">📢 Anunciar</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadPlayers()">↻ Atualizar</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot"></div>Lista de Jogadores</div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Jogador</th><th>Serial</th><th>IP</th><th>Ping</th><th>Nível</th><th>Tempo</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="players-tbody"><tr><td colspan="8" class="empty-row">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section id="page-resources" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+        Gerenciador de Recursos
+        <span class="page-sub">Gerencie os scripts e recursos do servidor</span>
+      </div>
+      <div class="filter-bar">
+        <input id="res-search" placeholder="Buscar recurso..." oninput="filterResources()"/>
+        <select id="res-status-filter" onchange="filterResources()">
+          <option value="">Todos</option>
+          <option value="running">Rodando</option>
+          <option value="stopped">Parado</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-upload')">↑ Adicionar</button>
+        <button class="btn btn-ghost btn-sm" onclick="startAllRes()">▶ Iniciar Todos</button>
+        <button class="btn btn-danger btn-sm" onclick="stopAllRes()">■ Parar Todos</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot"></div>Recursos do Servidor</div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>Nome</th><th>Versão</th><th>Autor</th><th>Status</th><th>CPU</th><th>RAM</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="resources-tbody"><tr><td colspan="7" class="empty-row">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- BANS -->
+    <section id="page-bans" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+        Lista de Banimentos
+        <span class="page-sub" id="bans-subtitle">Carregando...</span>
+      </div>
+      <div class="filter-bar">
+        <input id="ban-search" placeholder="Buscar por nick, serial, IP ou motivo..." oninput="filterBans()"/>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-ban')">+ Novo Banimento</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot" style="background:var(--danger)"></div>Banimentos Ativos</div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Jogador</th><th>Serial / IP</th><th>Motivo</th><th>Banido por</th><th>Data</th><th>Expira</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="bans-tbody"><tr><td colspan="8" class="empty-row">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONSOLE -->
+    <section id="page-console" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        Console do Servidor
+        <span class="page-sub">WebSocket em tempo real</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="consoleClear()">🗑 Limpar</button>
+        <button class="btn btn-ghost btn-sm" id="scroll-toggle-btn" onclick="toggleScroll()">⏸ Pausar scroll</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-danger btn-sm" onclick="serverRestart()">↺ Reiniciar</button>
+        <button class="btn btn-danger btn-sm" onclick="serverStop()">■ Parar</button>
+      </div>
+      <div id="console-output"></div>
+      <div id="console-input-row">
+        <input id="console-input" placeholder="Digite um comando: help, say, kick, players, status..." autocomplete="off"
+          onkeydown="consoleKey(event)"/>
+        <button class="btn btn-primary" onclick="consoleSend()">Enviar</button>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-3);margin-top:8px">
+        💡 Teclas ↑↓ para navegar no histórico de comandos
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="page-settings" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        Configurações do Servidor
+        <span class="page-sub">Parâmetros globais e segurança</span>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot"></div>Informações Gerais</div>
+          <div class="panel-body settings-form">
+            <div class="form-row">
+              <label>Nome do Servidor</label>
+              <input id="set-name" placeholder="Nome do servidor"/>
+            </div>
+            <div class="form-row">
+              <label>Game Mode</label>
+              <input id="set-mode" placeholder="Ex: Roleplay"/>
+            </div>
+            <div class="form-row">
+              <label>Max Players</label>
+              <input type="number" id="set-maxp" min="1" max="1000"/>
+            </div>
+            <div class="form-row">
+              <label>Porta</label>
+              <input type="number" id="set-port" min="1" max="65535"/>
+            </div>
+            <div class="form-row">
+              <label>Senha do Servidor</label>
+              <input type="password" id="set-pass" placeholder="Deixe vazio para público"/>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:6px">💾 Salvar</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot" style="background:var(--accent2)"></div>Segurança</div>
+          <div class="panel-body">
+            <div class="toggle-row">
+              <div>
+                <div style="font-size:.85rem">Anti-cheat ativo</div>
+                <div style="font-size:.72rem;color:var(--text-3)">Detecta modificações no cliente</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked id="tog-ac"/><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div style="font-size:.85rem">Bloquear VPN</div>
+                <div style="font-size:.72rem;color:var(--text-3)">Nega conexões via VPN</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="tog-vpn"/><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div style="font-size:.85rem">Proteção DDoS</div>
+                <div style="font-size:.72rem;color:var(--text-3)">Rate limiting por IP</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked id="tog-ddos"/><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div style="font-size:.85rem">Logs detalhados</div>
+                <div style="font-size:.72rem;color:var(--text-3)">Registra ações do servidor</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked id="tog-logs"/><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div style="font-size:.85rem">Auto-reinício em crash</div>
+                <div style="font-size:.72rem;color:var(--text-3)">Reinicia automaticamente</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked id="tog-ar"/><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-ban">
+  <div class="modal">
+    <h3>🚫 Novo Banimento</h3>
+    <div class="form-row"><label>Nick</label><input id="ban-nick" placeholder="Nome do jogador"/></div>
+    <div class="form-row"><label>Serial (opcional)</label><input id="ban-serial" placeholder="Será gerado automaticamente"/></div>
+    <div class="form-row"><label>Motivo</label><textarea id="ban-reason" placeholder="Descreva o motivo..."></textarea></div>
+    <div class="form-row">
+      <label>Duração</label>
+      <select id="ban-dur">
+        <option>1 hora</option><option>24 horas</option><option>7 dias</option>
+        <option>30 dias</option><option selected>Permanente</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ban')">Cancelar</button>
+      <button class="btn btn-danger" onclick="addBan()">Banir</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <h3>📦 Adicionar Recurso</h3>
+    <div class="form-row"><label>Nome</label><input id="up-name" placeholder="ex: myresource"/></div>
+    <div class="form-row"><label>Versão</label><input id="up-ver" placeholder="ex: 1.0.0"/></div>
+    <div class="form-row"><label>Autor</label><input id="up-author" placeholder="ex: VocêMesmo"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-upload')">Cancelar</button>
+      <button class="btn btn-primary" onclick="uploadResource()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-broadcast">
+  <div class="modal">
+    <h3>📢 Anunciar para Todos</h3>
+    <div class="form-row"><label>Mensagem</label><textarea id="bc-msg" placeholder="Digite o anúncio..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-broadcast')">Cancelar</button>
+      <button class="btn btn-primary" onclick="broadcast()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <h3 id="mc-title">Confirmar</h3>
+    <p id="mc-msg" style="color:var(--text-2);font-size:.85rem;margin-top:8px"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="mc-btn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="/js/charts.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

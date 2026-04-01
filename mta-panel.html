@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTA:SA — Server Control Panel</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base:   #0a0c10;
+      --bg-panel:  #0f1218;
+      --bg-card:   #141820;
+      --bg-hover:  #1a2030;
+      --bg-active: #1e2840;
+      --border:    #1f2c40;
+      --accent:    #00d4ff;
+      --accent2:   #7c3aed;
+      --accent3:   #10b981;
+      --accent4:   #f59e0b;
+      --danger:    #ef4444;
+      --warn:      #f97316;
+      --text-1:    #e2e8f0;
+      --text-2:    #94a3b8;
+      --text-3:    #475569;
+      --sidebar-w: 240px;
+      --header-h:  58px;
+      --radius:    8px;
+      --shadow:    0 4px 24px rgba(0,0,0,.55);
+      --glow:      0 0 20px rgba(0,212,255,.15);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Scrollbar ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ─── Header ────────────────────────────────────────────────── */
+    #header {
+      height: var(--header-h);
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    #header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .5px;
+    }
+    #header .logo svg { width: 28px; height: 28px; }
+    #header .logo span.hl { color: var(--accent); }
+    #header .server-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .badge-online {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .8rem; color: var(--accent3); font-weight: 600;
+    }
+    .pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent3);
+      box-shadow: 0 0 0 0 rgba(16,185,129,.5);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.5); }
+      70%  { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+    #header .hdr-stat {
+      font-size: .78rem; color: var(--text-2);
+      display: flex; flex-direction: column; align-items: flex-end;
+    }
+    #header .hdr-stat strong { color: var(--text-1); font-size: .88rem; }
+    .btn-icon {
+      width: 34px; height: 34px; border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .btn-icon:hover { background: var(--bg-hover); color: var(--accent); border-color: var(--accent); }
+
+    /* ─── Layout body ───────────────────────────────────────────── */
+    #layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ─── Sidebar ───────────────────────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .nav-section { padding: 18px 12px 6px; }
+    .nav-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--text-3);
+      padding: 0 8px; margin-bottom: 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--radius);
+      cursor: pointer; transition: all .15s;
+      font-size: .875rem; color: var(--text-2);
+      user-select: none;
+    }
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-1); }
+    .nav-item.active {
+      background: var(--bg-active);
+      color: var(--accent);
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+    .nav-badge {
+      margin-left: auto; font-size: .7rem; font-weight: 700;
+      background: var(--accent2); color: #fff;
+      padding: 1px 7px; border-radius: 20px;
+    }
+    .nav-badge.red { background: var(--danger); }
+    .nav-badge.green { background: var(--accent3); }
+    #sidebar footer {
+      margin-top: auto; padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      font-size: .75rem; color: var(--text-3);
+    }
+
+    /* ─── Main content ──────────────────────────────────────────── */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .page { display: none; animation: fadeIn .2s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .page-title {
+      font-size: 1.25rem; font-weight: 700;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+    }
+    .page-title svg { color: var(--accent); width: 22px; height: 22px; }
+
+    /* ─── Cards grid ────────────────────────────────────────────── */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: border-color .2s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .stat-card.c1::before { background: var(--accent); }
+    .stat-card.c2::before { background: var(--accent2); }
+    .stat-card.c3::before { background: var(--accent3); }
+    .stat-card.c4::before { background: var(--accent4); }
+    .stat-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+    .stat-card .label { font-size: .73rem; color: var(--text-2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 1.9rem; font-weight: 800; line-height: 1; }
+    .stat-card .sub   { font-size: .73rem; color: var(--text-3); margin-top: 6px; }
+    .stat-card .trend { font-size: .72rem; color: var(--accent3); margin-top: 4px; }
+    .stat-card .trend.down { color: var(--danger); }
+    .stat-icon {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      opacity: .07; width: 56px; height: 56px;
+    }
+
+    /* ─── Two-column grid ───────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ─── Panel ─────────────────────────────────────────────────── */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem; font-weight: 600;
+    }
+    .panel-header .ph-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); flex-shrink: 0;
+    }
+    .panel-header .ph-actions { margin-left: auto; display: flex; gap: 6px; }
+    .panel-body { padding: 16px; }
+
+    /* ─── Mini chart (canvas) ───────────────────────────────────── */
+    .chart-wrap { position: relative; height: 120px; }
+    canvas { width: 100% !important; }
+
+    /* ─── Gauge bar ─────────────────────────────────────────────── */
+    .gauge-row { margin-bottom: 12px; }
+    .gauge-row:last-child { margin-bottom: 0; }
+    .gauge-label { display: flex; justify-content: space-between; font-size: .78rem; color: var(--text-2); margin-bottom: 5px; }
+    .gauge-label span:last-child { color: var(--text-1); font-weight: 600; }
+    .gauge-track {
+      height: 5px; background: var(--bg-hover); border-radius: 99px; overflow: hidden;
+    }
+    .gauge-fill {
+      height: 100%; border-radius: 99px;
+      transition: width .8s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ─── Table ─────────────────────────────────────────────────── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .data-table th {
+      text-align: left; padding: 9px 12px;
+      color: var(--text-3); font-size: .7rem;
+      text-transform: uppercase; letter-spacing: .8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(31,44,64,.6);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr { transition: background .12s; }
+    .data-table tbody tr:hover { background: var(--bg-hover); }
+
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 99px;
+      font-size: .68rem; font-weight: 600; letter-spacing: .4px;
+    }
+    .tag.online  { background: rgba(16,185,129,.15); color: var(--accent3); }
+    .tag.offline { background: rgba(239,68,68,.12);  color: var(--danger); }
+    .tag.admin   { background: rgba(0,212,255,.12);  color: var(--accent); }
+    .tag.mod     { background: rgba(124,58,237,.15); color: var(--accent2); }
+    .tag.running { background: rgba(16,185,129,.12); color: var(--accent3); }
+    .tag.stopped { background: rgba(239,68,68,.1);   color: var(--danger); }
+    .tag.banned  { background: rgba(239,68,68,.12);  color: var(--danger); }
+
+    /* ─── Buttons ───────────────────────────────────────────────── */
+    .btn {
+      padding: 6px 14px; border-radius: var(--radius);
+      border: 1px solid transparent; font-size: .78rem; font-weight: 600;
+      cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-sm { padding: 4px 10px; font-size: .72rem; }
+    .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
+    .btn-primary:hover { background: #00bcec; }
+    .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--bg-hover); color: var(--text-1); }
+    .btn-danger { background: transparent; color: var(--danger); border-color: rgba(239,68,68,.4); }
+    .btn-danger:hover { background: rgba(239,68,68,.1); }
+    .btn-green { background: transparent; color: var(--accent3); border-color: rgba(16,185,129,.4); }
+    .btn-green:hover { background: rgba(16,185,129,.1); }
+
+    /* ─── Console ───────────────────────────────────────────────── */
+    #console-output {
+      background: #060911;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      height: 380px;
+      overflow-y: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+      font-size: .78rem;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .log-line { display: flex; gap: 10px; }
+    .log-time { color: var(--text-3); flex-shrink: 0; }
+    .log-info  { color: #60a5fa; }
+    .log-ok    { color: var(--accent3); }
+    .log-warn  { color: var(--accent4); }
+    .log-error { color: var(--danger); }
+    .log-cmd   { color: var(--accent); }
+
+    #console-input-row { display: flex; gap: 8px; }
+    #console-input {
+      flex: 1; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 9px 14px; color: var(--text-1);
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: .82rem; outline: none;
+      transition: border-color .15s;
+    }
+    #console-input:focus { border-color: var(--accent); }
+    #console-input::placeholder { color: var(--text-3); }
+
+    /* ─── Search / Filter bar ───────────────────────────────────── */
+    .filter-bar {
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .filter-bar input, .filter-bar select {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 7px 12px;
+      color: var(--text-1); font-size: .8rem; outline: none;
+      transition: border-color .15s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+    .filter-bar input { flex: 1; min-width: 160px; }
+
+    /* ─── Modal ─────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999; backdrop-filter: blur(3px);
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; min-width: 340px;
+      max-width: 500px; width: 90%;
+      transform: scale(.96); transition: transform .2s;
+      box-shadow: var(--shadow);
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal h3 { margin-bottom: 16px; font-size: 1rem; }
+    .modal label { display: block; font-size: .78rem; color: var(--text-2); margin-bottom: 5px; margin-top: 12px; }
+    .modal input, .modal select, .modal textarea {
+      width: 100%; background: var(--bg-hover);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 8px 12px; color: var(--text-1); font-size: .82rem; outline: none;
+    }
+    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--accent); }
+    .modal textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+    /* ─── Toast ─────────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed; bottom: 20px; right: 20px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 9999;
+    }
+    .toast {
+      padding: 10px 16px; border-radius: var(--radius);
+      font-size: .82rem; font-weight: 500;
+      background: var(--bg-card); border: 1px solid var(--border);
+      box-shadow: var(--shadow); min-width: 220px;
+      display: flex; align-items: center; gap: 8px;
+      animation: slideIn .25s ease;
+    }
+    .toast.success { border-color: var(--accent3); color: var(--accent3); }
+    .toast.error   { border-color: var(--danger);  color: var(--danger); }
+    .toast.info    { border-color: var(--accent);  color: var(--accent); }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* ─── Ping indicator ────────────────────────────────────────── */
+    .ping-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px;
+    }
+    .ping-good   { background: var(--accent3); }
+    .ping-medium { background: var(--accent4); }
+    .ping-bad    { background: var(--danger); }
+
+    /* ─── Resource usage bar row ────────────────────────────────── */
+    .res-bar-wrap { width: 80px; }
+    .res-bar { height: 4px; background: var(--bg-hover); border-radius: 99px; overflow: hidden; }
+    .res-bar-fill { height: 100%; border-radius: 99px; }
+
+    /* ─── Activity feed ─────────────────────────────────────────── */
+    .feed-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid rgba(31,44,64,.5);
+    }
+    .feed-item:last-child { border-bottom: none; }
+    .feed-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: .75rem;
+    }
+    .feed-icon.join  { background: rgba(16,185,129,.15); color: var(--accent3); }
+    .feed-icon.leave { background: rgba(239,68,68,.12);  color: var(--danger); }
+    .feed-icon.ban   { background: rgba(245,158,11,.15); color: var(--accent4); }
+    .feed-icon.cmd   { background: rgba(0,212,255,.1);   color: var(--accent); }
+    .feed-text { font-size: .78rem; line-height: 1.4; }
+    .feed-text strong { color: var(--text-1); }
+    .feed-time { font-size: .68rem; color: var(--text-3); margin-top: 2px; }
+
+    /* ─── Uptime ticker ─────────────────────────────────────────── */
+    #uptime-val { font-variant-numeric: tabular-nums; }
+
+    /* ─── Progress ring ─────────────────────────────────────────── */
+    .ring-wrap { position: relative; width: 90px; height: 90px; }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-wrap .ring-label {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: .72rem; color: var(--text-2); text-align: center;
+    }
+    .ring-wrap .ring-label strong { font-size: 1.1rem; color: var(--text-1); }
+
+    /* ─── Map placeholder ───────────────────────────────────────── */
+    #map-canvas {
+      width: 100%; height: 220px;
+      background: #080c12;
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Scrollable table container ────────────────────────────── */
+    .table-scroll { overflow-x: auto; }
+
+    /* ─── Highlight ─────────────────────────────────────────────── */
+    .hl-cyan   { color: var(--accent); }
+    .hl-purple { color: var(--accent2); }
+    .hl-green  { color: var(--accent3); }
+    .hl-yellow { color: var(--accent4); }
+    .hl-red    { color: var(--danger); }
+
+    /* mobile tweak */
+    @media (max-width: 680px) {
+      :root { --sidebar-w: 52px; }
+      .nav-item span, .nav-label, .nav-badge, #sidebar footer { display: none; }
+      .nav-item { justify-content: center; padding: 10px; }
+      .nav-item svg { width: 20px; height: 20px; }
+      #main { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────────── -->
+<header id="header">
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="6" fill="#00d4ff" fill-opacity=".12"/>
+      <path d="M7 10L14 6L21 10V18L14 22L7 18V10Z" stroke="#00d4ff" stroke-width="1.5" fill="none"/>
+      <circle cx="14" cy="14" r="3" fill="#00d4ff" fill-opacity=".8"/>
+    </svg>
+    <span>MTA<span class="hl-cyan">:SA</span> Control Panel</span>
+  </div>
+  <div class="server-status">
+    <div class="badge-online"><div class="pulse"></div>ONLINE</div>
+    <div class="hdr-stat"><span>Jogadores</span><strong id="hdr-players">0/100</strong></div>
+    <div class="hdr-stat"><span>Uptime</span><strong id="hdr-uptime">00:00:00</strong></div>
+    <div class="hdr-stat"><span>Ping médio</span><strong id="hdr-ping">-- ms</strong></div>
+    <button class="btn-icon" title="Notificações" onclick="showToast('Nenhuma notificação nova','info')">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a2 2 0 01-2-2h4a2 2 0 01-2 2z"/></svg>
+    </button>
+    <button class="btn-icon" title="Configurações" onclick="navigate('settings')">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ─── LAYOUT ─────────────────────────────────────────────────── -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Visão Geral</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="monitor" onclick="navigate('monitor')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/></svg>
+        <span>Monitor</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Gestão</div>
+      <div class="nav-item" data-page="players" onclick="navigate('players')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        <span>Jogadores</span>
+        <span class="nav-badge green" id="nav-player-count">0</span>
+      </div>
+      <div class="nav-item" data-page="resources" onclick="navigate('resources')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+        <span>Recursos</span>
+      </div>
+      <div class="nav-item" data-page="bans" onclick="navigate('bans')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+        <span>Banimentos</span>
+        <span class="nav-badge red" id="nav-ban-count">0</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Ferramentas</div>
+      <div class="nav-item" data-page="console" onclick="navigate('console')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        <span>Console</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="navigate('settings')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        <span>Configurações</span>
+      </div>
+    </div>
+
+    <footer>v2.1.0 · MTA:SA 1.6.1</footer>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="main">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/></svg>
+        Dashboard
+      </div>
+
+      <div class="grid-4">
+        <div class="stat-card c1">
+          <div class="label">Jogadores Online</div>
+          <div class="value hl-cyan" id="stat-players">0</div>
+          <div class="sub">máx. 100 slots</div>
+          <div class="trend" id="stat-players-trend">▲ +2 última hora</div>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <div class="stat-card c2">
+          <div class="label">CPU do Servidor</div>
+          <div class="value hl-purple" id="stat-cpu">0%</div>
+          <div class="sub" id="stat-cpu-core">4 núcleos disponíveis</div>
+          <div class="trend" id="stat-cpu-trend">▼ estável</div>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/></svg>
+        </div>
+        <div class="stat-card c3">
+          <div class="label">Memória RAM</div>
+          <div class="value hl-green" id="stat-ram">0 MB</div>
+          <div class="sub">de 4096 MB total</div>
+          <div class="trend" id="stat-ram-trend">▲ normal</div>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        </div>
+        <div class="stat-card c4">
+          <div class="label">Uptime</div>
+          <div class="value hl-yellow" style="font-size:1.4rem" id="stat-uptime">00:00:00</div>
+          <div class="sub">desde última reinicialização</div>
+          <div class="trend">● Estável</div>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot"></div>
+            Jogadores (últimas 60s)
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap">
+              <canvas id="chart-players" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot" style="background:var(--accent2)"></div>
+            CPU / RAM em tempo real
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap">
+              <canvas id="chart-cpu" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Recursos do sistema -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot" style="background:var(--accent3)"></div>
+            Recursos do Sistema
+          </div>
+          <div class="panel-body">
+            <div class="gauge-row">
+              <div class="gauge-label"><span>CPU</span><span id="g-cpu">0%</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-cpu" style="background:var(--accent2);width:0%"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>RAM</span><span id="g-ram">0%</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-ram" style="background:var(--accent3);width:0%"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Largura de Banda ↓</span><span id="g-dl">0 KB/s</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-dl" style="background:var(--accent);width:0%"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Largura de Banda ↑</span><span id="g-ul">0 KB/s</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-ul" style="background:var(--accent4);width:0%"></div></div>
+            </div>
+            <div class="gauge-row">
+              <div class="gauge-label"><span>Recursos ativos</span><span id="g-res">0</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gf-res" style="background:var(--accent4);width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atividade recente -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="ph-dot" style="background:var(--accent4)"></div>
+            Atividade Recente
+          </div>
+          <div class="panel-body" id="activity-feed" style="max-height:210px;overflow-y:auto">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MONITOR ══════════ -->
+    <section id="page-monitor" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/></svg>
+        Monitor de Performance
+      </div>
+
+      <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-cpu" cx="45" cy="45" r="38" fill="none" stroke="var(--accent2)" stroke-width="8"
+              stroke-dasharray="238.76" stroke-dashoffset="238.76" stroke-linecap="round" style="transition:stroke-dashoffset 1s"/>
+          </svg>
+          <div class="ring-label"><strong id="ring-cpu-val">0%</strong>CPU</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-ram" cx="45" cy="45" r="38" fill="none" stroke="var(--accent3)" stroke-width="8"
+              stroke-dasharray="238.76" stroke-dashoffset="238.76" stroke-linecap="round" style="transition:stroke-dashoffset 1s"/>
+          </svg>
+          <div class="ring-label"><strong id="ring-ram-val">0%</strong>RAM</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="ring-players" cx="45" cy="45" r="38" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-dasharray="238.76" stroke-dashoffset="238.76" stroke-linecap="round" style="transition:stroke-dashoffset 1s"/>
+          </svg>
+          <div class="ring-label"><strong id="ring-players-val">0%</strong>Slots</div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div class="panel" style="height:100%">
+            <div class="panel-header"><div class="ph-dot"></div>Info do Servidor</div>
+            <div class="panel-body" style="font-size:.8rem;line-height:2">
+              <div><span style="color:var(--text-3)">Nome:</span> <strong id="srv-name">Meu Servidor MTA</strong></div>
+              <div><span style="color:var(--text-3)">IP:Porta:</span> <strong>192.168.0.1:22003</strong></div>
+              <div><span style="color:var(--text-3)">Versão MTA:</span> <strong>1.6.1-rc-22442</strong></div>
+              <div><span style="color:var(--text-3)">Game Mode:</span> <strong id="srv-mode">Roleplay</strong></div>
+              <div><span style="color:var(--text-3)">Mapa:</span> <strong>Los Santos</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px">
+        <div class="panel-header"><div class="ph-dot"></div>CPU — Histórico (último minuto)</div>
+        <div class="panel-body"><div class="chart-wrap" style="height:150px"><canvas id="chart-cpu-full" height="150"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot" style="background:var(--accent3)"></div>RAM — Histórico (último minuto)</div>
+        <div class="panel-body"><div class="chart-wrap" style="height:150px"><canvas id="chart-ram-full" height="150"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- ══════════ PLAYERS ══════════ -->
+    <section id="page-players" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        Jogadores Online
+      </div>
+      <div class="filter-bar">
+        <input id="player-search" placeholder="Buscar por nome, serial ou IP..." oninput="filterPlayers()"/>
+        <select id="player-filter-role" onchange="filterPlayers()">
+          <option value="">Todos os níveis</option>
+          <option value="admin">Admin</option>
+          <option value="mod">Moderador</option>
+          <option value="player">Jogador</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-addplayer')">+ Adicionar</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderPlayers()">↻ Atualizar</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="ph-dot"></div>
+          Lista de Jogadores
+          <div class="ph-actions">
+            <span style="font-size:.75rem;color:var(--text-3)" id="player-count-label">Carregando...</span>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="players-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jogador</th>
+                <th>Serial</th>
+                <th>IP</th>
+                <th>Ping</th>
+                <th>Nível</th>
+                <th>Tempo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="players-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ RESOURCES ══════════ -->
+    <section id="page-resources" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+        Gerenciador de Recursos
+      </div>
+      <div class="filter-bar">
+        <input id="res-search" placeholder="Buscar recurso..." oninput="filterResources()"/>
+        <select id="res-filter-status" onchange="filterResources()">
+          <option value="">Todos</option>
+          <option value="running">Rodando</option>
+          <option value="stopped">Parado</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-upload')">↑ Upload Recurso</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="ph-dot"></div>Recursos do Servidor
+          <div class="ph-actions">
+            <button class="btn btn-ghost btn-sm" onclick="startAllRes()">▶ Iniciar Todos</button>
+            <button class="btn btn-danger btn-sm" onclick="stopAllRes()">■ Parar Todos</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="resources-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Versão</th>
+                <th>Autor</th>
+                <th>Status</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="resources-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ BANS ══════════ -->
+    <section id="page-bans" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+        Lista de Banimentos
+      </div>
+      <div class="filter-bar">
+        <input id="ban-search" placeholder="Buscar por nick, serial, IP ou motivo..." oninput="filterBans()"/>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-ban')">+ Novo Banimento</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="ph-dot" style="background:var(--danger)"></div>Banimentos Ativos</div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jogador</th>
+                <th>Serial / IP</th>
+                <th>Motivo</th>
+                <th>Banido por</th>
+                <th>Data</th>
+                <th>Expira</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="bans-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ CONSOLE ══════════ -->
+    <section id="page-console" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        Console do Servidor
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="consoleClear()">🗑 Limpar</button>
+        <button class="btn btn-ghost btn-sm" onclick="consoleToggleScroll()">⏸ Pausar scroll</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-danger btn-sm" onclick="serverAction('restart')">↺ Reiniciar Servidor</button>
+        <button class="btn btn-danger btn-sm" onclick="serverAction('stop')">■ Parar Servidor</button>
+      </div>
+      <div id="console-output"></div>
+      <div id="console-input-row">
+        <input id="console-input" placeholder="Digite um comando ex: say Olá a todos, players, kick 1 ..." autocomplete="off"
+          onkeydown="if(event.key==='Enter') consoleSend()"/>
+        <button class="btn btn-primary" onclick="consoleSend()">Enviar</button>
+      </div>
+    </section>
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <section id="page-settings" class="page">
+      <div class="page-title">
+        <svg viewBox="0 0 20 20" fill="currentColor" style="color:var(--accent)"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        Configurações do Servidor
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot"></div>Informações Gerais</div>
+          <div class="panel-body" style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label style="font-size:.75rem;color:var(--text-2);display:block;margin-bottom:4px">Nome do Servidor</label>
+              <input id="set-name" style="width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-1);font-size:.82rem;outline:none" value="Meu Servidor MTA"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;color:var(--text-2);display:block;margin-bottom:4px">Game Mode</label>
+              <input id="set-mode" style="width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-1);font-size:.82rem;outline:none" value="Roleplay"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;color:var(--text-2);display:block;margin-bottom:4px">Max Players</label>
+              <input type="number" id="set-maxplayers" style="width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-1);font-size:.82rem;outline:none" value="100"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;color:var(--text-2);display:block;margin-bottom:4px">Porta</label>
+              <input type="number" id="set-port" style="width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-1);font-size:.82rem;outline:none" value="22003"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;color:var(--text-2);display:block;margin-bottom:4px">Senha do Servidor</label>
+              <input type="password" id="set-pass" style="width:100%;background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-1);font-size:.82rem;outline:none" placeholder="Deixe em branco para público"/>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Salvar Configurações</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="ph-dot" style="background:var(--accent2)"></div>Permissões & Segurança</div>
+          <div class="panel-body" style="font-size:.82rem;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-hover);border-radius:var(--radius)">
+              <span>Anti-cheat ativo</span>
+              <label class="toggle"><input type="checkbox" checked id="tog-anticheat"/><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-hover);border-radius:var(--radius)">
+              <span>VPN bloqueada</span>
+              <label class="toggle"><input type="checkbox" id="tog-vpn"/><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-hover);border-radius:var(--radius)">
+              <span>Proteção DDoS</span>
+              <label class="toggle"><input type="checkbox" checked id="tog-ddos"/><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-hover);border-radius:var(--radius)">
+              <span>Logs detalhados</span>
+              <label class="toggle"><input type="checkbox" checked id="tog-logs"/><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg-hover);border-radius:var(--radius)">
+              <span>Auto-reinício em crash</span>
+              <label class="toggle"><input type="checkbox" checked id="tog-autorestart"/><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ─── MODALS ──────────────────────────────────────────────── -->
+
+<!-- Ban modal -->
+<div class="modal-overlay" id="modal-ban">
+  <div class="modal">
+    <h3>🚫 Adicionar Banimento</h3>
+    <label>Nick do Jogador</label>
+    <input id="ban-nick" placeholder="ex: xX_Player_Xx"/>
+    <label>Serial / IP</label>
+    <input id="ban-serial" placeholder="ex: A1B2C3D4E5..."/>
+    <label>Motivo</label>
+    <textarea id="ban-reason" placeholder="Descreva o motivo do banimento..."></textarea>
+    <label>Duração</label>
+    <select id="ban-duration">
+      <option value="1h">1 Hora</option>
+      <option value="24h">24 Horas</option>
+      <option value="7d">7 Dias</option>
+      <option value="30d">30 Dias</option>
+      <option value="perm">Permanente</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ban')">Cancelar</button>
+      <button class="btn btn-danger" onclick="addBan()">Banir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload resource modal -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <h3>📦 Upload de Recurso</h3>
+    <label>Nome do Recurso</label>
+    <input id="upload-name" placeholder="ex: myresource"/>
+    <label>Versão</label>
+    <input id="upload-ver" placeholder="ex: 1.0.0"/>
+    <label>Arquivo (.zip)</label>
+    <input type="file" id="upload-file" accept=".zip" style="padding:6px"/>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-upload')">Cancelar</button>
+      <button class="btn btn-primary" onclick="uploadRes()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add player modal -->
+<div class="modal-overlay" id="modal-addplayer">
+  <div class="modal">
+    <h3>👤 Enviar Mensagem / Ação</h3>
+    <label>Comando</label>
+    <select id="addp-cmd">
+      <option value="say">Anunciar para todos</option>
+      <option value="pm">Mensagem privada</option>
+      <option value="kick">Kick</option>
+    </select>
+    <label>Jogador alvo (ID ou *)</label>
+    <input id="addp-target" placeholder="ex: 5 ou *"/>
+    <label>Mensagem / Motivo</label>
+    <textarea id="addp-msg"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-addplayer')">Cancelar</button>
+      <button class="btn btn-primary" onclick="executePlayerAction()">Executar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <h3 id="confirm-title">Confirmar ação</h3>
+    <p id="confirm-msg" style="font-size:.85rem;color:var(--text-2);margin-top:6px"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-btn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Toggle switch CSS -->
+<style>
+.toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+.toggle input { display: none; }
+.slider {
+  position: absolute; inset: 0; background: var(--bg-base);
+  border: 1px solid var(--border); border-radius: 99px; cursor: pointer;
+  transition: background .2s;
+}
+.slider::before {
+  content: ''; position: absolute;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-3); top: 3px; left: 3px;
+  transition: transform .2s, background .2s;
+}
+.toggle input:checked + .slider { background: rgba(0,212,255,.15); border-color: var(--accent); }
+.toggle input:checked + .slider::before { transform: translateX(18px); background: var(--accent); }
+</style>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+let uptimeSeconds = 0;
+let scrollLocked  = false;
+let cmdHistory    = [];
+let cmdIdx        = -1;
+
+const state = {
+  players: 0, cpu: 0, ram: 0, dl: 0, ul: 0,
+  activeRes: 0, ping: 0
+};
+
+// ─── Seed data ───────────────────────────────────────────────
+const NAMES = ['GhostRider','XxProKiller','NightWalker','SilverFox','DarkWolf',
+  'BlueStorm','RedEagle','ShadowBlade','IronFist','ThunderBolt',
+  'VenomSnake','CoolBreeze','LegendKing','UrbanHunter','NeonFury'];
+const SERIALS = () => Array.from({length:32},()=>'0123456789ABCDEF'[Math.random()*16|0]).join('');
+const REASONS = ['Hacking','Aimbot','Flood','Insultos','Bug Abuse','Cheats externos'];
+
+let playersData   = [];
+let resourcesData = [];
+let bansData      = [];
+let activityFeed  = [];
+const consoleLines = [];
+
+// ─── History ring for charts ─────────────────────────────────
+const maxHist = 60;
+const hist = { players:[], cpu:[], ram:[] };
+for(let i=0;i<maxHist;i++){ hist.players.push(0); hist.cpu.push(0); hist.ram.push(0); }
+
+// ════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════════
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  const ni = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (ni) ni.classList.add('active');
+  if (page === 'players')   renderPlayers();
+  if (page === 'resources') renderResources();
+  if (page === 'bans')      renderBans();
+}
+
+// ════════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════════
+function showToast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success:'✓', error:'✗', info:'ℹ' };
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ════════════════════════════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+function confirmAction(title, msg, fn) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent   = msg;
+  const btn = document.getElementById('confirm-btn');
+  btn.onclick = () => { fn(); closeModal('modal-confirm'); };
+  openModal('modal-confirm');
+}
+
+// ════════════════════════════════════════════════════════════
+//  CANVAS CHART — lightweight vanilla
+// ════════════════════════════════════════════════════════════
+const charts = {};
+
+function initChart(id, color, color2) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  charts[id] = { canvas, ctx: canvas.getContext('2d'), color, color2 };
+  resizeCanvas(id);
+}
+
+function resizeCanvas(id) {
+  const c = charts[id];
+  if (!c) return;
+  c.canvas.width  = c.canvas.parentElement.clientWidth;
+  c.canvas.height = c.canvas.parentElement.clientHeight;
+}
+
+function drawChart(id, data1, data2, label1, label2, maxVal) {
+  const c = charts[id];
+  if (!c) return;
+  resizeCanvas(id);
+  const { ctx, canvas, color, color2 } = c;
+  const W = canvas.width, H = canvas.height;
+  const pad = { t:8, b:24, l:28, r:8 };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+  ctx.clearRect(0,0,W,H);
+
+  // grid lines
+  ctx.strokeStyle = 'rgba(31,44,64,.5)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = pad.t + (cH/4)*i;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // y labels
+  ctx.fillStyle = 'rgba(148,163,184,.5)';
+  ctx.font = '9px system-ui';
+  ctx.textAlign = 'right';
+  for(let i=0;i<=4;i++){
+    const y = pad.t + (cH/4)*i;
+    ctx.fillText(Math.round(maxVal*(1-i/4)), pad.l-3, y+3);
+  }
+
+  function drawLine(data, col) {
+    if (!data || data.length < 2) return;
+    const step = cW / (data.length - 1);
+    ctx.beginPath();
+    data.forEach((v,i) => {
+      const x = pad.l + i * step;
+      const y = pad.t + cH - (v / maxVal) * cH;
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.8;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // area fill
+    const last = data.length - 1;
+    ctx.lineTo(pad.l + last*step, pad.t + cH);
+    ctx.lineTo(pad.l, pad.t + cH);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
+    grad.addColorStop(0, col.replace(')',',0.18)').replace('rgb','rgba'));
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  if (data2) drawLine(data2, color2 || '#7c3aed');
+  drawLine(data1, color);
+
+  // legend
+  if (label1) {
+    ctx.fillStyle = color;
+    ctx.fillRect(pad.l, H-15, 10, 3);
+    ctx.fillStyle='rgba(148,163,184,.8)'; ctx.textAlign='left';
+    ctx.fillText(label1, pad.l+14, H-10);
+  }
+  if (label2) {
+    ctx.fillStyle = color2 || '#7c3aed';
+    ctx.fillRect(pad.l+80, H-15, 10, 3);
+    ctx.fillStyle='rgba(148,163,184,.8)';
+    ctx.fillText(label2, pad.l+94, H-10);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SEED INITIAL DATA
+// ════════════════════════════════════════════════════════════
+function seedPlayers() {
+  playersData = [];
+  const n = 8 + Math.floor(Math.random()*8);
+  const roles = ['player','player','player','player','mod','admin'];
+  for (let i=0;i<n;i++) {
+    const ping = 20 + Math.floor(Math.random()*200);
+    playersData.push({
+      id: i+1,
+      name: NAMES[i % NAMES.length],
+      serial: SERIALS(),
+      ip: `192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`,
+      ping,
+      role: roles[Math.floor(Math.random()*roles.length)],
+      time: Math.floor(Math.random()*180) + 5
+    });
+  }
+}
+
+function seedResources() {
+  const list = [
+    {name:'gamemode-rp',     ver:'3.2.1', author:'DevTeam',   status:'running', cpu:18, ram:64},
+    {name:'freeroam',        ver:'1.0.4', author:'MTA Team',  status:'running', cpu:5,  ram:12},
+    {name:'admin',           ver:'2.4.0', author:'MTA Team',  status:'running', cpu:3,  ram:8},
+    {name:'scoreboard',      ver:'1.2.0', author:'xDev',      status:'running', cpu:1,  ram:4},
+    {name:'vehicleshop',     ver:'0.9.8', author:'CarMaster', status:'running', cpu:7,  ram:22},
+    {name:'housing',         ver:'2.0.1', author:'DevTeam',   status:'running', cpu:9,  ram:30},
+    {name:'economy',         ver:'1.5.3', author:'EcoTeam',   status:'running', cpu:6,  ram:18},
+    {name:'anticheat-pro',   ver:'4.1.0', author:'SecureDev', status:'running', cpu:12, ram:40},
+    {name:'chat-system',     ver:'1.1.0', author:'ChatDev',   status:'running', cpu:2,  ram:6},
+    {name:'death-match',     ver:'0.5.2', author:'DmDev',     status:'stopped', cpu:0,  ram:0},
+    {name:'racing-system',   ver:'1.0.0', author:'RaceDev',   status:'stopped', cpu:0,  ram:0},
+    {name:'weapons-manager', ver:'2.0.0', author:'GunDev',    status:'stopped', cpu:0,  ram:0},
+  ];
+  resourcesData = list;
+}
+
+function seedBans() {
+  bansData = [];
+  const names = ['HackMaster','AimGod','SpeedHax','WallSniper','CheatBot'];
+  for(let i=0;i<names.length;i++) {
+    const d = new Date(Date.now() - Math.random()*30*86400000);
+    const exp = i < 2 ? 'Permanente' : new Date(d.getTime() + [86400000,604800000,2592000000][i%3]).toLocaleDateString('pt-BR');
+    bansData.push({
+      id: i+1, name: names[i],
+      serial: SERIALS().slice(0,16)+'...',
+      ip: `10.0.${i}.${Math.floor(Math.random()*255)}`,
+      reason: REASONS[i%REASONS.length],
+      by: 'Admin_Chefe',
+      date: d.toLocaleDateString('pt-BR'), expires: exp
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER TABLES
+// ════════════════════════════════════════════════════════════
+function pingClass(p) {
+  if (p < 80)  return 'ping-good';
+  if (p < 150) return 'ping-medium';
+  return 'ping-bad';
+}
+
+function renderPlayers(data) {
+  const rows = data || playersData;
+  document.getElementById('player-count-label').textContent = `${rows.length} jogador(es) online`;
+  document.getElementById('nav-player-count').textContent   = rows.length;
+  document.getElementById('hdr-players').textContent = `${rows.length}/100`;
+  document.getElementById('stat-players').textContent = rows.length;
+
+  const tbody = document.getElementById('players-tbody');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:30px">Nenhum jogador online</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td style="color:var(--text-3)">${p.id}</td>
+      <td><strong>${p.name}</strong></td>
+      <td style="font-family:monospace;font-size:.7rem;color:var(--text-3)">${p.serial.slice(0,12)}…</td>
+      <td style="color:var(--text-3)">${p.ip}</td>
+      <td><span class="ping-dot ${pingClass(p.ping)}"></span>${p.ping}ms</td>
+      <td><span class="tag ${p.role}">${p.role}</span></td>
+      <td style="color:var(--text-3)">${p.time}min</td>
+      <td style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-sm" onclick="pmPlayer(${p.id},'${p.name}')">✉</button>
+        <button class="btn btn-ghost btn-sm" onclick="kickPlayer(${p.id},'${p.name}')">Kick</button>
+        <button class="btn btn-danger btn-sm" onclick="banPlayer(${p.id},'${p.name}')">Ban</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterPlayers() {
+  const q    = document.getElementById('player-search').value.toLowerCase();
+  const role = document.getElementById('player-filter-role').value;
+  const filtered = playersData.filter(p =>
+    (!q || p.name.toLowerCase().includes(q) || p.serial.includes(q) || p.ip.includes(q)) &&
+    (!role || p.role === role)
+  );
+  renderPlayers(filtered);
+}
+
+function renderResources(data) {
+  const rows = data || resourcesData;
+  document.getElementById('g-res').textContent = rows.filter(r=>r.status==='running').length;
+  const tbody = document.getElementById('resources-tbody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td><strong>${r.name}</strong></td>
+      <td style="color:var(--text-3)">${r.ver}</td>
+      <td style="color:var(--text-3)">${r.author}</td>
+      <td><span class="tag ${r.status}">${r.status==='running'?'Rodando':'Parado'}</span></td>
+      <td>
+        <div class="res-bar-wrap">
+          <div style="font-size:.72rem;color:var(--text-3);margin-bottom:2px">${r.cpu}%</div>
+          <div class="res-bar"><div class="res-bar-fill" style="width:${r.cpu}%;background:var(--accent2)"></div></div>
+        </div>
+      </td>
+      <td>
+        <div class="res-bar-wrap">
+          <div style="font-size:.72rem;color:var(--text-3);margin-bottom:2px">${r.ram}MB</div>
+          <div class="res-bar"><div class="res-bar-fill" style="width:${Math.min(r.ram,100)}%;background:var(--accent3)"></div></div>
+        </div>
+      </td>
+      <td style="display:flex;gap:5px">
+        ${r.status==='running'
+          ? `<button class="btn btn-danger btn-sm" onclick="toggleResource('${r.name}','stop')">■ Parar</button>
+             <button class="btn btn-ghost btn-sm" onclick="restartResource('${r.name}')">↺</button>`
+          : `<button class="btn btn-green btn-sm" onclick="toggleResource('${r.name}','start')">▶ Iniciar</button>`
+        }
+      </td>
+    </tr>`).join('');
+}
+
+function filterResources() {
+  const q  = document.getElementById('res-search').value.toLowerCase();
+  const st = document.getElementById('res-filter-status').value;
+  renderResources(resourcesData.filter(r =>
+    (!q || r.name.includes(q) || r.author.toLowerCase().includes(q)) &&
+    (!st || r.status === st)
+  ));
+}
+
+function renderBans(data) {
+  const rows = data || bansData;
+  document.getElementById('nav-ban-count').textContent = rows.length;
+  const tbody = document.getElementById('bans-tbody');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:30px">Nenhum banimento ativo</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(b => `
+    <tr>
+      <td style="color:var(--text-3)">${b.id}</td>
+      <td><strong>${b.name}</strong></td>
+      <td style="font-family:monospace;font-size:.7rem;color:var(--text-3)">${b.serial}<br>${b.ip}</td>
+      <td>${b.reason}</td>
+      <td style="color:var(--text-3)">${b.by}</td>
+      <td style="color:var(--text-3)">${b.date}</td>
+      <td>${b.expires === 'Permanente' ? '<span class="tag banned">Permanente</span>' : b.expires}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="unban(${b.id})">Desbanir</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterBans() {
+  const q = document.getElementById('ban-search').value.toLowerCase();
+  renderBans(bansData.filter(b =>
+    !q || b.name.toLowerCase().includes(q) || b.serial.includes(q) ||
+    b.ip.includes(q) || b.reason.toLowerCase().includes(q)
+  ));
+}
+
+// ════════════════════════════════════════════════════════════
+//  PLAYER ACTIONS
+// ════════════════════════════════════════════════════════════
+function kickPlayer(id, name) {
+  confirmAction('Kick Player', `Tem certeza que deseja kickar ${name}?`, () => {
+    playersData = playersData.filter(p => p.id !== id);
+    renderPlayers();
+    addLog(`Jogador ${name} foi kickado por Admin`, 'warn');
+    addFeed('leave', `<strong>${name}</strong> foi kickado do servidor`);
+    showToast(`${name} foi kickado`, 'success');
+  });
+}
+
+function banPlayer(id, name) {
+  document.getElementById('ban-nick').value = name;
+  openModal('modal-ban');
+}
+
+function pmPlayer(id, name) {
+  document.getElementById('addp-cmd').value    = 'pm';
+  document.getElementById('addp-target').value = id;
+  openModal('modal-addplayer');
+}
+
+// ════════════════════════════════════════════════════════════
+//  RESOURCE ACTIONS
+// ════════════════════════════════════════════════════════════
+function toggleResource(name, action) {
+  const r = resourcesData.find(x => x.name === name);
+  if (!r) return;
+  r.status = action === 'start' ? 'running' : 'stopped';
+  if (action === 'start') { r.cpu = Math.floor(Math.random()*15)+1; r.ram = Math.floor(Math.random()*30)+4; }
+  else { r.cpu = 0; r.ram = 0; }
+  renderResources();
+  addLog(`Recurso "${name}" foi ${action==='start'?'iniciado':'parado'}`, action==='start'?'ok':'warn');
+  showToast(`${name} ${action==='start'?'iniciado':'parado'}`, action==='start'?'success':'info');
+}
+
+function restartResource(name) {
+  addLog(`Reiniciando recurso "${name}"...`, 'warn');
+  showToast(`${name} reiniciando...`, 'info');
+  setTimeout(() => {
+    addLog(`Recurso "${name}" reiniciado com sucesso`, 'ok');
+    showToast(`${name} reiniciado`, 'success');
+  }, 1200);
+}
+
+function startAllRes() {
+  resourcesData.forEach(r => {
+    if (r.status === 'stopped') {
+      r.status = 'running'; r.cpu = Math.floor(Math.random()*8)+1; r.ram = Math.floor(Math.random()*16)+2;
+    }
+  });
+  renderResources();
+  showToast('Todos os recursos iniciados', 'success');
+}
+
+function stopAllRes() {
+  confirmAction('Parar Todos','Isso irá parar TODOS os recursos. Continuar?', () => {
+    resourcesData.forEach(r => { r.status='stopped'; r.cpu=0; r.ram=0; });
+    renderResources();
+    showToast('Todos os recursos parados', 'info');
+  });
+}
+
+function uploadRes() {
+  const name = document.getElementById('upload-name').value.trim();
+  if (!name) { showToast('Informe o nome do recurso','error'); return; }
+  resourcesData.push({
+    name, ver: document.getElementById('upload-ver').value || '1.0.0',
+    author: 'Uploaded', status: 'stopped', cpu: 0, ram: 0
+  });
+  renderResources();
+  closeModal('modal-upload');
+  addLog(`Recurso "${name}" enviado com sucesso`, 'ok');
+  showToast(`Recurso ${name} adicionado`, 'success');
+}
+
+// ════════════════════════════════════════════════════════════
+//  BAN ACTIONS
+// ════════════════════════════════════════════════════════════
+function addBan() {
+  const nick   = document.getElementById('ban-nick').value.trim();
+  const serial = document.getElementById('ban-serial').value.trim() || SERIALS();
+  const reason = document.getElementById('ban-reason').value.trim() || 'Sem motivo';
+  const dur    = document.getElementById('ban-duration').value;
+  if (!nick) { showToast('Informe o nick','error'); return; }
+
+  const expMap = { '1h':'1 hora', '24h':'24 horas', '7d':'7 dias', '30d':'30 dias', perm:'Permanente' };
+  bansData.push({
+    id: bansData.length+1, name: nick,
+    serial: serial.slice(0,16)+'...',
+    ip: '—', reason, by: 'Admin',
+    date: new Date().toLocaleDateString('pt-BR'),
+    expires: expMap[dur]
+  });
+  playersData = playersData.filter(p => p.name !== nick);
+  renderPlayers(); renderBans();
+  closeModal('modal-ban');
+  addLog(`Jogador ${nick} foi banido: ${reason}`, 'error');
+  addFeed('ban', `<strong>${nick}</strong> foi banido — ${reason}`);
+  showToast(`${nick} banido`, 'success');
+}
+
+function unban(id) {
+  const b = bansData.find(x=>x.id===id);
+  confirmAction('Desbanir', `Desbanir ${b?.name}?`, () => {
+    bansData = bansData.filter(x => x.id !== id);
+    renderBans();
+    showToast(`${b?.name} desbanido`, 'success');
+    addLog(`Banimento de ${b?.name} removido`, 'ok');
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  CONSOLE
+// ════════════════════════════════════════════════════════════
+function addLog(msg, type='info') {
+  const now = new Date();
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  consoleLines.push({ t, msg, type });
+  if (consoleLines.length > 500) consoleLines.shift();
+  const out = document.getElementById('console-output');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">[${t}]</span><span class="log-${type}">${msg}</span>`;
+  out.appendChild(line);
+  if (!scrollLocked) out.scrollTop = out.scrollHeight;
+}
+
+function consoleClear() {
+  document.getElementById('console-output').innerHTML = '';
+  consoleLines.length = 0;
+  addLog('Console limpo por Admin', 'info');
+}
+
+function consoleToggleScroll() {
+  scrollLocked = !scrollLocked;
+  showToast(scrollLocked ? 'Scroll pausado' : 'Scroll retomado', 'info');
+}
+
+function consoleSend() {
+  const inp = document.getElementById('console-input');
+  const cmd = inp.value.trim();
+  if (!cmd) return;
+  cmdHistory.unshift(cmd);
+  cmdIdx = -1;
+  inp.value = '';
+  addLog('> ' + cmd, 'cmd');
+  processCommand(cmd);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('console-input');
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp') {
+      cmdIdx = Math.min(cmdIdx+1, cmdHistory.length-1);
+      inp.value = cmdHistory[cmdIdx] || '';
+    } else if (e.key === 'ArrowDown') {
+      cmdIdx = Math.max(cmdIdx-1, -1);
+      inp.value = cmdIdx < 0 ? '' : cmdHistory[cmdIdx];
+    }
+  });
+});
+
+function processCommand(cmd) {
+  const parts = cmd.toLowerCase().split(' ');
+  const c = parts[0];
+  if (c === 'players' || c === 'player') {
+    addLog(`Jogadores online: ${playersData.length}`, 'ok');
+    playersData.forEach(p => addLog(`  #${p.id} ${p.name} [${p.ping}ms] [${p.role}]`, 'info'));
+    return;
+  }
+  if (c === 'say') {
+    const msg = parts.slice(1).join(' ');
+    addLog(`[GLOBAL] Admin: ${msg}`, 'ok');
+    showToast('Mensagem enviada para todos', 'success');
+    return;
+  }
+  if (c === 'kick') {
+    const id = parseInt(parts[1]);
+    const p  = playersData.find(x=>x.id===id);
+    if (p) { kickPlayer(id, p.name); } else addLog(`Jogador #${id} não encontrado`, 'error');
+    return;
+  }
+  if (c === 'resources' || c === 'res') {
+    addLog(`Recursos rodando: ${resourcesData.filter(r=>r.status==='running').length}/${resourcesData.length}`, 'ok');
+    return;
+  }
+  if (c === 'status') {
+    addLog(`CPU: ${state.cpu}% | RAM: ${state.ram}MB | Players: ${state.players} | Uptime: ${formatUptime(uptimeSeconds)}`, 'ok');
+    return;
+  }
+  if (c === 'help') {
+    const cmds = ['help','players','say <msg>','kick <id>','resources','status','clear','uptime'];
+    addLog('Comandos disponíveis: ' + cmds.join(', '), 'info');
+    return;
+  }
+  if (c === 'clear') { consoleClear(); return; }
+  if (c === 'uptime') { addLog(`Uptime: ${formatUptime(uptimeSeconds)}`, 'ok'); return; }
+  addLog(`Comando desconhecido: "${cmd}". Digite "help" para listar.`, 'warn');
+}
+
+// ════════════════════════════════════════════════════════════
+//  ACTIVITY FEED
+// ════════════════════════════════════════════════════════════
+function addFeed(type, text) {
+  const now = new Date();
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  activityFeed.unshift({ type, text, t });
+  if (activityFeed.length > 20) activityFeed.pop();
+  renderFeed();
+}
+
+function renderFeed() {
+  const icons = { join:'↗', leave:'↙', ban:'⊘', cmd:'⌨' };
+  document.getElementById('activity-feed').innerHTML =
+    activityFeed.map(f => `
+      <div class="feed-item">
+        <div class="feed-icon ${f.type}">${icons[f.type]||'•'}</div>
+        <div>
+          <div class="feed-text">${f.text}</div>
+          <div class="feed-time">${f.t}</div>
+        </div>
+      </div>`).join('') || '<div style="color:var(--text-3);font-size:.8rem;padding:10px 0">Nenhuma atividade ainda...</div>';
+}
+
+// ════════════════════════════════════════════════════════════
+//  SERVER ACTIONS
+// ════════════════════════════════════════════════════════════
+function serverAction(action) {
+  const labels = { restart: 'Reiniciar Servidor', stop: 'Parar Servidor' };
+  confirmAction(labels[action], `Tem certeza que deseja ${action === 'restart' ? 'reiniciar' : 'parar'} o servidor?`, () => {
+    addLog(`Servidor sendo ${action === 'restart' ? 'reiniciado' : 'parado'} pelo Admin...`, 'warn');
+    showToast(action === 'restart' ? 'Servidor reiniciando...' : 'Servidor parando...', 'info');
+    if (action === 'restart') {
+      setTimeout(() => { addLog('Servidor reiniciado com sucesso!', 'ok'); showToast('Servidor online!', 'success'); }, 2500);
+    }
+  });
+}
+
+function executePlayerAction() {
+  const cmd    = document.getElementById('addp-cmd').value;
+  const target = document.getElementById('addp-target').value;
+  const msg    = document.getElementById('addp-msg').value;
+  addLog(`Executado: ${cmd} ${target} ${msg}`, 'cmd');
+  closeModal('modal-addplayer');
+  showToast('Ação executada', 'success');
+}
+
+function saveSettings() {
+  const name = document.getElementById('set-name').value;
+  document.getElementById('srv-name').textContent = name;
+  document.getElementById('srv-mode').textContent = document.getElementById('set-mode').value;
+  addLog('Configurações salvas pelo Admin', 'ok');
+  showToast('Configurações salvas!', 'success');
+}
+
+// ════════════════════════════════════════════════════════════
+//  UPTIME
+// ════════════════════════════════════════════════════════════
+function formatUptime(s) {
+  const h = Math.floor(s/3600);
+  const m = Math.floor((s%3600)/60);
+  const sec = s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  SIMULATION TICK
+// ════════════════════════════════════════════════════════════
+function updateRings() {
+  const circumference = 238.76;
+  function setRing(id, pct) {
+    const el = document.getElementById(id);
+    if (el) el.style.strokeDashoffset = circumference * (1 - pct/100);
+  }
+  setRing('ring-cpu', state.cpu);
+  setRing('ring-ram', (state.ram/4096)*100);
+  setRing('ring-players', (state.players/100)*100);
+  const rv = v => v ? v.textContent = Math.round(v===document.getElementById('ring-ram-val') ? (state.ram/4096)*100 : 0) + '%' : null;
+  document.getElementById('ring-cpu-val').textContent     = state.cpu + '%';
+  document.getElementById('ring-ram-val').textContent     = Math.round((state.ram/4096)*100) + '%';
+  document.getElementById('ring-players-val').textContent = state.players + '%';
+}
+
+function tick() {
+  uptimeSeconds++;
+
+  // Smooth random walk
+  state.cpu  = Math.max(5,  Math.min(95,  state.cpu  + (Math.random()*10-5)));
+  state.ram  = Math.max(400,Math.min(3200,state.ram  + (Math.random()*80-40)));
+  state.dl   = Math.max(10, Math.min(980, state.dl   + (Math.random()*60-30)));
+  state.ul   = Math.max(5,  Math.min(500, state.ul   + (Math.random()*40-20)));
+  state.ping = Math.max(20, Math.min(180, state.ping + (Math.random()*14-7)));
+
+  // Random player join/leave events (every ~15s)
+  if (Math.random() < 0.07 && playersData.length < 98) {
+    const newId = Math.max(...playersData.map(p=>p.id), 0) + 1;
+    const name  = NAMES[Math.floor(Math.random()*NAMES.length)] + '_' + Math.floor(Math.random()*999);
+    playersData.push({
+      id:newId, name, serial:SERIALS(),
+      ip:`192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`,
+      ping:30+Math.floor(Math.random()*120), role:'player', time:0
+    });
+    addFeed('join', `<strong>${name}</strong> entrou no servidor`);
+    addLog(`${name} conectou-se ao servidor`, 'ok');
+  }
+  if (Math.random() < 0.04 && playersData.length > 0) {
+    const idx  = Math.floor(Math.random()*playersData.length);
+    const left = playersData.splice(idx,1)[0];
+    addFeed('leave', `<strong>${left.name}</strong> saiu do servidor`);
+    addLog(`${left.name} desconectou-se`, 'info');
+  }
+  // Increment playtime
+  playersData.forEach(p => p.time++);
+
+  state.players = playersData.length;
+
+  // History
+  hist.players.push(state.players); hist.players.shift();
+  hist.cpu.push(Math.round(state.cpu));   hist.cpu.shift();
+  hist.ram.push(Math.round((state.ram/4096)*100)); hist.ram.shift();
+
+  // Update header stats
+  document.getElementById('hdr-players').textContent = `${state.players}/100`;
+  document.getElementById('hdr-uptime').textContent  = formatUptime(uptimeSeconds);
+  document.getElementById('hdr-ping').textContent    = `${Math.round(state.ping)}ms`;
+  document.getElementById('stat-uptime').textContent = formatUptime(uptimeSeconds);
+  document.getElementById('stat-cpu').textContent    = Math.round(state.cpu) + '%';
+  document.getElementById('stat-ram').textContent    = Math.round(state.ram) + ' MB';
+  document.getElementById('stat-players').textContent= state.players;
+
+  // Gauge bars
+  const cpuPct = Math.round(state.cpu);
+  const ramPct = Math.round((state.ram/4096)*100);
+  const dlPct  = Math.round((state.dl/980)*100);
+  const ulPct  = Math.round((state.ul/500)*100);
+  const running = resourcesData.filter(r=>r.status==='running').length;
+  const resPct  = Math.round((running/resourcesData.length)*100);
+
+  el('g-cpu').textContent   = cpuPct + '%';
+  el('gf-cpu').style.width  = cpuPct + '%';
+  el('g-ram').textContent   = ramPct + '%';
+  el('gf-ram').style.width  = ramPct + '%';
+  el('g-dl').textContent    = Math.round(state.dl) + ' KB/s';
+  el('gf-dl').style.width   = dlPct + '%';
+  el('g-ul').textContent    = Math.round(state.ul) + ' KB/s';
+  el('gf-ul').style.width   = ulPct + '%';
+  el('g-res').textContent   = running;
+  el('gf-res').style.width  = resPct + '%';
+
+  // Charts
+  drawChart('chart-players', hist.players, null, 'Jogadores', null, 100);
+  drawChart('chart-cpu', hist.cpu, hist.ram, 'CPU', 'RAM', 100);
+  drawChart('chart-cpu-full', hist.cpu, null, 'CPU %', null, 100);
+  drawChart('chart-ram-full', hist.ram, null, 'RAM %', null, 100);
+
+  updateRings();
+
+  // Player list auto-refresh if on players page
+  if (document.getElementById('page-players').classList.contains('active')) {
+    renderPlayers();
+  }
+}
+
+function el(id) { return document.getElementById(id); }
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  seedPlayers();
+  seedResources();
+  seedBans();
+
+  initChart('chart-players','#00d4ff');
+  initChart('chart-cpu', '#7c3aed', '#10b981');
+  initChart('chart-cpu-full','#7c3aed');
+  initChart('chart-ram-full','#10b981');
+
+  // Pre-fill history with non-zero data
+  for (let i=0;i<maxHist;i++){
+    hist.players[i] = 8 + Math.floor(Math.random()*12);
+    hist.cpu[i]     = 20 + Math.floor(Math.random()*40);
+    hist.ram[i]     = 25 + Math.floor(Math.random()*30);
+  }
+
+  // Initial state values
+  state.cpu     = 35 + Math.random()*20;
+  state.ram     = 800 + Math.random()*600;
+  state.dl      = 200 + Math.random()*200;
+  state.ul      = 80 + Math.random()*100;
+  state.ping    = 50 + Math.random()*50;
+  state.players = playersData.length;
+
+  // Seed uptime a bit
+  uptimeSeconds = 3600*2 + Math.floor(Math.random()*3600);
+
+  // Initial logs
+  addLog('MTA:SA Server Control Panel inicializado', 'ok');
+  addLog('Servidor online — aguardando conexões', 'ok');
+  addLog(`${playersData.length} jogadores carregados na sessão`, 'info');
+  addLog(`${resourcesData.filter(r=>r.status==='running').length} recursos ativos`, 'info');
+  addLog('Anti-cheat ativo', 'ok');
+  addLog('Proteção DDoS ativa', 'ok');
+
+  renderBans();
+  renderFeed();
+
+  // Tick every 1s
+  setInterval(tick, 1000);
+
+  // Occasional server log messages
+  const serverMessages = [
+    ['Checkpoint salvo no banco de dados','ok'],
+    ['Backup automático iniciado','info'],
+    ['Anti-cheat: verificação concluída, nenhuma anomalia','ok'],
+    ['Ping alto detectado em alguns jogadores','warn'],
+    ['Backup automático concluído','ok'],
+    ['Garbage collector executado','info'],
+    ['Cache de veículos limpo','info'],
+  ];
+  setInterval(() => {
+    const m = serverMessages[Math.floor(Math.random()*serverMessages.length)];
+    addLog(m[0], m[1]);
+  }, 7000);
+});
+
+window.addEventListener('resize', () => {
+  Object.keys(charts).forEach(id => resizeCanvas(id));
+});
+</script>
+</body>
+</html>
