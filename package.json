@@ -14,7 +14,13 @@
     "type": "git",
     "url": "git+https://github.com/arthurbarros700-cpu/Test-mobile-Cursor.git"
   },
-  "keywords": ["fivem", "roleplay", "login", "painel", "spartan"],
+  "keywords": [
+    "fivem",
+    "roleplay",
+    "login",
+    "painel",
+    "spartan"
+  ],
   "author": "Spartan Roleplay",
   "license": "ISC",
   "dependencies": {
@@ -27,6 +33,7 @@
     "express-rate-limit": "^8.3.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "puppeteer-core": "^24.40.0"
   }
 }

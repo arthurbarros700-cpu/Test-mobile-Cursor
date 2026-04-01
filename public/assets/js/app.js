@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   SPARTAN ROLEPLAY — Client Application
+   SPARTAN ROLEPLAY — Client Application  v2.1
    ═══════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
@@ -227,33 +227,32 @@ function togglePassword(inputId, btn) {
   icon.className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
 }
 
-// ─── Password Strength ────────────────────────────────────────────────────────
-const regPasswordEl = document.getElementById('regPassword');
-if (regPasswordEl) {
-  regPasswordEl.addEventListener('input', function () {
-    const val = this.value;
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^a-zA-Z0-9]/.test(val)) score++;
+// ─── Password Strength (bound in DOMContentLoaded) ───────────────────────────
+function handlePasswordStrength() {
+  const val = this.value;
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^a-zA-Z0-9]/.test(val)) score++;
 
-    const bars = ['sb1','sb2','sb3','sb4'];
-    const classes = ['active-weak','active-fair','active-good','active-strong'];
-    const labels  = ['Fraca', 'Razoável', 'Boa', 'Forte'];
-    const colors  = ['#f87171','#fbbf24','#84cc16','#4ade80'];
+  const bars    = ['sb1', 'sb2', 'sb3', 'sb4'];
+  const classes = ['active-weak', 'active-fair', 'active-good', 'active-strong'];
+  const labels  = ['Fraca', 'Razoável', 'Boa', 'Forte'];
+  const colors  = ['#f87171', '#fbbf24', '#84cc16', '#4ade80'];
 
-    bars.forEach((id, i) => {
-      const el = document.getElementById(id);
-      el.className = 'strength-bar';
-      if (i < score) el.classList.add(classes[score - 1]);
-    });
-
-    const label = document.getElementById('strengthLabel');
-    if (val.length === 0) { label.textContent = ''; return; }
-    label.textContent = labels[score - 1] || 'Fraca';
-    label.style.color = colors[score - 1] || '#f87171';
+  bars.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'strength-bar';
+    if (i < score) el.classList.add(classes[score - 1]);
   });
+
+  const label = document.getElementById('strengthLabel');
+  if (!label) return;
+  if (val.length === 0) { label.textContent = ''; return; }
+  label.textContent = labels[score - 1] || 'Fraca';
+  label.style.color = colors[score - 1] || '#f87171';
 }
 
 // ─── Button Loading State ─────────────────────────────────────────────────────
@@ -263,12 +262,14 @@ function setButtonLoading(btnId, loading) {
   const text   = btn.querySelector('.btn-text');
   const loader = btn.querySelector('.btn-loader');
   btn.disabled = loading;
-  if (text)   text.style.display   = loading ? 'none'  : '';
-  if (loader) loader.style.display = loading ? 'flex'  : 'none';
+  // Use explicit values instead of '' to avoid computed-style fallbacks
+  if (text)   text.style.display   = loading ? 'none' : 'flex';
+  if (loader) loader.style.display = loading ? 'flex' : 'none';
 }
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
-document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
+// ─── AUTH SUBMIT HANDLERS (bound inside DOMContentLoaded at the bottom) ───────
+
+async function handleLoginSubmit(e) {
   e.preventDefault();
   clearAllErrors();
 
@@ -277,74 +278,109 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   const remember   = document.getElementById('rememberMe').checked;
 
   let valid = true;
-  if (!identifier) { document.getElementById('err-login-identifier').textContent = 'Campo obrigatório.'; document.getElementById('loginIdentifier').classList.add('error'); valid = false; }
-  if (!password)   { document.getElementById('err-login-password').textContent = 'Campo obrigatório.';   document.getElementById('loginPassword').classList.add('error');   valid = false; }
-  if (!valid) return;
+  if (!identifier) {
+    document.getElementById('err-login-identifier').textContent = 'Campo obrigatório.';
+    document.getElementById('loginIdentifier').classList.add('error');
+    valid = false;
+  }
+  if (!password) {
+    document.getElementById('err-login-password').textContent = 'Campo obrigatório.';
+    document.getElementById('loginPassword').classList.add('error');
+    valid = false;
+  }
+  if (!valid) { shakeCard(); return; }
 
   setButtonLoading('loginBtn', true);
-
-  const { ok, data } = await API.post('/api/auth/login', { identifier, password, remember });
-
-  setButtonLoading('loginBtn', false);
-
-  if (ok && data.success) {
-    State.user = data.user;
-    State.accessToken = data.accessToken;
-    showLoginSuccess(data.user, data.message);
-  } else {
-    showToast(data.message || 'Credenciais inválidas.', 'error');
-    document.getElementById('loginIdentifier').classList.add('error');
-    document.getElementById('loginPassword').classList.add('error');
-    shakeCard();
+  try {
+    const { ok, data } = await API.post('/api/auth/login', { identifier, password, remember });
+    if (ok && data.success) {
+      State.user = data.user;
+      State.accessToken = data.accessToken;
+      showLoginSuccess(data.user, data.message);
+    } else {
+      showToast(data.message || 'Credenciais inválidas.', 'error');
+      document.getElementById('loginIdentifier').classList.add('error');
+      document.getElementById('loginPassword').classList.add('error');
+      shakeCard();
+    }
+  } catch (err) {
+    showToast('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading('loginBtn', false);
   }
-});
+}
 
-// ─── REGISTER ─────────────────────────────────────────────────────────────────
-document.getElementById('registerForm')?.addEventListener('submit', async function (e) {
+async function handleRegisterSubmit(e) {
   e.preventDefault();
   clearAllErrors();
 
-  const username       = document.getElementById('regUsername').value.trim();
-  const email          = document.getElementById('regEmail').value.trim();
-  const password       = document.getElementById('regPassword').value;
-  const confirmPassword= document.getElementById('regConfirm').value;
-  const acceptTerms    = document.getElementById('acceptTerms').checked;
+  const username        = document.getElementById('regUsername').value.trim();
+  const email           = document.getElementById('regEmail').value.trim();
+  const password        = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirm').value;
+  const acceptTerms     = document.getElementById('acceptTerms').checked;
 
   let valid = true;
+  const errList = [];
 
-  if (!username) { setError('reg-username', 'regUsername', 'Campo obrigatório.'); valid = false; }
-  else if (username.length < 3) { setError('reg-username', 'regUsername', 'Mínimo 3 caracteres.'); valid = false; }
-  else if (!/^[a-zA-Z0-9_]+$/.test(username)) { setError('reg-username', 'regUsername', 'Apenas letras, números e _.'); valid = false; }
+  if (!username) {
+    setError('reg-username', 'regUsername', 'Campo obrigatório.'); valid = false;
+  } else if (username.length < 3) {
+    setError('reg-username', 'regUsername', 'Mínimo 3 caracteres.'); valid = false;
+  } else if (username.length > 20) {
+    setError('reg-username', 'regUsername', 'Máximo 20 caracteres.'); valid = false;
+  } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    setError('reg-username', 'regUsername', 'Apenas letras, números e _.'); valid = false;
+  }
 
-  if (!email) { setError('reg-email', 'regEmail', 'Campo obrigatório.'); valid = false; }
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('reg-email', 'regEmail', 'Email inválido.'); valid = false; }
+  if (!email) {
+    setError('reg-email', 'regEmail', 'Campo obrigatório.'); valid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setError('reg-email', 'regEmail', 'Email inválido.'); valid = false;
+  }
 
-  if (!password) { setError('reg-password', 'regPassword', 'Campo obrigatório.'); valid = false; }
-  else if (password.length < 8) { setError('reg-password', 'regPassword', 'Mínimo 8 caracteres.'); valid = false; }
-  else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) { setError('reg-password', 'regPassword', 'Precisa de maiúscula, minúscula e número.'); valid = false; }
+  if (!password) {
+    setError('reg-password', 'regPassword', 'Campo obrigatório.'); valid = false;
+  } else if (password.length < 8) {
+    setError('reg-password', 'regPassword', 'Mínimo 8 caracteres.'); valid = false;
+  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+    setError('reg-password', 'regPassword', 'Requer maiúscula, minúscula e número.'); valid = false;
+  }
 
-  if (!confirmPassword) { setError('reg-confirm', 'regConfirm', 'Campo obrigatório.'); valid = false; }
-  else if (password !== confirmPassword) { setError('reg-confirm', 'regConfirm', 'Senhas não coincidem.'); valid = false; }
+  if (!confirmPassword) {
+    setError('reg-confirm', 'regConfirm', 'Campo obrigatório.'); valid = false;
+  } else if (password !== confirmPassword) {
+    setError('reg-confirm', 'regConfirm', 'As senhas não coincidem.'); valid = false;
+  }
 
-  if (!acceptTerms) { document.getElementById('err-reg-terms').textContent = 'Você deve aceitar os Termos de Uso.'; valid = false; }
+  if (!acceptTerms) {
+    const termsErr = document.getElementById('err-reg-terms');
+    if (termsErr) termsErr.textContent = 'Você deve aceitar os Termos de Uso.';
+    valid = false;
+  }
 
-  if (!valid) return;
+  if (!valid) { shakeCard(); return; }
 
   setButtonLoading('registerBtn', true);
-
-  const { ok, data } = await API.post('/api/auth/register', { username, email, password, confirmPassword });
-
-  setButtonLoading('registerBtn', false);
-
-  if (ok && data.success) {
-    State.user = data.user;
-    State.accessToken = data.accessToken;
-    showLoginSuccess(data.user, data.message);
-  } else {
-    showToast(data.message || 'Erro ao criar conta.', 'error');
+  try {
+    const { ok, data } = await API.post('/api/auth/register', {
+      username, email, password, confirmPassword,
+    });
+    if (ok && data.success) {
+      State.user = data.user;
+      State.accessToken = data.accessToken;
+      showLoginSuccess(data.user, data.message);
+    } else {
+      showToast(data.message || 'Erro ao criar conta. Tente novamente.', 'error');
+      shakeCard();
+    }
+  } catch (err) {
+    showToast('Erro de conexão. Tente novamente.', 'error');
     shakeCard();
+  } finally {
+    setButtonLoading('registerBtn', false);
   }
-});
+}
 
 function setError(errId, inputId, msg) {
   const errEl = document.getElementById(`err-${errId}`);
@@ -353,26 +389,37 @@ function setError(errId, inputId, msg) {
   if (inputEl) inputEl.classList.add('error');
 }
 
-// ─── FORGOT PASSWORD ──────────────────────────────────────────────────────────
-document.getElementById('forgotForm')?.addEventListener('submit', async function (e) {
+async function handleForgotSubmit(e) {
   e.preventDefault();
   clearAllErrors();
 
   const email = document.getElementById('forgotEmail').value.trim();
-  if (!email) { document.getElementById('err-forgot-email').textContent = 'Campo obrigatório.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('err-forgot-email').textContent = 'Email inválido.'; return; }
+  if (!email) {
+    document.getElementById('err-forgot-email').textContent = 'Campo obrigatório.';
+    document.getElementById('forgotEmail').classList.add('error');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('err-forgot-email').textContent = 'Email inválido.';
+    document.getElementById('forgotEmail').classList.add('error');
+    return;
+  }
 
   setButtonLoading('forgotBtn', true);
-  const { ok, data } = await API.post('/api/auth/forgot-password', { email });
-  setButtonLoading('forgotBtn', false);
-
-  if (data.success || ok) {
-    showToast('Verifique seu email para instruções de recuperação.', 'success', 6000);
-    setTimeout(() => switchTab('login'), 2500);
-  } else {
-    showToast(data.message || 'Erro ao processar solicitação.', 'error');
+  try {
+    const { ok, data } = await API.post('/api/auth/forgot-password', { email });
+    if (data.success || ok) {
+      showToast('Se o email estiver cadastrado, você receberá as instruções em breve.', 'success', 6000);
+      setTimeout(() => switchTab('login'), 3000);
+    } else {
+      showToast(data.message || 'Erro ao processar solicitação.', 'error');
+    }
+  } catch {
+    showToast('Erro de conexão. Tente novamente.', 'error');
+  } finally {
+    setButtonLoading('forgotBtn', false);
   }
-});
+}
 
 // ─── Show Login Success ───────────────────────────────────────────────────────
 function showLoginSuccess(user, message) {
@@ -403,9 +450,12 @@ function animateSuccessEntry() {
 
 function shakeCard() {
   const card = document.getElementById('authCard');
-  card.style.animation = 'none';
+  if (!card) return;
+  // Remove and force reflow to restart animation cleanly
+  card.classList.remove('shake');
+  void card.offsetWidth; // trigger reflow
   card.classList.add('shake');
-  card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
+  setTimeout(() => card.classList.remove('shake'), 600);
 }
 
 // ─── Go to Dashboard ──────────────────────────────────────────────────────────
@@ -527,11 +577,10 @@ function updateStatusUI(server) {
 
 function updateSidebarStats(server) {
   const count = server?.current_players ?? 0;
-  document.getElementById('statPlayers')?.textContent && (document.getElementById('statPlayers').textContent = count);
-
+  const statEl = document.getElementById('statPlayers');
+  if (statEl) statEl.textContent = count + ' online';
   const quickStats = document.getElementById('quickStats');
   if (quickStats) quickStats.style.display = '';
-  document.getElementById('statPlayers').textContent = count + ' online';
 }
 
 function startServerRefresh() {
@@ -649,14 +698,6 @@ async function copyServerIP() {
   showToast(`IP copiado: ${ip}`, 'success', 3000);
 }
 
-// ─── Refresh button ───────────────────────────────────────────────────────────
-document.getElementById('refreshBtn')?.addEventListener('click', function () {
-  this.style.animation = 'spin 0.5s linear';
-  setTimeout(() => { this.style.animation = ''; }, 500);
-  loadServerStatus();
-  showToast('Status atualizado.', 'info', 2000);
-});
-
 // ─── Terms Modal ──────────────────────────────────────────────────────────────
 function showTermsModal() {
   const modal = document.getElementById('termsModal');
@@ -740,7 +781,35 @@ async function checkExistingSession() {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load initial data
+  // Attach form handlers (safe, DOM is guaranteed ready here)
+  const loginForm    = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const forgotForm   = document.getElementById('forgotForm');
+
+  if (loginForm)    loginForm.addEventListener('submit',    handleLoginSubmit);
+  if (registerForm) registerForm.addEventListener('submit', handleRegisterSubmit);
+  if (forgotForm)   forgotForm.addEventListener('submit',   handleForgotSubmit);
+
+  // Attach password strength listener
+  const regPasswordEl = document.getElementById('regPassword');
+  if (regPasswordEl) {
+    regPasswordEl.addEventListener('input', handlePasswordStrength);
+  }
+
+  // Attach refresh button
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function () {
+      this.style.animation = 'none';
+      void this.offsetWidth;
+      this.style.animation = 'spin 0.5s linear';
+      setTimeout(() => { this.style.animation = ''; }, 500);
+      loadServerStatus();
+      showToast('Status atualizado.', 'info', 2000);
+    });
+  }
+
+  // Load initial data in parallel
   await Promise.all([
     loadServerStatus(),
     loadNews(),
@@ -750,12 +819,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadRightPanelStats();
   startServerRefresh();
 
-  // Auto-refresh server status every 30s
+  // Auto-refresh on visibility change
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadServerStatus();
+  });
+
+  // Auto-refresh every 30s
   setInterval(() => {
     if (document.visibilityState === 'visible') loadServerStatus();
   }, 30000);
 
-  // Check for existing session silently
+  // Restore session silently
   checkExistingSession();
 });
 
