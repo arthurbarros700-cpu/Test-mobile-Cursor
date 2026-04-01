@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Comportamento de Jogo">
+
+        <ListPreference
+            android:key="pref_velocidade"
+            android:title="Velocidade de Jogo"
+            android:summary="%s"
+            android:entries="@array/opcoes_velocidade"
+            android:entryValues="@array/valores_velocidade"
+            android:defaultValue="NORMAL" />
+
+        <ListPreference
+            android:key="pref_estrategia"
+            android:title="Estratégia de IA"
+            android:summary="%s"
+            android:entries="@array/opcoes_estrategia"
+            android:entryValues="@array/valores_estrategia"
+            android:defaultValue="IA_AVANCADA" />
+
+        <SeekBarPreference
+            android:key="pref_delay_base"
+            android:title="Delay Base (ms)"
+            android:summary="Tempo mínimo entre ações"
+            android:defaultValue="500"
+            android:min="100"
+            app:max="2000"
+            android:showSeekBarValue="true" />
+
+        <SeekBarPreference
+            android:key="pref_delay_variacao"
+            android:title="Variação do Delay (ms)"
+            android:summary="Variação aleatória adicionada ao delay"
+            android:defaultValue="200"
+            android:min="0"
+            app:max="1000"
+            android:showSeekBarValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Recursos Automáticos">
+
+        <SwitchPreferenceCompat
+            android:key="pref_usar_boosters"
+            android:title="Usar Boosters Automaticamente"
+            android:summary="Ativa e usa power-ups durante as fases"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_anti_deteccao"
+            android:title="Modo Anti-Detecção"
+            android:summary="Simula comportamento humano com variações aleatórias"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_iniciar_boot"
+            android:title="Iniciar com o Dispositivo"
+            android:summary="Inicia o bot automaticamente após reinicialização"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Limites da Sessão">
+
+        <SeekBarPreference
+            android:key="pref_max_fases"
+            android:title="Máximo de Fases por Sessão"
+            android:summary="0 = ilimitado"
+            android:defaultValue="0"
+            android:min="0"
+            app:max="100"
+            android:showSeekBarValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Notificações">
+
+        <SwitchPreferenceCompat
+            android:key="pref_notif_fase"
+            android:title="Notificar Fase Concluída"
+            android:summary="Mostra notificação quando uma fase é completada"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="pref_notif_vidas"
+            android:title="Notificar Sem Vidas"
+            android:summary="Alerta quando as vidas acabam"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Sobre">
+
+        <Preference
+            android:key="pref_versao"
+            android:title="Versão do App"
+            android:summary="Royal Match Bot v1.0.0" />
+
+        <Preference
+            android:key="pref_testar_bot"
+            android:title="Como Testar"
+            android:summary="Toque para ver instruções de teste" />
+
+        <Preference
+            android:key="pref_sobre"
+            android:title="Informações"
+            android:summary="Bot de automação profissional para Royal Match" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

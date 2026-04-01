@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Royal Match Bot</string>
+    <string name="servico_bot_nome">Bot Royal Match - Jogador Automático</string>
+    <string name="descricao_acessibilidade">O Royal Match Bot usa o Serviço de Acessibilidade para analisar a tela do jogo e realizar jogadas automáticas. Nenhum dado pessoal é coletado.</string>
+
+    <!-- Tela Principal -->
+    <string name="titulo_principal">Royal Match Bot</string>
+    <string name="subtitulo_principal">Jogador Automático Profissional</string>
+    <string name="btn_iniciar">Iniciar Bot</string>
+    <string name="btn_parar">Parar Bot</string>
+    <string name="btn_configuracoes">Configurações</string>
+    <string name="btn_estatisticas">Estatísticas</string>
+    <string name="btn_logs">Ver Logs</string>
+
+    <!-- Status do Bot -->
+    <string name="status_inativo">Inativo</string>
+    <string name="status_ativo">Ativo - Jogando</string>
+    <string name="status_analisando">Analisando Tela…</string>
+    <string name="status_jogando">Executando Jogada…</string>
+    <string name="status_aguardando">Aguardando Royal Match…</string>
+    <string name="status_vidas_acabaram">Sem Vidas - Aguardando…</string>
+    <string name="status_fase_concluida">Fase Concluída!</string>
+    <string name="status_coletando_recompensas">Coletando Recompensas…</string>
+
+    <!-- Permissões -->
+    <string name="titulo_permissao_acessibilidade">Permissão de Acessibilidade Necessária</string>
+    <string name="msg_permissao_acessibilidade">Para o bot funcionar automaticamente, é necessário ativar o Serviço de Acessibilidade do Royal Match Bot.\n\nVá em: Configurações → Acessibilidade → Royal Match Bot → Ativar</string>
+    <string name="btn_abrir_acessibilidade">Abrir Configurações de Acessibilidade</string>
+    <string name="titulo_permissao_overlay">Permissão de Sobreposição Necessária</string>
+    <string name="msg_permissao_overlay">O bot precisa exibir informações sobre outros aplicativos para funcionar.\n\nVá em: Configurações → Aplicativos → Royal Match Bot → Exibir sobre outros apps → Permitir</string>
+    <string name="btn_abrir_overlay">Permitir Sobreposição</string>
+
+    <!-- Configurações -->
+    <string name="titulo_configuracoes">Configurações do Bot</string>
+    <string name="cfg_velocidade_titulo">Velocidade de Jogo</string>
+    <string name="cfg_velocidade_desc">Controla quão rápido o bot executa as jogadas</string>
+    <string name="cfg_estrategia_titulo">Estratégia de Jogo</string>
+    <string name="cfg_estrategia_desc">Algoritmo usado para escolher as melhores jogadas</string>
+    <string name="cfg_auto_vida_titulo">Usar Vidas Automaticamente</string>
+    <string name="cfg_auto_vida_desc">Coleta e usa vidas/corações automaticamente</string>
+    <string name="cfg_auto_booster_titulo">Usar Boosters Automaticamente</string>
+    <string name="cfg_auto_booster_desc">Usa power-ups e boosters durante as fases</string>
+    <string name="cfg_notificacoes_titulo">Notificações</string>
+    <string name="cfg_notificacoes_desc">Recebe alertas sobre o progresso do bot</string>
+    <string name="cfg_horario_titulo">Horário de Funcionamento</string>
+    <string name="cfg_horario_desc">Define quando o bot pode jogar</string>
+    <string name="cfg_max_fases_titulo">Limite de Fases por Sessão</string>
+    <string name="cfg_max_fases_desc">Define quantas fases jogar antes de parar</string>
+    <string name="cfg_delay_titulo">Delay entre Ações (ms)</string>
+    <string name="cfg_delay_desc">Tempo de espera entre cada ação do bot</string>
+    <string name="cfg_anti_deteccao_titulo">Modo Anti-Detecção</string>
+    <string name="cfg_anti_deteccao_desc">Simula comportamento humano para evitar detecção</string>
+
+    <!-- Estatísticas -->
+    <string name="titulo_estatisticas">Estatísticas</string>
+    <string name="stat_fases_completas">Fases Completadas</string>
+    <string name="stat_fases_falhas">Fases Falhas</string>
+    <string name="stat_taxa_sucesso">Taxa de Sucesso</string>
+    <string name="stat_tempo_total">Tempo Total de Jogo</string>
+    <string name="stat_movimentos_total">Total de Movimentos</string>
+    <string name="stat_boosters_usados">Boosters Usados</string>
+    <string name="stat_sessao_atual">Sessão Atual</string>
+    <string name="stat_historico">Histórico por Fase</string>
+    <string name="btn_limpar_estatisticas">Limpar Estatísticas</string>
+
+    <!-- Logs -->
+    <string name="titulo_logs">Registro de Atividades</string>
+    <string name="btn_limpar_logs">Limpar Logs</string>
+    <string name="btn_exportar_logs">Exportar Logs</string>
+
+    <!-- Estratégias -->
+    <string name="estrategia_ia_avancada">IA Avançada (Recomendado)</string>
+    <string name="estrategia_agressiva">Agressiva - Prioriza Combos</string>
+    <string name="estrategia_conservadora">Conservadora - Segura e Eficiente</string>
+    <string name="estrategia_velocidade">Velocidade Máxima</string>
+
+    <!-- Velocidades -->
+    <string name="velocidade_muito_lenta">Muito Lenta (Mais Humano)</string>
+    <string name="velocidade_lenta">Lenta</string>
+    <string name="velocidade_normal">Normal</string>
+    <string name="velocidade_rapida">Rápida</string>
+    <string name="velocidade_turbo">Turbo (Mais Rápida)</string>
+
+    <!-- Mensagens -->
+    <string name="msg_bot_iniciado">Bot iniciado! Abra o Royal Match para começar.</string>
+    <string name="msg_bot_parado">Bot parado com sucesso.</string>
+    <string name="msg_ativar_acessibilidade">Por favor, ative o Serviço de Acessibilidade primeiro.</string>
+    <string name="msg_fase_concluida">Fase %d concluída com sucesso!</string>
+    <string name="msg_sem_vidas">Sem vidas disponíveis. Aguardando recarga…</string>
+    <string name="msg_erro_geral">Erro inesperado. Reiniciando…</string>
+    <string name="canal_notificacao">Royal Match Bot</string>
+    <string name="notif_titulo_ativo">Royal Match Bot Ativo</string>
+    <string name="notif_msg_ativo">Jogando automaticamente…</string>
+
+    <!-- Tutorial -->
+    <string name="titulo_tutorial">Como Configurar o Bot</string>
+    <string name="tutorial_passo1">Passo 1: Ativar Acessibilidade</string>
+    <string name="tutorial_passo1_desc">Vá em Configurações do Android → Acessibilidade → Serviços Instalados → Royal Match Bot → Ativar</string>
+    <string name="tutorial_passo2">Passo 2: Permitir Sobreposição</string>
+    <string name="tutorial_passo2_desc">Vá em Configurações → Aplicativos → Royal Match Bot → Permissões → Exibir sobre outros apps → Permitir</string>
+    <string name="tutorial_passo3">Passo 3: Configurar o Bot</string>
+    <string name="tutorial_passo3_desc">Ajuste a velocidade, estratégia e outras opções conforme sua preferência</string>
+    <string name="tutorial_passo4">Passo 4: Iniciar o Bot</string>
+    <string name="tutorial_passo4_desc">Toque em "Iniciar Bot", abra o Royal Match e deixe o bot jogar por você!</string>
+</resources>

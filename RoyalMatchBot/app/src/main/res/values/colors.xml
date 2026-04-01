@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores principais - tema dourado real -->
+    <color name="cor_primaria">#1A1A2E</color>
+    <color name="cor_primaria_variante">#16213E</color>
+    <color name="cor_secundaria">#FFD700</color>
+    <color name="cor_secundaria_variante">#FFA500</color>
+    <color name="cor_fundo">#0F0F23</color>
+    <color name="cor_superficie">#1E1E3F</color>
+
+    <!-- Status -->
+    <color name="cor_ativo">#00E676</color>
+    <color name="cor_inativo">#FF5252</color>
+    <color name="cor_aguardando">#FFD600</color>
+    <color name="cor_processando">#40C4FF</color>
+
+    <!-- Texto -->
+    <color name="cor_texto_primario">#FFFFFF</color>
+    <color name="cor_texto_secundario">#B0BEC5</color>
+    <color name="cor_texto_destaque">#FFD700</color>
+
+    <!-- Cards -->
+    <color name="cor_card_fundo">#252545</color>
+    <color name="cor_card_borda">#3D3D7A</color>
+
+    <!-- Gradiente -->
+    <color name="cor_gradiente_inicio">#1A1A2E</color>
+    <color name="cor_gradiente_fim">#0F0F23</color>
+
+    <!-- Botões -->
+    <color name="cor_btn_iniciar">#00C853</color>
+    <color name="cor_btn_parar">#FF1744</color>
+    <color name="cor_btn_normal">#3D3D7A</color>
+
+    <!-- Gráficos -->
+    <color name="cor_grafico_sucesso">#00E676</color>
+    <color name="cor_grafico_falha">#FF5252</color>
+    <color name="cor_grafico_linha">#40C4FF</color>
+</resources>

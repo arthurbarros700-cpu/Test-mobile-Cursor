@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RoyalMatchBot" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/cor_primaria</item>
+        <item name="colorPrimaryVariant">@color/cor_primaria_variante</item>
+        <item name="colorSecondary">@color/cor_secundaria</item>
+        <item name="colorSecondaryVariant">@color/cor_secundaria_variante</item>
+        <item name="android:colorBackground">@color/cor_fundo</item>
+        <item name="colorSurface">@color/cor_superficie</item>
+        <item name="colorOnPrimary">@color/cor_texto_primario</item>
+        <item name="colorOnSecondary">@color/cor_fundo</item>
+        <item name="colorOnBackground">@color/cor_texto_primario</item>
+        <item name="colorOnSurface">@color/cor_texto_primario</item>
+        <item name="android:statusBarColor">@color/cor_fundo</item>
+        <item name="android:navigationBarColor">@color/cor_fundo</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.RoyalMatchBot.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/cor_fundo</item>
+        <item name="postSplashScreenTheme">@style/Theme.RoyalMatchBot</item>
+    </style>
+</resources>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/cor_fundo">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="REGISTRO DE ATIVIDADES"
+            android:textColor="@color/cor_texto_secundario"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExportarLogs"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Exportar"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp"
+            app:strokeColor="@color/cor_card_borda"
+            android:textColor="@color/cor_texto_primario"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLimparLogs"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Limpar"
+            android:textSize="12sp"
+            app:strokeColor="@color/cor_inativo"
+            android:textColor="@color/cor_inativo"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipTodos"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Todos"
+            android:checked="true"
+            app:chipBackgroundColor="@color/cor_secundaria"
+            android:textColor="@color/cor_fundo"
+            style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAcoes"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Ações"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipErros"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Erros"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipFases"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Fases"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Chip.Filter" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerLogs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp"
+        android:clipToPadding="false" />
+</LinearLayout>

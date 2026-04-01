@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="opcoes_velocidade">
+        <item>Muito Lenta (Mais Humano)</item>
+        <item>Lenta</item>
+        <item>Normal</item>
+        <item>Rápida</item>
+        <item>Turbo (Mais Rápida)</item>
+    </string-array>
+
+    <string-array name="valores_velocidade">
+        <item>MUITO_LENTA</item>
+        <item>LENTA</item>
+        <item>NORMAL</item>
+        <item>RAPIDA</item>
+        <item>TURBO</item>
+    </string-array>
+
+    <string-array name="opcoes_estrategia">
+        <item>IA Avançada (Recomendado)</item>
+        <item>Agressiva - Prioriza Combos</item>
+        <item>Conservadora - Segura e Eficiente</item>
+        <item>Velocidade Máxima</item>
+    </string-array>
+
+    <string-array name="valores_estrategia">
+        <item>IA_AVANCADA</item>
+        <item>AGRESSIVA</item>
+        <item>CONSERVADORA</item>
+        <item>VELOCIDADE_MAXIMA</item>
+    </string-array>
+
+    <string-array name="opcoes_delay">
+        <item>100ms (Ultrarrápido)</item>
+        <item>300ms (Rápido)</item>
+        <item>500ms (Normal)</item>
+        <item>800ms (Humano)</item>
+        <item>1200ms (Muito Lento)</item>
+    </string-array>
+</resources>
