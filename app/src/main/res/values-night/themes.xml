@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RoyalBotLab" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/royal_gold</item>
+        <item name="colorOnPrimary">@color/royal_navy</item>
+        <item name="colorSecondary">@color/royal_blue</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="android:statusBarColor">@color/royal_navy</item>
+        <item name="android:navigationBarColor">@color/royal_navy</item>
+    </style>
+</resources>

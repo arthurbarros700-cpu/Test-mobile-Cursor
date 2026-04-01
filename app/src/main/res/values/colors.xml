@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="royal_navy">#13233C</color>
+    <color name="royal_blue">#284F8F</color>
+    <color name="royal_light">#E8F0FF</color>
+    <color name="royal_gold">#F8C74D</color>
+    <color name="royal_green">#48B774</color>
+    <color name="royal_red">#E05D5D</color>
+    <color name="royal_surface">#F6F8FC</color>
+    <color name="royal_text">#1E2633</color>
+    <color name="royal_card">#FFFFFF</color>
+    <color name="royal_border">#D7E1F1</color>
+</resources>

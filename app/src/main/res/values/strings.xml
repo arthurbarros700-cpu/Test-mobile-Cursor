@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Royal Match Bot Mobile</string>
+    <string name="titulo_principal">Royal Match Bot Mobile</string>
+    <string name="subtitulo_principal">Bot autonomo para jogar no celular</string>
+    <string name="btn_nova_partida">Abrir acessibilidade</string>
+    <string name="btn_auto_ligar">Ativar bot</string>
+    <string name="btn_auto_desligar">Pausar bot</string>
+    <string name="btn_proximo_nivel">Abrir Royal Match</string>
+    <string name="label_nivel">Capturas</string>
+    <string name="label_pontuacao">Swipes</string>
+    <string name="label_movimentos">Grade</string>
+    <string name="label_meta">Pacote ativo</string>
+    <string name="label_status_bot">Status do bot</string>
+    <string name="status_bot_inativo">Inativo</string>
+    <string name="status_bot_ativo">Ativo</string>
+    <string name="descricao_controles">O bot usa acessibilidade, captura de tela, analise heuristica do tabuleiro e gestos de swipe para jogar sozinho.</string>
+    <string name="descricao_painel">Instale no celular, habilite a acessibilidade, abra o Royal Match e deixe o painel monitorar e executar as jogadas.</string>
+    <string name="label_combo">Ultima decisao</string>
+    <string name="label_objetivo">Resumo da analise</string>
+    <string name="label_dificuldade">Velocidade</string>
+    <string name="texto_vitoria">Automacao em execucao</string>
+    <string name="texto_derrota">Automacao pausada</string>
+    <string name="texto_aguardando">Aguardando ativacao do bot.</string>
+    <string name="texto_bot_pensando">Bot analisando melhor jogada...</string>
+    <string name="texto_bot_executando">Bot executando swipe...</string>
+    <string name="texto_dica">Dica: abra o Royal Match, entre em uma fase e toque em Ativar bot para deixar o app jogar sozinho.</string>
+    <string name="btn_velocidade">Velocidade do bot</string>
+    <string name="velocidade_lenta">Lenta</string>
+    <string name="velocidade_media">Media</string>
+    <string name="velocidade_rapida">Rapida</string>
+    <string name="titulo_painel">Painel operacional</string>
+    <string name="titulo_metricas">Telemetria da automacao</string>
+    <string name="acessibilidade_rotulo">Bot Royal Match Mobile</string>
+    <string name="acessibilidade_descricao">Captura a tela do jogo, estima a grade 8x8, escolhe a melhor troca com heuristica match-3 e envia swipes automaticamente.</string>
+</resources>
