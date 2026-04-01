@@ -1,0 +1,16 @@
+# ══════════════════════════════════════════════════
+#   Royal Match Bot - Dependências Python
+# ══════════════════════════════════════════════════
+
+# ── Dependências obrigatórias ──────────────────────
+numpy>=1.21.0           # Arrays e processamento numérico
+Pillow>=9.0.0           # Processamento de imagens (fallback do OpenCV)
+PyYAML>=6.0             # Leitura de arquivos de configuração YAML
+colorama>=0.4.6         # Cores no terminal (Windows)
+
+# ── Visão Computacional (altamente recomendado) ───
+opencv-python-headless>=4.6.0  # Processamento de imagem avançado
+
+# ── Opcionais para melhor performance ─────────────
+# scipy>=1.9.0          # Algoritmos científicos (melhora IA)
+# scikit-image>=0.19.0  # Visão computacional adicional

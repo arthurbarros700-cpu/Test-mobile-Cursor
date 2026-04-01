@@ -1,0 +1,103 @@
+# ============================================================
+#   Royal Match Bot - Configurações Principais
+#   Edite este arquivo para personalizar o comportamento do bot
+# ============================================================
+
+dispositivo:
+  # Modo de conexão: "adb" (USB/Wi-Fi) ou "termux" (direto no celular)
+  modo: "adb"
+  # Endereço ADB (use "localhost:5555" para Wi-Fi ou deixe vazio para USB)
+  endereco_adb: ""
+  # Porta ADB Wireless
+  porta_adb: 5555
+  # Resolução do dispositivo (deixe 0,0 para detecção automática)
+  resolucao:
+    largura: 0
+    altura: 0
+  # Densidade de pixels (DPI)
+  dpi: 0
+  # Delay base entre ações (milissegundos)
+  delay_base_ms: 300
+  # Variação aleatória nos delays para simular humano (milissegundos)
+  variacao_delay_ms: 150
+
+jogo:
+  # Nome do pacote do Royal Match na Play Store
+  pacote_app: "com.dreamgames.royalmatch"
+  # Resolução esperada do tabuleiro (colunas x linhas)
+  tabuleiro_colunas: 9
+  tabuleiro_linhas: 9
+  # Tempo máximo esperando animações (segundos)
+  timeout_animacao: 8.0
+  # Tempo máximo de uma fase completa (segundos)
+  timeout_fase: 300
+  # Pausar se bateria abaixo de X%
+  parar_bateria_minima: 20
+  # Pausar entre fases (segundos)
+  pausa_entre_fases: 2.0
+  # Número máximo de tentativas por fase antes de desistir
+  max_tentativas_fase: 5
+  # Usar boosters automaticamente
+  usar_boosters: true
+  # Limite de vidas para pausar (0 = nunca pausar por vidas)
+  parar_vidas_minimas: 1
+
+ia:
+  # Algoritmo de solução: "minimax", "beam_search", "mcts" ou "hibrido"
+  algoritmo: "hibrido"
+  # Profundidade de busca do Minimax
+  profundidade_minimax: 4
+  # Número de candidatos no Beam Search
+  largura_beam: 12
+  # Iterações do Monte Carlo Tree Search
+  iteracoes_mcts: 500
+  # Priorizar objetivos da fase (true) ou pontuação máxima (false)
+  priorizar_objetivos: true
+  # Peso para combos em cadeia
+  peso_combo: 2.5
+  # Peso para geração de power-ups
+  peso_powerup: 3.0
+  # Usar análise preditiva de tabuleiro
+  analise_preditiva: true
+
+visao:
+  # Confiança mínima para classificação de peças (0.0 a 1.0)
+  confianca_minima: 0.75
+  # Usar GPU para inferência (se disponível)
+  usar_gpu: false
+  # Tamanho da janela de captura de peça (pixels)
+  tamanho_celula: 64
+  # Método de detecção: "template", "ml" ou "hibrido"
+  metodo_deteccao: "hibrido"
+  # Limiar de detecção de mudança de tela
+  limiar_mudanca_tela: 0.15
+  # Escala de processamento (1.0 = resolução original)
+  escala_processamento: 0.5
+
+estatisticas:
+  # Salvar log detalhado
+  log_detalhado: true
+  # Salvar screenshots de cada jogada
+  salvar_screenshots: false
+  # Diretório para screenshots
+  dir_screenshots: "logs/screenshots"
+  # Salvar estatísticas em JSON
+  salvar_stats: true
+  # Arquivo de estatísticas
+  arquivo_stats: "logs/estatisticas.json"
+  # Notificação por Telegram (deixe vazio para desativar)
+  telegram_token: ""
+  telegram_chat_id: ""
+
+seguranca:
+  # Simular comportamento humano (movimentos não-lineares)
+  simular_humano: true
+  # Pausas aleatórias ocasionais (segundos)
+  pausa_aleatoria_min: 30
+  pausa_aleatoria_max: 120
+  # Probabilidade de pausa aleatória por jogada (0.0 a 1.0)
+  prob_pausa: 0.02
+  # Limite de horas contínuas de jogo
+  limite_horas_continuas: 6
+  # Pausa após limite (minutos)
+  pausa_apos_limite_min: 15

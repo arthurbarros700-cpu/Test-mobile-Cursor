@@ -1,0 +1,15 @@
+# ══════════════════════════════════════════════════
+#   Royal Match Bot - Dependências para Termux
+#   (execução direta no celular Android)
+# ══════════════════════════════════════════════════
+
+# Instale via pip no Termux:
+# pip install -r requirements-termux.txt
+
+numpy
+Pillow
+PyYAML
+
+# OpenCV para ARM (Termux)
+# Se falhar, instale via: pkg install python-opencv
+# opencv-python
