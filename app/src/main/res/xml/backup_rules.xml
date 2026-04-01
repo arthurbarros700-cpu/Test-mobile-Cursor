@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="sharedpref" path="royal_match_bot_prefs.xml" />
+    <exclude domain="database" path="bot_logs.db" />
+</full-backup-content>

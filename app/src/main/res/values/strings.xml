@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Royal Match Bot</string>
+    <string name="servico_acessibilidade_nome">Royal Match Bot — Serviço de Automação</string>
+    <string name="servico_acessibilidade_desc">Permite que o bot jogue Royal Match automaticamente,
+        realizando toques e swipes no tabuleiro em seu nome.</string>
+
+    <!-- Botões -->
+    <string name="btn_iniciar">▶ INICIAR BOT</string>
+    <string name="btn_parar">⏹ PARAR</string>
+    <string name="btn_pausar">⏸ PAUSAR</string>
+    <string name="btn_configuracoes">⚙️ Configurações</string>
+    <string name="btn_logs">📋 Logs</string>
+    <string name="btn_estatisticas">📊 Estatísticas</string>
+    <string name="btn_abrir_jogo">👑 Abrir Royal Match</string>
+    <string name="btn_salvar">Salvar</string>
+    <string name="btn_redefinir">Redefinir</string>
+
+    <!-- Status -->
+    <string name="status_parado">Bot parado</string>
+    <string name="status_ativo">Bot ativo</string>
+
+    <!-- Configurações labels -->
+    <string name="label_velocidade">Velocidade de Jogo</string>
+    <string name="label_estrategia">Estratégia</string>
+    <string name="label_usar_boosters">Usar Boosters Automaticamente</string>
+    <string name="label_coletar_recompensas">Coletar Recompensas Diárias</string>
+    <string name="label_iniciar_sistema">Iniciar com o Sistema</string>
+    <string name="label_modo_sigilo">Modo Sigilo (movimentos humanizados)</string>
+    <string name="label_limite_horas">Limite de Horas por Dia</string>
+    <string name="label_nivel_log">Nível de Log</string>
+    <string name="label_notif_fase">Notificar ao completar fase</string>
+    <string name="label_notif_erros">Notificar erros</string>
+    <string name="label_salvar_logs">Salvar logs no dispositivo</string>
+
+    <!-- Arrays -->
+    <string-array name="velocidades_array">
+        <item>Muito Lenta (3s)</item>
+        <item>Lenta (2s)</item>
+        <item>Normal (1s)</item>
+        <item>Rápida (0.6s)</item>
+        <item>Muito Rápida (0.3s)</item>
+    </string-array>
+
+    <string-array name="estrategias_array">
+        <item>Agressiva — mais combos e pontos</item>
+        <item>Balanceada — equilíbrio</item>
+        <item>Conservadora — foco em desobstruir</item>
+        <item>Boosters Primeiro</item>
+        <item>Foco no Objetivo da fase</item>
+    </string-array>
+
+    <string-array name="niveis_log_array">
+        <item>Verbose (todos)</item>
+        <item>Debug</item>
+        <item>Info</item>
+        <item>Aviso</item>
+        <item>Somente Erros</item>
+    </string-array>
+</resources>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <!-- Filtros -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:scrollbars="none"
+        android:background="@color/surface">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gap="8dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTodos"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Todos"
+                app:chipBackgroundColor="@color/primary_light"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="🟢 Info"
+                app:chipBackgroundColor="@color/surface_variant"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAviso"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="🟡 Aviso"
+                app:chipBackgroundColor="@color/surface_variant"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipErro"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="🔴 Erro"
+                app:chipBackgroundColor="@color/surface_variant"
+                android:textColor="@color/text_primary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDebug"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="⚪ Debug"
+                app:chipBackgroundColor="@color/surface_variant"
+                android:textColor="@color/text_primary" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Header com contagem e ações -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:background="@color/surface_variant">
+
+        <TextView
+            android:id="@+id/tvContadorLogs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0 registros"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnScrollFim"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="↓ Fim"
+            android:textSize="11sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="8dp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginEnd="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLimparLogs"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="🗑 Limpar"
+            android:textSize="11sp"
+            app:backgroundTint="@color/estado_erro"
+            app:cornerRadius="8dp"
+            android:paddingHorizontal="12dp" />
+    </LinearLayout>
+
+    <!-- Lista de logs -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerLogs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        android:clipToPadding="false" />
+
+</LinearLayout>

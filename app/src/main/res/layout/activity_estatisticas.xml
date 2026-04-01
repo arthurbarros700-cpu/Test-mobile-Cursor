@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="16dp"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Sessão atual -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="20dp">
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📱 SESSÃO ATUAL"
+                    style="@style/LabelEstatistica"
+                    android:layout_marginBottom="16dp" />
+
+                <GridLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="3"
+                    android:rowCount="3"
+                    android:useDefaultMargins="true">
+
+                    <!-- Fases -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoFases" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Fases" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+
+                    <!-- Jogadas -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoJogadas" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Jogadas" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+
+                    <!-- Combos -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoCombos" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Combos" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+
+                    <!-- Boosters -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoBoosters" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Boosters" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+
+                    <!-- Tempo -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoTempo" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="00:00" style="@style/TextoEstatistica"
+                            android:textSize="18sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Tempo" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+
+                    <!-- Capturas -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvSessaoCapturas" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Capturas" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+                </GridLayout>
+
+                <!-- Taxa de sucesso com barra -->
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="TAXA DE SUCESSO" style="@style/LabelEstatistica"
+                    android:layout_marginTop="20dp" android:layout_marginBottom="8dp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical">
+                    <ProgressBar android:id="@+id/progressTaxaSucesso"
+                        android:layout_width="0dp" android:layout_height="12dp"
+                        android:layout_weight="1"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:max="100"
+                        android:layout_marginEnd="12dp" />
+                    <TextView android:id="@+id/tvSessaoTaxa"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="0%" android:textSize="16sp" android:textStyle="bold"
+                        android:textColor="@color/success" />
+                </LinearLayout>
+
+                <TextView android:id="@+id/tvSessaoMediaJogadas"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="0 jogadas/fase" android:textSize="13sp"
+                    android:textColor="@color/text_secondary" android:layout_marginTop="8dp" />
+
+                <TextView android:id="@+id/tvSessaoErros"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="0 erros recuperados" android:textSize="13sp"
+                    android:textColor="@color/text_secondary" android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Histórico -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="20dp">
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏆 HISTÓRICO TOTAL"
+                    style="@style/LabelEstatistica"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvHistoricoFases" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Fases" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvHistoricoJogadas" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Jogadas" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvHistoricoPontuacao" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0" style="@style/TextoEstatistica"
+                            android:textSize="22sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Pontuação" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:id="@+id/tvHistoricoTempo" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:text="0h 0min" style="@style/TextoEstatistica"
+                            android:textSize="22sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Tempo Total" style="@style/LabelEstatistica" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLimparHistorico"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:text="🗑️ Limpar Histórico"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="@color/estado_erro"
+            android:textColor="@color/error"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

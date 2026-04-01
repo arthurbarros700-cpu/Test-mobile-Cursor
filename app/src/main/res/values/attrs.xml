@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Atributos customizados para temas -->
+    <attr name="state_color_pausar" format="color" />
+</resources>
