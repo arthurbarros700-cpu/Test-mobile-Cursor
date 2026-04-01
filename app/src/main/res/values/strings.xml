@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Royal Match Auto Bot</string>
+    <string name="accessibility_service_name">Royal Bot Accessibility</string>
+    <string name="accessibility_service_description">Controla gestos para automatizar jogadas no Royal Match.</string>
+    <string name="titulo_painel">Painel de Controle</string>
+    <string name="descricao_painel">Ative o serviço de acessibilidade e ajuste os parâmetros para jogar automaticamente.</string>
+    <string name="bot_ativo">Bot Ativo</string>
+    <string name="intervalo_ms">Intervalo entre jogadas (ms)</string>
+    <string name="limiar_confianca">Limiar de confiança</string>
+    <string name="abrir_acessibilidade">Abrir configurações de acessibilidade</string>
+    <string name="status_titulo">Status do serviço</string>
+    <string name="status_ligado">Ligado e aguardando tela do jogo</string>
+    <string name="status_desligado">Desligado ou sem permissão</string>
+    <string name="status_sem_imagem">Sem captura válida da tela</string>
+    <string name="status_jogada">Executando jogada automática</string>
+    <string name="aviso_uso">Use por sua conta e risco. Este projeto é educacional e pode violar termos do jogo.</string>
+</resources>
