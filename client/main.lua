@@ -196,6 +196,9 @@ local function applyPartRepair(veh, partId)
         elseif key == 'doors' then
             for d = 0, 5 do
                 if GetIsDoorValid(veh, d) then
+                    pcall(function()
+                        SetVehicleDoorBroken(veh, d, false)
+                    end)
                     SetVehicleDoorShut(veh, d, false)
                 end
             end
