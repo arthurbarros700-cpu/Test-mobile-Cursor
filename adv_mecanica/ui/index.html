@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADV Mecânica</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+  <!-- ═══ MAIN CONTAINER ════════════════════════════════════════════════════ -->
+  <div id="app" class="hidden">
+
+    <!-- ─── Workshop Panel ─────────────────────────────────────────── -->
+    <div id="panel-workshop" class="panel hidden">
+      <div class="panel-header">
+        <div class="header-brand">
+          <i class="fa-solid fa-wrench"></i>
+          <span>ADV Mecânica Profissional</span>
+        </div>
+        <div class="header-right">
+          <div class="xp-badge">
+            <i class="fa-solid fa-star"></i>
+            <span id="xp-display">0 XP</span>
+            <span id="level-display" class="level-pill">Nível 1</span>
+          </div>
+          <button class="btn-close" onclick="UI.close()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- Top bar: vehicle info -->
+      <div class="vehicle-bar">
+        <div class="veh-info">
+          <i class="fa-solid fa-car"></i>
+          <span id="veh-name">—</span>
+        </div>
+        <div class="veh-actions">
+          <button class="btn-sm" onclick="UI.liftVehicle()"><i class="fa-solid fa-arrow-up"></i> Elevar</button>
+          <button class="btn-sm btn-danger" onclick="UI.lowerVehicle()"><i class="fa-solid fa-arrow-down"></i> Baixar</button>
+          <button class="btn-sm btn-tow" onclick="UI.towVehicle()"><i class="fa-solid fa-truck-ramp-box"></i> Reboque</button>
+        </div>
+      </div>
+
+      <!-- Body: tabs + content -->
+      <div class="panel-body">
+
+        <!-- Left: Part Groups Tabs -->
+        <div class="sidebar">
+          <div id="tab-list" class="tab-list"></div>
+          <div class="sidebar-footer">
+            <button class="btn-full btn-orange" onclick="UI.openStock()">
+              <i class="fa-solid fa-boxes-stacked"></i> Estoque
+            </button>
+            <button class="btn-full btn-blue" onclick="UI.openStats()">
+              <i class="fa-solid fa-chart-bar"></i> Estatísticas
+            </button>
+          </div>
+        </div>
+
+        <!-- Center: Part list -->
+        <div class="main-content">
+          <div id="parts-container" class="parts-grid"></div>
+
+          <!-- Repair summary footer -->
+          <div class="repair-summary hidden" id="repair-summary">
+            <div class="summary-info">
+              <span><i class="fa-solid fa-clock"></i> Tempo: <b id="sum-time">0s</b></span>
+              <span><i class="fa-solid fa-money-bill"></i> Custo: <b id="sum-cost">R$ 0</b></span>
+              <span><i class="fa-solid fa-star"></i> XP: <b id="sum-xp">0</b></span>
+            </div>
+            <div class="summary-actions">
+              <select id="payment-method" class="select-pay">
+                <option value="bank">Banco</option>
+                <option value="cash">Dinheiro</option>
+              </select>
+              <button class="btn-repair" onclick="UI.startRepair()">
+                <i class="fa-solid fa-hammer"></i> Reparar Selecionados
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Fluids / status panel -->
+        <div class="right-panel">
+          <div class="panel-section-title"><i class="fa-solid fa-gauge-high"></i> Diagnóstico</div>
+          <div id="fluids-panel" class="fluids-list"></div>
+          <div class="panel-section-title mt-16"><i class="fa-solid fa-car-burst"></i> Carroceria</div>
+          <div id="body-panel" class="body-diagram"></div>
+        </div>
+      </div>
+
+      <!-- Repair Progress Overlay -->
+      <div id="repair-overlay" class="repair-overlay hidden">
+        <div class="repair-card">
+          <div class="repair-icon"><i class="fa-solid fa-gears fa-spin"></i></div>
+          <div class="repair-label" id="repair-label">Reparando...</div>
+          <div class="repair-step" id="repair-step">Peça 1/1</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="repair-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Stock Panel ─────────────────────────────────────────────── -->
+    <div id="panel-stock" class="panel hidden">
+      <div class="panel-header">
+        <div class="header-brand"><i class="fa-solid fa-boxes-stacked"></i> Gestão de Estoque</div>
+        <button class="btn-close" onclick="UI.closeStock()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="stock-body">
+        <div class="stock-search-bar">
+          <input id="stock-search" type="text" placeholder="Buscar peça..." oninput="UI.filterStock(this.value)" />
+          <button class="btn-sm btn-green" onclick="UI.openRestockModal()"><i class="fa-solid fa-plus"></i> Requisitar</button>
+        </div>
+        <table class="stock-table">
+          <thead>
+            <tr>
+              <th>Peça</th><th>Item</th><th>Em Estoque</th><th>Status</th><th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="stock-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── Stats Panel ─────────────────────────────────────────────── -->
+    <div id="panel-stats" class="panel hidden">
+      <div class="panel-header">
+        <div class="header-brand"><i class="fa-solid fa-chart-line"></i> Estatísticas da Oficina</div>
+        <button class="btn-close" onclick="UI.closeStats()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="stats-body">
+        <div class="stat-cards" id="stat-cards"></div>
+        <div class="chart-title">Peças mais reparadas</div>
+        <div id="stat-bars" class="stat-bars"></div>
+      </div>
+    </div>
+
+    <!-- ─── Inspection Panel ────────────────────────────────────────── -->
+    <div id="panel-inspection" class="panel hidden">
+      <div class="panel-header">
+        <div class="header-brand"><i class="fa-solid fa-microscope"></i> Laudo de Inspeção</div>
+        <button class="btn-close" onclick="UI.closeInspection()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="inspection-body" class="inspection-body"></div>
+    </div>
+
+    <!-- ─── Pattern Minigame Overlay ───────────────────────────────── -->
+    <div id="pattern-overlay" class="pattern-overlay hidden">
+      <div class="pattern-card">
+        <div class="pattern-title">Sequência de Reparo</div>
+        <div id="pattern-sequence" class="pattern-sequence"></div>
+        <div id="pattern-progress" class="pattern-progress"></div>
+        <div class="pattern-hint">Pressione as teclas na ordem correta!</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/particles.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
