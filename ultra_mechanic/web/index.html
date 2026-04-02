@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ultra Mechanic Pro</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <main id="app" class="hidden">
+        <section class="panel glass">
+            <header class="panel-header">
+                <div>
+                    <h1 id="title">Ultra Mechanic Pro</h1>
+                    <p id="subtitle">Diagnostico avancado</p>
+                </div>
+                <button id="btnClose" class="btn ghost">Fechar</button>
+            </header>
+
+            <section class="meta-row">
+                <article class="meta-card">
+                    <span class="meta-label">Oficina</span>
+                    <strong id="metaWorkshop">-</strong>
+                </article>
+                <article class="meta-card">
+                    <span class="meta-label">Placa</span>
+                    <strong id="metaPlate">-</strong>
+                </article>
+                <article class="meta-card">
+                    <span class="meta-label">KM</span>
+                    <strong id="metaMileage">0</strong>
+                </article>
+            </section>
+
+            <section class="columns">
+                <section class="col col-wide">
+                    <h2>Diagnostico por componente</h2>
+                    <div id="components" class="component-list"></div>
+                </section>
+
+                <section class="col">
+                    <h2>Orcamento</h2>
+                    <label class="input-label" for="tierSelect">Padrao de reparo</label>
+                    <select id="tierSelect"></select>
+                    <div class="actions">
+                        <button id="btnQuote" class="btn primary">Gerar orcamento</button>
+                        <button id="btnRefresh" class="btn">Atualizar</button>
+                    </div>
+
+                    <div class="quote-box" id="quoteBox">
+                        <p>Sem orcamento gerado.</p>
+                    </div>
+
+                    <button id="btnStartRepair" class="btn success full" disabled>Iniciar reparo</button>
+                </section>
+            </section>
+
+            <section class="columns stock-row">
+                <section class="col">
+                    <h2>Estoque de pecas</h2>
+                    <div id="stockList" class="stock-list"></div>
+                </section>
+                <section class="col">
+                    <h2>Historico rapido</h2>
+                    <div id="quotesList" class="quotes-list"></div>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

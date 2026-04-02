@@ -1,0 +1,56 @@
+CREATE TABLE IF NOT EXISTS um_vehicles (
+    plate VARCHAR(16) NOT NULL PRIMARY KEY,
+    model BIGINT NOT NULL DEFAULT 0,
+    mileage DOUBLE NOT NULL DEFAULT 0,
+    components LONGTEXT NULL,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS um_workshop_stock (
+    workshop_id INT NOT NULL,
+    item VARCHAR(64) NOT NULL,
+    amount INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (workshop_id, item)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS um_quotes (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    plate VARCHAR(16) NOT NULL,
+    workshop_id INT NOT NULL,
+    model BIGINT NOT NULL DEFAULT 0,
+    tier VARCHAR(32) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'draft',
+    created_by VARCHAR(64) NULL,
+    mechanic_identifier VARCHAR(80) NULL,
+    total_price INT NOT NULL DEFAULT 0,
+    total_duration INT NOT NULL DEFAULT 0,
+    lines_json LONGTEXT NULL,
+    stock_json LONGTEXT NULL,
+    before_json LONGTEXT NULL,
+    after_json LONGTEXT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_plate_status (plate, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS um_repairs (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    quote_id INT NOT NULL,
+    plate VARCHAR(16) NOT NULL,
+    workshop_id INT NOT NULL,
+    model BIGINT NOT NULL DEFAULT 0,
+    status VARCHAR(32) NOT NULL DEFAULT 'in_progress',
+    started_by VARCHAR(64) NULL,
+    mechanic_identifier VARCHAR(80) NULL,
+    total_price INT NOT NULL DEFAULT 0,
+    duration_ms INT NOT NULL DEFAULT 0,
+    stock_json LONGTEXT NULL,
+    before_json LONGTEXT NULL,
+    after_json LONGTEXT NULL,
+    started_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_plate_status (plate, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
