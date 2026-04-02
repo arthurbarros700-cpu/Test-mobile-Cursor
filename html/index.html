@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VX Mechanic Pro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="app hidden">
+    <div class="backdrop"></div>
+    <main class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <p class="eyebrow">VX Mechanic Pro</p>
+          <h1>Central de Engenharia</h1>
+          <p id="workshopName" class="muted">Oficina indisponivel</p>
+        </div>
+
+        <nav id="tabButtons" class="tab-buttons"></nav>
+
+        <div class="sidebar-card">
+          <span>Status atual</span>
+          <strong id="statusText">Aguardando conexao</strong>
+        </div>
+
+        <button id="closeButton" class="ghost-button">Fechar painel</button>
+      </aside>
+
+      <section class="content">
+        <header class="header">
+          <div>
+            <p class="eyebrow">Diagnostico ultra realista</p>
+            <h2 id="vehicleTitle">Sem veiculo conectado</h2>
+          </div>
+          <div class="header-metrics">
+            <article class="header-card">
+              <span>Placa</span>
+              <strong id="vehiclePlate">---</strong>
+            </article>
+            <article class="header-card">
+              <span>Classe</span>
+              <strong id="vehicleClass">---</strong>
+            </article>
+            <article class="header-card danger">
+              <span>Integridade</span>
+              <strong id="vehicleHealth">0%</strong>
+            </article>
+          </div>
+        </header>
+
+        <section id="tab-overview" class="tab-view active"></section>
+        <section id="tab-components" class="tab-view"></section>
+        <section id="tab-services" class="tab-view"></section>
+        <section id="tab-tuning" class="tab-view"></section>
+        <section id="tab-stock" class="tab-view"></section>
+        <section id="tab-history" class="tab-view"></section>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
