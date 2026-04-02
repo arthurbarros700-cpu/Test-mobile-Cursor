@@ -1,0 +1,8 @@
+node_modules
+database/spartan.db
+database/spartan.db-shm
+database/spartan.db-wal
+.env
+*.log
+.git
+.gitignore

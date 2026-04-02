@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spartan Roleplay — Painel de Acesso</title>
+  <meta name="description" content="Entre no servidor Spartan Roleplay. A melhor experiência de roleplay do Brasil." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- PARTICLE CANVAS -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- BACKGROUND LAYERS -->
+<div class="bg-overlay"></div>
+<div class="bg-grid"></div>
+<div class="bg-vignette"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- AMBIENT ORBS -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- MAIN LAYOUT -->
+<div class="main-layout" id="mainLayout">
+
+  <!-- ──────────────────────────────────────────────────── LEFT PANEL -->
+  <aside class="side-panel left-panel" id="leftPanel">
+
+    <!-- Server Logo & Branding -->
+    <div class="brand-block">
+      <div class="brand-emblem">
+        <div class="emblem-ring ring-outer"></div>
+        <div class="emblem-ring ring-middle"></div>
+        <div class="emblem-ring ring-inner"></div>
+        <div class="emblem-icon">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="emblem-glow"></div>
+      </div>
+      <h1 class="brand-name">SPARTAN</h1>
+      <p class="brand-sub">R O L E P L A Y</p>
+      <div class="brand-divider">
+        <span class="divider-line"></span>
+        <i class="fas fa-star divider-icon"></i>
+        <span class="divider-line"></span>
+      </div>
+      <p class="brand-motto">Onde cada história é lendária</p>
+    </div>
+
+    <!-- Live Server Status -->
+    <div class="server-status-card" id="serverStatusCard">
+      <div class="status-header">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-label" id="statusLabel">Conectando...</span>
+        <button class="refresh-btn" id="refreshBtn" title="Atualizar status">
+          <i class="fas fa-rotate-right"></i>
+        </button>
+      </div>
+      <div class="status-info">
+        <div class="info-row">
+          <i class="fas fa-server info-icon"></i>
+          <span class="info-text" id="serverName">—</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-network-wired info-icon"></i>
+          <span class="info-text" id="serverIP">—</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-code-branch info-icon"></i>
+          <span class="info-text" id="serverVersion">—</span>
+        </div>
+      </div>
+      <div class="player-bar-wrap">
+        <div class="player-bar-labels">
+          <span><i class="fas fa-users"></i> Jogadores Online</span>
+          <span class="player-count"><span id="currentPlayers">0</span> / <span id="maxPlayers">128</span></span>
+        </div>
+        <div class="player-bar">
+          <div class="player-bar-fill" id="playerBarFill"></div>
+          <div class="player-bar-shine"></div>
+        </div>
+      </div>
+      <button class="btn-connect" onclick="copyServerIP()">
+        <i class="fas fa-play"></i>
+        <span>Conectar ao Servidor</span>
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+
+    <!-- Latest News -->
+    <div class="news-section">
+      <div class="section-title">
+        <i class="fas fa-newspaper"></i>
+        <span>Notícias</span>
+        <div class="title-line"></div>
+      </div>
+      <div class="news-list" id="newsList">
+        <div class="news-loading">
+          <div class="loading-spinner"></div>
+          <span>Carregando notícias...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Footer -->
+    <div class="quick-stats" id="quickStats" style="display:none">
+      <div class="stat-chip">
+        <i class="fas fa-users-rectangle"></i>
+        <div>
+          <span class="chip-value" id="statPlayers">—</span>
+          <span class="chip-label">Jogadores</span>
+        </div>
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-calendar-days"></i>
+        <div>
+          <span class="chip-value" id="statDays">847</span>
+          <span class="chip-label">Dias Online</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ──────────────────────────────────────────────────── CENTER (AUTH) -->
+  <main class="auth-center">
+
+    <!-- ═══ AUTH CARD ═══ -->
+    <div class="auth-card" id="authCard">
+
+      <!-- Tab switcher -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="tab-btn active" data-tab="login" onclick="switchTab('login')">
+          <i class="fas fa-right-to-bracket"></i> Entrar
+        </button>
+        <button class="tab-btn" data-tab="register" onclick="switchTab('register')">
+          <i class="fas fa-user-plus"></i> Registrar
+        </button>
+      </div>
+
+      <!-- ─── LOGIN FORM ─── -->
+      <div class="auth-panel active" id="panel-login">
+        <div class="panel-header">
+          <h2>Acesso ao Painel</h2>
+          <p>Insira suas credenciais para continuar</p>
+        </div>
+
+        <form class="auth-form" id="loginForm" novalidate>
+          <div class="form-group" id="fg-login-identifier">
+            <label for="loginIdentifier">
+              <i class="fas fa-user"></i> Usuário ou E-mail
+            </label>
+            <div class="input-wrap">
+              <input
+                type="text"
+                id="loginIdentifier"
+                name="identifier"
+                placeholder="seu_usuario ou email@exemplo.com"
+                autocomplete="username"
+                required
+              />
+              <div class="input-border"></div>
+            </div>
+            <span class="field-error" id="err-login-identifier"></span>
+          </div>
+
+          <div class="form-group" id="fg-login-password">
+            <label for="loginPassword">
+              <i class="fas fa-lock"></i> Senha
+            </label>
+            <div class="input-wrap has-toggle">
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                placeholder="Sua senha secreta"
+                autocomplete="current-password"
+                required
+              />
+              <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" tabindex="-1">
+                <i class="fas fa-eye"></i>
+              </button>
+              <div class="input-border"></div>
+            </div>
+            <span class="field-error" id="err-login-password"></span>
+          </div>
+
+          <div class="form-row-inline">
+            <label class="checkbox-wrap">
+              <input type="checkbox" id="rememberMe" />
+              <span class="checkbox-custom"></span>
+              <span>Lembrar de mim</span>
+            </label>
+            <button type="button" class="link-btn" onclick="switchTab('forgot')">Esqueci a senha</button>
+          </div>
+
+          <button type="submit" class="btn-primary" id="loginBtn">
+            <span class="btn-text"><i class="fas fa-right-to-bracket"></i> Entrar</span>
+            <span class="btn-loader" style="display:none"><div class="spinner"></div></span>
+            <div class="btn-shine"></div>
+          </button>
+
+          <div class="divider-or"><span>ou entre com</span></div>
+
+          <div class="social-row">
+            <button type="button" class="btn-social discord" onclick="showToast('Discord OAuth em breve!','info')">
+              <i class="fab fa-discord"></i> Discord
+            </button>
+            <button type="button" class="btn-social steam" onclick="showToast('Steam Auth em breve!','info')">
+              <i class="fab fa-steam"></i> Steam
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ─── REGISTER FORM ─── -->
+      <div class="auth-panel" id="panel-register">
+        <div class="panel-header">
+          <h2>Criar Conta</h2>
+          <p>Junte-se à comunidade Spartan</p>
+        </div>
+
+        <form class="auth-form" id="registerForm" novalidate>
+          <div class="form-grid-2">
+            <div class="form-group" id="fg-reg-username">
+              <label for="regUsername"><i class="fas fa-user"></i> Username</label>
+              <div class="input-wrap">
+                <input type="text" id="regUsername" name="username" placeholder="SpartanWarrior" autocomplete="username" required />
+                <div class="input-border"></div>
+              </div>
+              <span class="field-error" id="err-reg-username"></span>
+            </div>
+            <div class="form-group" id="fg-reg-email">
+              <label for="regEmail"><i class="fas fa-envelope"></i> E-mail</label>
+              <div class="input-wrap">
+                <input type="email" id="regEmail" name="email" placeholder="voce@email.com" autocomplete="email" required />
+                <div class="input-border"></div>
+              </div>
+              <span class="field-error" id="err-reg-email"></span>
+            </div>
+          </div>
+
+          <div class="form-group" id="fg-reg-password">
+            <label for="regPassword"><i class="fas fa-lock"></i> Senha</label>
+            <div class="input-wrap has-toggle">
+              <input type="password" id="regPassword" name="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required />
+              <button type="button" class="toggle-pw" onclick="togglePassword('regPassword', this)" tabindex="-1">
+                <i class="fas fa-eye"></i>
+              </button>
+              <div class="input-border"></div>
+            </div>
+            <div class="password-strength" id="passwordStrength">
+              <div class="strength-bars">
+                <div class="strength-bar" id="sb1"></div>
+                <div class="strength-bar" id="sb2"></div>
+                <div class="strength-bar" id="sb3"></div>
+                <div class="strength-bar" id="sb4"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel"></span>
+            </div>
+            <span class="field-error" id="err-reg-password"></span>
+          </div>
+
+          <div class="form-group" id="fg-reg-confirm">
+            <label for="regConfirm"><i class="fas fa-lock-open"></i> Confirmar Senha</label>
+            <div class="input-wrap has-toggle">
+              <input type="password" id="regConfirm" name="confirmPassword" placeholder="Repita a senha" autocomplete="new-password" required />
+              <button type="button" class="toggle-pw" onclick="togglePassword('regConfirm', this)" tabindex="-1">
+                <i class="fas fa-eye"></i>
+              </button>
+              <div class="input-border"></div>
+            </div>
+            <span class="field-error" id="err-reg-confirm"></span>
+          </div>
+
+          <label class="checkbox-wrap terms-check" id="fg-reg-terms">
+            <input type="checkbox" id="acceptTerms" />
+            <span class="checkbox-custom"></span>
+            <span>Concordo com os <a href="javascript:void(0)" class="link-accent" onclick="showTermsModal(); return false;">Termos de Uso</a> e <a href="javascript:void(0)" class="link-accent" onclick="showTermsModal(); return false;">Regras do Servidor</a></span>
+          </label>
+          <span class="field-error" id="err-reg-terms"></span>
+
+          <button type="submit" class="btn-primary" id="registerBtn">
+            <span class="btn-text"><i class="fas fa-user-plus"></i> Criar Conta</span>
+            <span class="btn-loader" style="display:none"><div class="spinner"></div></span>
+            <div class="btn-shine"></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── FORGOT PASSWORD ─── -->
+      <div class="auth-panel" id="panel-forgot">
+        <div class="panel-header">
+          <button class="back-btn" onclick="switchTab('login')">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2>Recuperar Senha</h2>
+          <p>Enviaremos um link para seu e-mail</p>
+        </div>
+
+        <form class="auth-form" id="forgotForm" novalidate>
+          <div class="form-group" id="fg-forgot-email">
+            <label for="forgotEmail"><i class="fas fa-envelope"></i> E-mail Cadastrado</label>
+            <div class="input-wrap">
+              <input type="email" id="forgotEmail" name="email" placeholder="voce@email.com" required />
+              <div class="input-border"></div>
+            </div>
+            <span class="field-error" id="err-forgot-email"></span>
+          </div>
+
+          <button type="submit" class="btn-primary" id="forgotBtn">
+            <span class="btn-text"><i class="fas fa-paper-plane"></i> Enviar Link</span>
+            <span class="btn-loader" style="display:none"><div class="spinner"></div></span>
+            <div class="btn-shine"></div>
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── SUCCESS PANEL ─── -->
+      <div class="auth-panel" id="panel-success">
+        <div class="success-block">
+          <div class="success-emblem">
+            <div class="success-ring"></div>
+            <i class="fas fa-check-circle success-icon"></i>
+          </div>
+          <h2 id="successTitle">Login Realizado!</h2>
+          <p id="successMsg">Bem-vindo ao Spartan Roleplay.</p>
+          <div class="user-welcome-card" id="userWelcomeCard">
+            <div class="welcome-avatar" id="welcomeAvatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="welcome-info">
+              <span class="welcome-name" id="welcomeName">—</span>
+              <span class="welcome-role" id="welcomeRole">—</span>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="goToDashboard()">
+            <span class="btn-text"><i class="fas fa-gauge-high"></i> Ir para o Painel</span>
+            <div class="btn-shine"></div>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /auth-card -->
+
+  </main>
+
+  <!-- ──────────────────────────────────────────────────── RIGHT PANEL -->
+  <aside class="side-panel right-panel" id="rightPanel">
+
+    <!-- Community Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" data-value="2847">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-body">
+          <span class="stat-number" id="sc-players">0</span>
+          <span class="stat-name">Jogadores Totais</span>
+        </div>
+        <div class="stat-glow"></div>
+      </div>
+      <div class="stat-card" data-value="4123">
+        <div class="stat-icon"><i class="fas fa-id-card"></i></div>
+        <div class="stat-body">
+          <span class="stat-number" id="sc-chars">0</span>
+          <span class="stat-name">Personagens</span>
+        </div>
+        <div class="stat-glow"></div>
+      </div>
+      <div class="stat-card" data-value="847">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-body">
+          <span class="stat-number" id="sc-days">0</span>
+          <span class="stat-name">Dias Online</span>
+        </div>
+        <div class="stat-glow"></div>
+      </div>
+      <div class="stat-card" data-value="98">
+        <div class="stat-icon"><i class="fas fa-star"></i></div>
+        <div class="stat-body">
+          <span class="stat-number" id="sc-rating">0</span>
+          <span class="stat-name">% Satisfação</span>
+        </div>
+        <div class="stat-glow"></div>
+      </div>
+    </div>
+
+    <!-- Top Players / Leaderboard -->
+    <div class="leaderboard-section">
+      <div class="section-title">
+        <i class="fas fa-trophy"></i>
+        <span>Top Jogadores</span>
+        <div class="title-line"></div>
+      </div>
+      <div class="leaderboard-list" id="leaderboardList">
+        <div class="news-loading">
+          <div class="loading-spinner"></div>
+          <span>Carregando...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social / Community Links -->
+    <div class="community-links">
+      <div class="section-title">
+        <i class="fas fa-link"></i>
+        <span>Comunidade</span>
+        <div class="title-line"></div>
+      </div>
+      <div class="link-grid">
+        <a href="#" class="comm-link discord-link" onclick="showToast('Discord em breve!','info'); return false;">
+          <i class="fab fa-discord"></i>
+          <span>Discord</span>
+          <span class="link-badge">2.1k</span>
+        </a>
+        <a href="#" class="comm-link steam-link" onclick="showToast('Steam em breve!','info'); return false;">
+          <i class="fab fa-steam"></i>
+          <span>Steam Group</span>
+          <span class="link-badge">890</span>
+        </a>
+        <a href="#" class="comm-link forum-link" onclick="showToast('Fórum em breve!','info'); return false;">
+          <i class="fas fa-comments"></i>
+          <span>Fórum</span>
+          <span class="link-badge">Novo</span>
+        </a>
+        <a href="#" class="comm-link youtube-link" onclick="showToast('YouTube em breve!','info'); return false;">
+          <i class="fab fa-youtube"></i>
+          <span>YouTube</span>
+          <span class="link-badge">455</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer info -->
+    <div class="panel-footer">
+      <p>© 2024 Spartan Roleplay. Todos os direitos reservados.</p>
+      <div class="footer-links">
+        <a href="#" onclick="return false;">Termos de Uso</a>
+        <span>·</span>
+        <a href="#" onclick="return false;">Privacidade</a>
+        <span>·</span>
+        <a href="#" onclick="return false;">Suporte</a>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- DASHBOARD (hidden until logged in) -->
+<div class="dashboard-overlay" id="dashboardOverlay" style="display:none">
+  <div class="dashboard-layout">
+    <!-- Dashboard Sidebar -->
+    <nav class="dash-sidebar">
+      <div class="dash-brand">
+        <i class="fas fa-shield-halved"></i>
+        <span>SPARTAN</span>
+      </div>
+      <div class="dash-user-mini" id="dashUserMini">
+        <div class="duser-avatar"><i class="fas fa-user"></i></div>
+        <div>
+          <span class="duser-name" id="dashUsername">—</span>
+          <span class="duser-role" id="dashUserRole">—</span>
+        </div>
+      </div>
+      <ul class="dash-nav">
+        <li class="active"><a href="#" onclick="return false;"><i class="fas fa-gauge-high"></i> Dashboard</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-id-card"></i> Meus Personagens</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-clock-rotate-left"></i> Histórico</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-wallet"></i> Banco</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-briefcase"></i> Empregos</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-house"></i> Propriedades</a></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-car"></i> Veículos</a></li>
+        <li class="nav-divider"></li>
+        <li><a href="#" onclick="return false;"><i class="fas fa-gear"></i> Configurações</a></li>
+        <li><a href="#" onclick="handleLogout()"><i class="fas fa-right-from-bracket"></i> Sair</a></li>
+      </ul>
+    </nav>
+
+    <!-- Dashboard Main Content -->
+    <div class="dash-main">
+      <!-- Top bar -->
+      <header class="dash-topbar">
+        <div class="topbar-left">
+          <h1 class="dash-title">Dashboard</h1>
+          <span class="dash-subtitle">Bem-vindo de volta, <strong id="dashWelcomeName">Jogador</strong>!</span>
+        </div>
+        <div class="topbar-right">
+          <div class="server-badge" id="dashServerBadge">
+            <div class="status-dot online"></div>
+            <span>Servidor Online</span>
+          </div>
+          <button class="icon-btn" onclick="handleLogout()" title="Sair">
+            <i class="fas fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats cards -->
+      <div class="dash-stats-grid">
+        <div class="dash-stat-card blue">
+          <div class="dsc-icon"><i class="fas fa-clock"></i></div>
+          <div class="dsc-info">
+            <span class="dsc-value" id="dshPlaytime">0h</span>
+            <span class="dsc-label">Tempo de Jogo</span>
+          </div>
+          <div class="dsc-glow"></div>
+        </div>
+        <div class="dash-stat-card gold">
+          <div class="dsc-icon"><i class="fas fa-id-card"></i></div>
+          <div class="dsc-info">
+            <span class="dsc-value" id="dshChars">0</span>
+            <span class="dsc-label">Personagens</span>
+          </div>
+          <div class="dsc-glow"></div>
+        </div>
+        <div class="dash-stat-card green">
+          <div class="dsc-icon"><i class="fas fa-calendar-days"></i></div>
+          <div class="dsc-info">
+            <span class="dsc-value" id="dshMember">—</span>
+            <span class="dsc-label">Membro desde</span>
+          </div>
+          <div class="dsc-glow"></div>
+        </div>
+        <div class="dash-stat-card red">
+          <div class="dsc-icon"><i class="fas fa-triangle-exclamation"></i></div>
+          <div class="dsc-info">
+            <span class="dsc-value" id="dshWarnings">0</span>
+            <span class="dsc-label">Advertências</span>
+          </div>
+          <div class="dsc-glow"></div>
+        </div>
+      </div>
+
+      <!-- Content grid -->
+      <div class="dash-content-grid">
+        <!-- Account info card -->
+        <div class="dash-card">
+          <div class="card-header">
+            <i class="fas fa-user-shield"></i>
+            <h3>Informações da Conta</h3>
+          </div>
+          <div class="card-body">
+            <div class="info-list">
+              <div class="info-item">
+                <span class="ii-label"><i class="fas fa-user"></i> Username</span>
+                <span class="ii-value" id="diUsername">—</span>
+              </div>
+              <div class="info-item">
+                <span class="ii-label"><i class="fas fa-envelope"></i> E-mail</span>
+                <span class="ii-value" id="diEmail">—</span>
+              </div>
+              <div class="info-item">
+                <span class="ii-label"><i class="fas fa-crown"></i> Cargo</span>
+                <span class="ii-value" id="diRole">—</span>
+              </div>
+              <div class="info-item">
+                <span class="ii-label"><i class="fas fa-clock"></i> Último Login</span>
+                <span class="ii-value" id="diLastLogin">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="dash-card">
+          <div class="card-header">
+            <i class="fas fa-bolt"></i>
+            <h3>Ações Rápidas</h3>
+          </div>
+          <div class="card-body">
+            <div class="action-grid">
+              <button class="action-btn" onclick="copyServerIP()">
+                <i class="fas fa-play"></i>
+                <span>Conectar</span>
+              </button>
+              <button class="action-btn" onclick="showToast('Personagens em breve!','info')">
+                <i class="fas fa-id-card"></i>
+                <span>Personagens</span>
+              </button>
+              <button class="action-btn" onclick="showToast('Regras do servidor','info')">
+                <i class="fas fa-scroll"></i>
+                <span>Regras</span>
+              </button>
+              <button class="action-btn" onclick="showToast('Suporte via Discord!','info')">
+                <i class="fas fa-headset"></i>
+                <span>Suporte</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- News widget in dashboard -->
+        <div class="dash-card span-2">
+          <div class="card-header">
+            <i class="fas fa-newspaper"></i>
+            <h3>Últimas Notícias</h3>
+          </div>
+          <div class="card-body">
+            <div class="dash-news-list" id="dashNewsList">
+              <div class="news-loading"><div class="loading-spinner"></div><span>Carregando...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TERMS MODAL -->
+<div class="modal-overlay" id="termsModal" style="display:none" onclick="closeTermsModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3><i class="fas fa-scroll"></i> Termos de Uso — Spartan Roleplay</h3>
+      <button class="modal-close" onclick="closeTermsModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <h4>1. Respeito Mútuo</h4>
+      <p>Todos os jogadores devem tratar uns aos outros com respeito. Comportamento tóxico, ofensivo ou discriminatório resultará em banimento.</p>
+      <h4>2. Roleplay Realista</h4>
+      <p>Mantenha sempre o contexto do roleplay. Saídas de personagem (OOC) devem ser minimizadas e devidamente sinalizadas.</p>
+      <h4>3. Proibições</h4>
+      <p>É proibido o uso de hacks, cheats, exploits ou qualquer modificação não autorizada que afete a experiência de outros jogadores.</p>
+      <h4>4. Comunicação</h4>
+      <p>Use os canais adequados para comunicação IC (in character) e OOC (out of character). Não misture as duas realidades.</p>
+      <h4>5. Decisões da Administração</h4>
+      <p>As decisões da equipe de administração são finais. Recursos podem ser feitos pelo canal oficial de suporte no Discord.</p>
+      <h4>6. Dados Pessoais</h4>
+      <p>Seus dados são armazenados com segurança e nunca serão compartilhados com terceiros sem seu consentimento.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary small" onclick="acceptTerms()">
+        <i class="fas fa-check"></i> Aceitar Termos
+      </button>
+      <button class="btn-ghost" onclick="closeTermsModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Copy IP Tooltip -->
+<div class="copy-tooltip" id="copyTooltip">
+  <i class="fas fa-copy"></i> IP Copiado!
+</div>
+
+<script src="/assets/js/app.js"></script>
+</body>
+</html>

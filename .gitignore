@@ -1,0 +1,10 @@
+node_modules/
+database/spartan.db
+database/spartan.db-shm
+database/spartan.db-wal
+.env
+*.log
+.DS_Store
+Thumbs.db
+spartan_theme.wav
+video_assets/

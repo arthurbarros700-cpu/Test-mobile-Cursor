@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Spartan Roleplay — Trailer Oficial</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#c9922e;--gl:#e8b44a;--gb:#ffd97d;--d:#03030a;--d2:#080810;--b:rgba(201,146,46,.18);--t:#c0b8a8;--m:#5a5248;}
+body{background:var(--d);color:var(--t);font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;gap:0;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 15% 20%,rgba(201,146,46,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 80%,rgba(100,20,20,.06) 0%,transparent 55%);z-index:0;}
+.wrap{position:relative;z-index:1;width:100%;max-width:1000px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+.hd{text-align:center;}
+.ey{font-size:.72rem;letter-spacing:.45em;color:var(--g);text-transform:uppercase;margin-bottom:8px;opacity:.8;}
+h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:900;background:linear-gradient(135deg,var(--g) 0%,var(--gb) 50%,var(--g) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.06em;}
+.tg{margin-top:6px;font-size:.85rem;color:var(--m);}
+.vw{width:100%;background:#000;border:1px solid var(--b);border-radius:10px;overflow:hidden;box-shadow:0 0 60px rgba(201,146,46,.09),0 24px 60px rgba(0,0,0,.95);}
+video{width:100%;display:block;}
+.specs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.spec{border:1px solid var(--b);border-radius:20px;padding:4px 13px;font-size:.75rem;color:var(--g);background:rgba(201,146,46,.04);}
+.dl{width:100%;background:rgba(8,8,16,.9);border:1px solid var(--b);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:16px;}
+.dl-t{font-family:'Cinzel',serif;font-size:.9rem;color:var(--g);letter-spacing:.15em;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:560px){.grid{grid-template-columns:1fr;}}
+.card{background:rgba(0,0,0,.4);border:1px solid rgba(201,146,46,.12);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;transition:.2s;display:flex;flex-direction:column;gap:6px;}
+.card:hover{border-color:var(--g);background:rgba(201,146,46,.04);}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--g);}
+.ch{font-size:.68rem;letter-spacing:.1em;color:var(--m);text-transform:uppercase;}
+.cn{font-size:.9rem;font-weight:700;color:#fff;}
+.cn2{font-size:.68rem;color:var(--m);}
+.btn{display:inline-flex;align-items:center;gap:7px;margin-top:4px;padding:9px 18px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.04em;text-decoration:none;transition:.2s;cursor:pointer;border:none;}
+.bp{background:linear-gradient(135deg,var(--g),var(--gl));color:#04040a;box-shadow:0 4px 16px rgba(201,146,46,.28);}
+.bp:hover{transform:translateY(-2px);box-shadow:0 7px 24px rgba(201,146,46,.48);}
+.bg2{background:rgba(255,255,255,.04);border:1px solid var(--b);color:var(--g);}
+.bg2:hover{border-color:var(--g);background:rgba(201,146,46,.07);}
+.hw{background:rgba(0,0,0,.3);border:1px solid rgba(201,146,46,.08);border-radius:8px;padding:14px 18px;}
+.hwt{font-size:.72rem;letter-spacing:.1em;color:var(--g);text-transform:uppercase;margin-bottom:8px;}
+.steps{display:flex;flex-direction:column;gap:5px;}
+.step{display:flex;gap:9px;font-size:.78rem;color:var(--t);}
+.sn{color:var(--g);font-weight:700;font-size:.68rem;flex-shrink:0;}
+.ft{font-size:.68rem;color:var(--m);text-align:center;}
+.ft a{color:var(--g);text-decoration:none;}
+.ft a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hd">
+  <div class="ey">⚔ FiveM · GTA RP · Brasil ⚔</div>
+  <h1>SPARTAN ROLEPLAY</h1>
+  <div class="tg">Trailer Oficial 2024 — Dark Cinematic Trap</div>
+</div>
+
+<!-- VIDEO PLAYER — sources from most reliable to local fallback -->
+<div class="vw" id="vw">
+  <video id="v" controls preload="auto" playsinline>
+    <source src="https://files.catbox.moe/iv1d2e.mp4" type="video/mp4"/>
+    <source src="/spartan_trailer.mp4" type="video/mp4"/>
+  </video>
+</div>
+
+<div class="specs">
+  <span class="spec">1920×1080 Full HD</span>
+  <span class="spec">H.264 · AAC 192kbps</span>
+  <span class="spec">60 segundos</span>
+  <span class="spec">58 MB</span>
+  <span class="spec">Dark Trap · Sem Narração</span>
+</div>
+
+<div class="dl">
+  <div class="dl-t">⬇ DOWNLOAD</div>
+  <div class="grid">
+    <div class="card">
+      <div class="ch">Catbox.moe · Permanente · CDN Global</div>
+      <div class="cn">Download Direto — Link Permanente</div>
+      <div class="cn2">✅ Sem conta · Sem expiração · Alta velocidade</div>
+      <a class="btn bp" href="https://files.catbox.moe/iv1d2e.mp4" download="spartan_trailer.mp4" target="_blank">⬇ Baixar (58 MB)</a>
+    </div>
+    <div class="card">
+      <div class="ch">GoFile.io · Permanente</div>
+      <div class="cn">GoFile — Assistir + Baixar</div>
+      <div class="cn2">✅ Player online integrado · Sem conta</div>
+      <a class="btn bg2" href="https://gofile.io/d/c0Cmpn" target="_blank">▶ Abrir no GoFile →</a>
+    </div>
+  </div>
+  <div class="hw">
+    <div class="hwt">Como baixar no celular</div>
+    <div class="steps">
+      <div class="step"><span class="sn">1</span>Clique em "Baixar" acima</div>
+      <div class="step"><span class="sn">2</span>O MP4 abre no navegador — pressione e segure → "Salvar vídeo"</div>
+      <div class="step"><span class="sn">PC</span>Clique com botão direito → "Salvar link como..."</div>
+    </div>
+  </div>
+</div>
+
+<div class="ft">
+  © 2024 Spartan Roleplay &nbsp;·&nbsp;
+  <a href="/">Painel de Login</a> &nbsp;·&nbsp;
+  <a href="https://github.com/arthurbarros700-cpu/Test-mobile-Cursor" target="_blank">GitHub</a>
+</div>
+</div>
+
+<script>
+(function(){
+  var video = document.getElementById('v');
+  var sources = video.querySelectorAll('source');
+  var idx = 0;
+
+  function tryNext() {
+    idx++;
+    if (idx < sources.length) {
+      video.src = sources[idx].src;
+      video.load();
+      video.play().catch(function(){});
+    }
+  }
+
+  video.addEventListener('error', function(e) {
+    console.warn('Source failed:', sources[idx] && sources[idx].src);
+    tryNext();
+  });
+
+  sources.forEach(function(src, i) {
+    src.addEventListener('error', function() {
+      if (i === idx) tryNext();
+    });
+  });
+})();
+</script>
+</body>
+</html>
