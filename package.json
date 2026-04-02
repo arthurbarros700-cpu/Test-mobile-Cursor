@@ -1,0 +1,19 @@
+{
+  "name": "mta-discord-panel-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord profissional com painel interativo e ponte MTA:SA",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
