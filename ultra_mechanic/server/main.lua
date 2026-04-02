@@ -6,6 +6,7 @@ local framework = {
 }
 
 local hasDatabase = false
+local hasMySQLAwait = false
 local vehicleCache = {}
 local stockCache = {}
 local quoteCache = {}
@@ -37,6 +38,30 @@ local function normalizePlate(rawPlate)
         return ""
     end
     return rawPlate:gsub("^%s*(.-)%s*$", "%1"):upper()
+end
+
+local function parseDbTimestamp(value)
+    if type(value) == "number" then
+        return math.floor(value)
+    end
+
+    if type(value) ~= "string" or value == "" then
+        return nil
+    end
+
+    local year, month, day, hour, min, sec = value:match("^(%d+)%-(%d+)%-(%d+) (%d+):(%d+):(%d+)$")
+    if not year then
+        return nil
+    end
+
+    return os.time({
+        year = tonumber(year),
+        month = tonumber(month),
+        day = tonumber(day),
+        hour = tonumber(hour),
+        min = tonumber(min),
+        sec = tonumber(sec)
+    })
 end
 
 local function decodeJson(value, fallback)
@@ -232,11 +257,36 @@ local function ensureStockCache()
     end
 end
 
+local function oxQueryAwait(kind, query, params)
+    local p = promise.new()
+    params = params or {}
+
+    if kind == "single" then
+        exports.oxmysql:single(query, params, function(result)
+            p:resolve(result)
+        end)
+    elseif kind == "insert" then
+        exports.oxmysql:insert(query, params, function(result)
+            p:resolve(result)
+        end)
+    else
+        exports.oxmysql:query(query, params, function(result)
+            p:resolve(result)
+        end)
+    end
+
+    return Citizen.Await(p)
+end
+
 local function dbExec(query, params)
     if not hasDatabase then
         return true
     end
-    MySQL.query.await(query, params or {})
+    if hasMySQLAwait then
+        MySQL.query.await(query, params or {})
+    else
+        oxQueryAwait("query", query, params or {})
+    end
     return true
 end
 
@@ -244,21 +294,30 @@ local function dbQuery(query, params)
     if not hasDatabase then
         return {}
     end
-    return MySQL.query.await(query, params or {})
+    if hasMySQLAwait then
+        return MySQL.query.await(query, params or {})
+    end
+    return oxQueryAwait("query", query, params or {})
 end
 
 local function dbSingle(query, params)
     if not hasDatabase then
         return nil
     end
-    return MySQL.single.await(query, params or {})
+    if hasMySQLAwait then
+        return MySQL.single.await(query, params or {})
+    end
+    return oxQueryAwait("single", query, params or {})
 end
 
 local function dbInsert(query, params)
     if not hasDatabase then
         return nil
     end
-    return MySQL.insert.await(query, params or {})
+    if hasMySQLAwait then
+        return MySQL.insert.await(query, params or {})
+    end
+    return oxQueryAwait("insert", query, params or {})
 end
 
 local function saveStock(workshopId, item, amount)
@@ -522,6 +581,7 @@ local function getQuoteById(quoteId)
     if hasDatabase then
         local row = dbSingle("SELECT * FROM um_quotes WHERE id = ? LIMIT 1", { quoteId })
         if row then
+            local expiresAt = parseDbTimestamp(row.expires_at) or (now() + Config.QuoteTimeoutSeconds)
             local loaded = {
                 id = tonumber(row.id),
                 plate = normalizePlate(row.plate),
@@ -529,8 +589,8 @@ local function getQuoteById(quoteId)
                 model = tonumber(row.model) or 0,
                 tier = row.tier,
                 status = row.status,
-                createdAt = now(),
-                expiresAt = now() + Config.QuoteTimeoutSeconds,
+                createdAt = parseDbTimestamp(row.created_at) or now(),
+                expiresAt = expiresAt,
                 createdBy = tonumber(row.created_by) or 0,
                 mechanicIdentifier = row.mechanic_identifier,
                 totalPrice = tonumber(row.total_price) or 0,
@@ -561,7 +621,7 @@ end
 
 local function saveRepair(repair)
     if hasDatabase then
-        if not repair.id or repair.id <= 0 then
+        if not repair.persisted then
             local insertId = dbInsert([[
                 INSERT INTO um_repairs (
                     quote_id, plate, workshop_id, model, status, started_by, mechanic_identifier,
@@ -584,6 +644,7 @@ local function saveRepair(repair)
             if insertId then
                 repair.id = insertId
                 repairCounter = math.max(repairCounter, insertId)
+                repair.persisted = true
             end
         else
             dbExec([[
@@ -593,7 +654,9 @@ local function saveRepair(repair)
             ]], { repair.status, repair.status == "completed" or repair.status == "cancelled", repair.id })
         end
     end
-    repairCache[repair.id] = repair
+    if repair.id then
+        repairCache[repair.id] = repair
+    end
 end
 
 local function buildPanelData(workshopId, plate, model)
@@ -650,14 +713,18 @@ local function buildPanelData(workshopId, plate, model)
     local quotes = {}
     for _, quote in pairs(quoteCache) do
         if quote.plate == normalizePlate(plate) and quote.workshopId == workshopId and quote.status == "draft" then
-            quotes[#quotes + 1] = {
-                id = quote.id,
-                tier = quote.tier,
-                totalPrice = quote.totalPrice,
-                totalDuration = quote.totalDuration,
-                createdAt = quote.createdAt,
-                expiresAt = quote.expiresAt
-            }
+            if now() > (quote.expiresAt or 0) then
+                saveQuoteStatus(quote.id, "expired")
+            else
+                quotes[#quotes + 1] = {
+                    id = quote.id,
+                    tier = quote.tier,
+                    totalPrice = quote.totalPrice,
+                    totalDuration = quote.totalDuration,
+                    createdAt = quote.createdAt,
+                    expiresAt = quote.expiresAt
+                }
+            end
         end
     end
     table.sort(quotes, function(a, b) return a.id > b.id end)
@@ -933,7 +1000,8 @@ end)
 
 CreateThread(function()
     identifyFramework()
-    hasDatabase = type(MySQL) == "table" and MySQL.query and MySQL.query.await ~= nil
+    hasMySQLAwait = type(MySQL) == "table" and MySQL.query and MySQL.query.await ~= nil
+    hasDatabase = hasMySQLAwait or GetResourceState("oxmysql") == "started"
 
     ensureStockCache()
 

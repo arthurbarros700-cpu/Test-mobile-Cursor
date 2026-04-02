@@ -376,6 +376,17 @@ RegisterNUICallback("orderStock", function(data, cb)
         amount = data and data.amount
     })
     cb({ ok = ok, payload = response })
+
+    if ok then
+        local okRefresh, panelPayload = callServer("getPanelData", {
+            workshopId = currentWorkshopId,
+            plate = currentVehicleContext.plate,
+            model = currentVehicleContext.model
+        })
+        if okRefresh and panelPayload then
+            SendNUIMessage({ action = "open", payload = panelPayload })
+        end
+    end
 end)
 
 RegisterNetEvent("ultra_mechanic:client:updateVehicleState", function(plate, components)
