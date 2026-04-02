@@ -23,15 +23,66 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
       connectSrc: ["'self'"],
+      mediaSrc: ["'self'", 'blob:', 'https:'],
     },
   },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── Video streaming with range support ───────────────────────────────────────
+app.get(/\.(mp4|webm|ogg)$/, (req, res, next) => {
+  const fs = require('fs');
+  const path = require('path');
+  const filePath = path.join(__dirname, 'public', req.path);
+
+  if (!fs.existsSync(filePath)) return next();
+
+  const stat   = fs.statSync(filePath);
+  const total  = stat.size;
+  const range  = req.headers.range;
+
+  res.setHeader('Accept-Ranges', 'bytes');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+
+  if (range) {
+    const [startStr, endStr] = range.replace(/bytes=/, '').split('-');
+    const start = parseInt(startStr, 10);
+    const end   = endStr ? parseInt(endStr, 10) : Math.min(start + 1024 * 1024 - 1, total - 1);
+    const chunkSize = end - start + 1;
+
+    res.writeHead(206, {
+      'Content-Range':  `bytes ${start}-${end}/${total}`,
+      'Content-Length': chunkSize,
+      'Content-Type':   'video/mp4',
+    });
+    fs.createReadStream(filePath, { start, end }).pipe(res);
+  } else {
+    res.writeHead(200, {
+      'Content-Length': total,
+      'Content-Type':   'video/mp4',
+    });
+    fs.createReadStream(filePath).pipe(res);
+  }
+});
+
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.mp4') || filePath.endsWith('.webm')) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+  }
+}));
 
 // ─── Rate Limiters ─────────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
