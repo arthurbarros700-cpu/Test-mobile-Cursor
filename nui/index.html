@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mecânica Pro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <div class="backdrop"></div>
+    <div class="panel" role="dialog" aria-labelledby="panel-title">
+      <header class="panel-head">
+        <div>
+          <p class="eyebrow">Workshop OS</p>
+          <h1 id="panel-title">Diagnóstico veicular</h1>
+          <p class="shop-line"><span id="shop-label">—</span></p>
+        </div>
+        <div class="head-actions">
+          <div class="money" title="Saldo">
+            <span class="money-label">Saldo</span>
+            <span id="money-value">$0</span>
+          </div>
+          <button type="button" class="icon-btn" id="btn-refresh" title="Atualizar">↻</button>
+          <button type="button" class="icon-btn" id="btn-close" title="Fechar (Esc)">✕</button>
+        </div>
+      </header>
+
+      <div class="panel-body">
+        <section class="card diagnostics">
+          <div class="card-head">
+            <h2 id="diag-title">Subsistemas</h2>
+            <span class="badge" id="health-badge">Ao vivo</span>
+          </div>
+          <div id="subsystem-list" class="subsystem-list"></div>
+        </section>
+
+        <section class="card inventory">
+          <div class="card-head">
+            <h2 id="stock-title">Estoque &amp; peças</h2>
+          </div>
+          <div id="parts-list" class="parts-list"></div>
+        </section>
+      </div>
+
+      <footer class="panel-foot">
+        <p class="hint">Selecione uma peça compatível com o subsistema em desgaste. Reparos em oficina consomem estoque.</p>
+      </footer>
+    </div>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
