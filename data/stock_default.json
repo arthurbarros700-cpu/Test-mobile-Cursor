@@ -1,0 +1,13 @@
+{
+  "engine_block": 6,
+  "transmission": 4,
+  "radiator": 10,
+  "brakes_kit": 12,
+  "suspension_kit": 8,
+  "battery": 20,
+  "fuel_pump": 8,
+  "tyre": 40,
+  "door_actuator": 14,
+  "glass_kit": 16,
+  "exhaust_system": 5
+}
