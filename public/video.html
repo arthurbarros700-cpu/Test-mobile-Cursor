@@ -4,46 +4,181 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Spartan Roleplay — Trailer Oficial</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#03030a;color:#e8e0d0;font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;}
-.logo{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.4em;color:#c9922e;margin-bottom:6px;text-align:center;}
-h1{font-family:'Cinzel',serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,#c9922e,#ffd97d,#c9922e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
-.sub{color:#6a6050;font-size:.9rem;text-align:center;margin-bottom:28px;letter-spacing:.06em;}
-.vwrap{width:100%;max-width:1000px;background:#060608;border:1px solid rgba(201,146,46,.25);border-radius:12px;overflow:hidden;box-shadow:0 0 80px rgba(201,146,46,.10),0 24px 64px rgba(0,0,0,.9);}
-video{width:100%;display:block;}
-.row{display:flex;gap:12px;margin-top:20px;justify-content:center;flex-wrap:wrap;}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;text-decoration:none;transition:.25s;}
-.btn-dl{background:linear-gradient(135deg,#c9922e,#e8b44a);color:#04040a;box-shadow:0 4px 24px rgba(201,146,46,.35);}
-.btn-dl:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,146,46,.55);}
-.btn-gh{background:rgba(255,255,255,.06);border:1px solid rgba(201,146,46,.25);color:#c9922e;}
-.btn-gh:hover{border-color:#c9922e;background:rgba(201,146,46,.08);}
-.specs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
-.spec{background:rgba(201,146,46,.06);border:1px solid rgba(201,146,46,.15);border-radius:20px;padding:5px 14px;font-size:.8rem;color:#c9922e;letter-spacing:.04em;}
-.note{font-size:.75rem;color:#3a3028;text-align:center;max-width:600px;margin-top:20px;}
+:root{
+  --gold:#c9922e;--gold-l:#e8b44a;--gold-b:#ffd97d;
+  --dark:#03030a;--dark2:#080810;--dark3:#0e0f18;
+  --border:rgba(201,146,46,.2);--text:#c8c0b0;--muted:#5a5248;
+}
+body{background:var(--dark);color:var(--text);font-family:'Rajdhani',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 16px;gap:0;}
+
+/* BG */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 15% 20%,rgba(201,146,46,.06) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 85% 80%,rgba(100,20,20,.06) 0%,transparent 55%);
+  z-index:0;}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:980px;display:flex;flex-direction:column;align-items:center;gap:24px;}
+
+/* Header */
+.header{text-align:center;}
+.eyebrow{font-size:.75rem;letter-spacing:.5em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:.8;}
+h1{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;
+   background:linear-gradient(135deg,var(--gold) 0%,var(--gold-b) 50%,var(--gold) 100%);
+   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+   letter-spacing:.06em;line-height:1.1;}
+.tagline{margin-top:8px;font-size:.9rem;color:var(--muted);letter-spacing:.08em;}
+
+/* Video player */
+.player-wrap{width:100%;background:#000;
+  border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(201,146,46,.05),
+             0 0 60px rgba(201,146,46,.08),
+             0 30px 80px rgba(0,0,0,.95);}
+video{width:100%;display:block;aspect-ratio:16/9;background:#000;}
+
+/* Specs row */
+.specs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.spec{border:1px solid var(--border);border-radius:20px;padding:5px 14px;
+  font-size:.78rem;color:var(--gold);letter-spacing:.04em;
+  background:rgba(201,146,46,.04);}
+
+/* Download section */
+.dl-section{width:100%;background:var(--dark3);border:1px solid var(--border);
+  border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:20px;}
+.dl-title{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);letter-spacing:.15em;}
+
+.link-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:600px){.link-grid{grid-template-columns:1fr;}}
+
+.dl-card{display:flex;flex-direction:column;gap:8px;
+  background:rgba(0,0,0,.4);border:1px solid rgba(201,146,46,.15);
+  border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;
+  transition:.25s ease;}
+.dl-card:hover{border-color:var(--gold);background:rgba(201,146,46,.05);}
+.dl-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;background:var(--gold);}
+
+.dl-host{font-size:.72rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.dl-name{font-size:.95rem;font-weight:700;color:white;}
+.dl-note{font-size:.72rem;color:var(--muted);}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;margin-top:4px;
+  padding:10px 20px;border-radius:8px;font-family:'Rajdhani',sans-serif;
+  font-weight:700;font-size:.88rem;letter-spacing:.05em;text-decoration:none;
+  transition:.2s ease;cursor:pointer;border:none;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#04040a;
+  box-shadow:0 4px 18px rgba(201,146,46,.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,146,46,.5);}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--gold);}
+.btn-ghost:hover{border-color:var(--gold);background:rgba(201,146,46,.08);transform:translateY(-1px);}
+
+/* How to download */
+.howto{background:rgba(0,0,0,.3);border:1px solid rgba(201,146,46,.10);border-radius:10px;padding:16px 20px;}
+.howto-title{font-size:.78rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.steps{display:flex;flex-direction:column;gap:6px;}
+.step{display:flex;align-items:baseline;gap:10px;font-size:.82rem;color:var(--text);}
+.step-n{color:var(--gold);font-weight:700;font-size:.7rem;flex-shrink:0;}
+
+/* Footer */
+.footer{font-size:.72rem;color:var(--muted);text-align:center;}
+.footer a{color:var(--gold);text-decoration:none;}
+.footer a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
-<div class="logo">⚔ SPARTAN ROLEPLAY ⚔</div>
-<h1>Trailer Oficial 2024</h1>
-<p class="sub">FiveM · GTA RP · Brasil</p>
-<div class="vwrap">
-  <video controls preload="metadata">
-    <source src="/spartan_roleplay_v3.mp4" type="video/mp4"/>
-  </video>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow">⚔ Servidor FiveM · GTA RP · Brasil ⚔</div>
+    <h1>SPARTAN ROLEPLAY</h1>
+    <div class="tagline">Trailer Oficial 2024 — Dark Cinematic Trap</div>
+  </div>
+
+  <!-- Player -->
+  <div class="player-wrap">
+    <video controls preload="metadata" id="mainVideo">
+      <source src="https://files.catbox.moe/rw1qoc.mp4" type="video/mp4"/>
+      <source src="/spartan_roleplay_v3.mp4" type="video/mp4"/>
+      Seu navegador não suporta vídeo HTML5.
+    </video>
+  </div>
+
+  <!-- Specs -->
+  <div class="specs">
+    <span class="spec">1920 × 1080 Full HD</span>
+    <span class="spec">H.264 · AAC</span>
+    <span class="spec">90 segundos</span>
+    <span class="spec">32 MB</span>
+    <span class="spec">Dark Trap · Sem Narração</span>
+    <span class="spec">Efeitos Cinematográficos AAA</span>
+  </div>
+
+  <!-- Download section -->
+  <div class="dl-section">
+    <div class="dl-title">⬇ DOWNLOAD DO VÍDEO</div>
+
+    <div class="link-grid">
+
+      <!-- Catbox (permanent) -->
+      <div class="dl-card">
+        <div class="dl-host">Catbox.moe · Permanente</div>
+        <div class="dl-name">Download Direto · Link Permanente</div>
+        <div class="dl-note">✅ Sem expiração · Alta velocidade · Global</div>
+        <a class="dl-btn btn-primary" href="https://files.catbox.moe/rw1qoc.mp4" download="spartan_roleplay_trailer.mp4" target="_blank">
+          ⬇ Baixar Agora (32 MB)
+        </a>
+      </div>
+
+      <!-- GoFile (permanent) -->
+      <div class="dl-card">
+        <div class="dl-host">GoFile.io · Permanente</div>
+        <div class="dl-name">GoFile — Assistir + Baixar</div>
+        <div class="dl-note">✅ Player online + download · Sem conta</div>
+        <a class="dl-btn btn-ghost" href="https://gofile.io/d/c0Cmpn" target="_blank">
+          ▶ Abrir no GoFile →
+        </a>
+      </div>
+
+    </div>
+
+    <!-- How to download on mobile -->
+    <div class="howto">
+      <div class="howto-title">Como baixar no celular</div>
+      <div class="steps">
+        <div class="step"><span class="step-n">1</span> Clique em "Baixar Agora" acima</div>
+        <div class="step"><span class="step-n">2</span> O arquivo MP4 vai abrir no navegador</div>
+        <div class="step"><span class="step-n">3</span> Pressione e segure o vídeo → "Salvar vídeo" ou use os 3 pontos ⋮ → Download</div>
+        <div class="step"><span class="step-n">PC</span> Clique com botão direito → "Salvar link como..." ou use o botão de download do player</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© 2024 Spartan Roleplay · Todos os direitos reservados</p>
+    <p style="margin-top:6px">
+      <a href="https://github.com/arthurbarros700-cpu/Test-mobile-Cursor" target="_blank">GitHub do Projeto</a>
+      &nbsp;·&nbsp;
+      <a href="/">Painel de Login</a>
+    </p>
+  </div>
+
 </div>
-<div class="row">
-  <a class="btn btn-dl" href="/spartan_roleplay_v3.mp4" download="spartan_roleplay_trailer.mp4">⬇ Baixar (32 MB)</a>
-  <a class="btn btn-gh" href="https://github.com/arthurbarros700-cpu/Test-mobile-Cursor" target="_blank">GitHub →</a>
-</div>
-<div class="specs">
-  <span class="spec">1920 × 1080 Full HD</span>
-  <span class="spec">H.264 · AAC</span>
-  <span class="spec">90 segundos</span>
-  <span class="spec">Dark Trap · Sem Narração</span>
-  <span class="spec">Efeitos Cinematográficos</span>
-</div>
-<p class="note">Clique ▶ para assistir ou ⬇ para baixar no PC.</p>
+
+<script>
+// If local server source fails, fallback to catbox
+document.getElementById('mainVideo').addEventListener('error', function() {
+  var src = this.querySelector('source');
+  if (src && src.src.includes('localhost')) {
+    src.src = 'https://files.catbox.moe/rw1qoc.mp4';
+    this.load();
+  }
+}, true);
+</script>
 </body>
 </html>
