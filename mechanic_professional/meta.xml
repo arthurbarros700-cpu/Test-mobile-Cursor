@@ -1,0 +1,22 @@
+<meta>
+    <info
+        author="MechanicProfessional"
+        name="MechanicProfessional"
+        description="Oficina avançada: estoque com reservas, FSM de OS, diagnóstico multi-sensor, painel DX e trilha de auditoria."
+        version="1.0.0"
+        type="script"
+    />
+    <oop>true</oop>
+    <min_mta_version client="1.5.9" server="1.5.9" />
+
+    <script src="shared/catalog.lua" type="shared" cache="false" />
+    <script src="shared/constants.lua" type="shared" cache="false" />
+
+    <script src="server/audit_log.lua" type="server" cache="false" />
+    <script src="server/inventory_engine.lua" type="server" cache="false" />
+    <script src="server/diagnostics_engine.lua" type="server" cache="false" />
+    <script src="server/workshop_fsm.lua" type="server" cache="false" />
+    <script src="server/core.lua" type="server" cache="false" />
+
+    <script src="client/panel_dx.lua" type="client" cache="false" />
+</meta>
