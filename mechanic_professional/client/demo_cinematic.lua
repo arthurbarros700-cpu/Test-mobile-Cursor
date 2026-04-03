@@ -22,10 +22,10 @@ addEventHandler("mechanic:demoPhase", root, function(payload)
         cue[k] = v
     end
     if cue.open_panel then
-        triggerEvent("mechanic:demoOpenPanel", localPlayer)
+        triggerEvent("mechanic:demoOpenPanel", root)
     end
     if cue.tab then
-        triggerEvent("mechanic:demoSetTab", localPlayer, cue.tab)
+        triggerEvent("mechanic:demoSetTab", root, cue.tab)
     end
 end)
 
