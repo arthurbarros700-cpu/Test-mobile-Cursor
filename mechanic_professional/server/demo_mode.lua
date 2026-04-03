@@ -260,15 +260,40 @@ local function runDemoSequence(player)
 
     schedule(18000, function()
         demoCue(player, {
+            narrator = "Bloco extra para vídeo: mostre o painel (F2), role estoque e logs enquanto o narrador fala — conteúdo B-roll.",
+            tab = "inv",
+            phase = "broll_1",
+        })
+    end)
+
+    schedule(18000, function()
+        demoCue(player, {
+            narrator = "No servidor, MechanicAudit correlaciona job_id; no cliente, apenas fatias recentes para performance.",
+            tab = "log",
+            phase = "broll_2",
+        })
+        triggerClientEvent(player, "mechanic:onAuditSlice", player, MechanicAudit:recent(90, LOG_LEVEL.DEBUG))
+    end)
+
+    schedule(20000, function()
+        demoCue(player, {
+            narrator = "FSM valida cada transição; inventário usa reserva atômica por OS e commit na passagem ao QC.",
+            tab = "os",
+            phase = "broll_3",
+        })
+    end)
+
+    schedule(20000, function()
+        demoCue(player, {
             title = "Demonstração concluída",
             subtitle = "MechanicProfessional",
-            narrator = "Comando /mechanicdemo repete o roteiro. Grave 5+ min com OBS ou captura de tela cheia.",
+            narrator = "Comando /mechanicdemo ou F11 repetem o roteiro. Grave com OBS (5+ min) em tela cheia 1080p.",
             tab = "os",
             open_panel = true,
             done = true,
             phase = "fin",
         })
-        outputChatBox("[MechanicPro] Demo finalizada (~5–6 min de roteiro).", player, 80, 220, 120)
+        outputChatBox("[MechanicPro] Demo finalizada (roteiro > 5 min).", player, 80, 220, 120)
         activeDemoFor[player] = nil
     end)
 end
