@@ -16,8 +16,13 @@
     <script src="server/generated/dtc_registry.lua" type="server" cache="false" />
     <script src="server/generated/service_procedures.lua" type="server" cache="false" />
     <script src="server/generated/vehicle_profiles.lua" type="server" cache="false" />
+    <script src="server/generated/suppliers_master.lua" type="server" cache="false" />
+    <script src="server/generated/labor_flat_rate.lua" type="server" cache="false" />
+    <script src="server/generated/tsb_index.lua" type="server" cache="false" />
+    <script src="server/generated/torque_specs.lua" type="server" cache="false" />
 
     <script src="server/audit_log.lua" type="server" cache="false" />
+    <script src="server/reference_library.lua" type="server" cache="false" />
     <script src="server/inventory_engine.lua" type="server" cache="false" />
     <script src="server/diagnostics_engine.lua" type="server" cache="false" />
     <script src="server/workshop_fsm.lua" type="server" cache="false" />

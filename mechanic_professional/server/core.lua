@@ -27,6 +27,7 @@ local function jobToDto(job)
         mechanic = job.mechanic,
         parts_plan = job.parts_plan,
         diagnostic = job.diagnostic,
+        ref_context = job.ref_context,
     }
 end
 
@@ -111,11 +112,15 @@ addEventHandler("onResourceStart", resourceRoot, function()
     if parts then
         outputDebugString(
             string.format(
-                "[MechanicProfessional] bases geradas: %d SKUs, %d DTCs, %d procedimentos, %d perfis de veículo.",
+                "[MechanicProfessional] bases: %d SKUs, %d DTC, %d proc, %d veículos, %d fornec., %d flat-rate, %d TSB, %d torque.",
                 parts or 0,
                 dtc or 0,
                 proc or 0,
-                veh or 0
+                veh or 0,
+                MECHANIC_GEN_SUPPLIERS_COUNT or 0,
+                MECHANIC_GEN_LABOR_FLAT_COUNT or 0,
+                MECHANIC_GEN_TSB_COUNT or 0,
+                MECHANIC_GEN_TORQUE_COUNT or 0
             ),
             3
         )

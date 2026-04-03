@@ -128,9 +128,41 @@ local function drawJobPanel()
             local findings = job.diagnostic.findings or {}
             dxDrawText("Achados:", rx, ry, rx + 200, ry + 16, COL.muted, 0.85, "default")
             ry = ry + 16
-            dxDrawText(table.concat(findings, "\n"), rx, ry, px + pw - 16, y0 + ph - 60, COL.text, 0.82, "default", "left", "top", true, false)
+            dxDrawText(table.concat(findings, "\n"), rx, ry, px + pw - 16, y0 + ph - 148, COL.text, 0.82, "default", "left", "top", true, false)
         end
-        ry = y0 + ph - 120
+        if job.ref_context then
+            local rc = job.ref_context
+            local bits = {}
+            if rc.tsb and rc.tsb.title then
+                bits[#bits + 1] = "TSB: " .. tostring(rc.tsb.title):sub(1, 52)
+            end
+            if rc.torque and rc.torque.torque_nm then
+                bits[#bits + 1] = string.format("Torque: %s Nm (%s)", tostring(rc.torque.torque_nm), tostring(rc.torque.assembly or ""))
+            end
+            if rc.flat_labor and rc.flat_labor.flat_hours then
+                bits[#bits + 1] = string.format("Flat-rate: %s h · %s", tostring(rc.flat_labor.flat_hours), tostring(rc.flat_labor.op_family or ""))
+            end
+            if rc.vehicle_ref and rc.vehicle_ref.label then
+                bits[#bits + 1] = "Perfil ref: " .. tostring(rc.vehicle_ref.label):sub(1, 48)
+            end
+            if #bits > 0 then
+                dxDrawText(
+                    table.concat(bits, "\n"),
+                    rx,
+                    y0 + ph - 142,
+                    px + pw - 12,
+                    y0 + ph - 122,
+                    COL.muted,
+                    0.72,
+                    "default",
+                    "left",
+                    "top",
+                    true,
+                    false
+                )
+            end
+        end
+        ry = y0 + ph - 118
         dxDrawText("Plano de peças:", rx, ry, rx + 200, ry + 16, COL.muted, 0.85, "default")
         ry = ry + 14
         for _, line in ipairs(job.parts_plan or {}) do

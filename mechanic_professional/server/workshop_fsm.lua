@@ -88,6 +88,7 @@ function WorkshopFSM:transition(jobId, newState, player)
     if newState == JOB_STATE.DIAGNOSTIC then
         job.diagnostic = MechanicDiagnostics:runProfile(job.family, job.mileage_km)
         job.parts_plan = job.diagnostic.parts_plan or {}
+        job.ref_context = MechanicReference and MechanicReference:snapshotForJob(job) or nil
         MechanicAudit:append(LOG_LEVEL.INFO, "DIAG", "diagnóstico concluído", {
             job_id = jobId,
             dtc = job.diagnostic.dtc,
