@@ -6,8 +6,8 @@ Esta pasta contém uma **simulação visual de alta fidelidade** do painel Disco
 
 Abre no Chrome/Safari — a animação corre na página (não precisas de app):
 
-- **Demo em ecrã completo:**  
-  https://cdn.jsdelivr.net/gh/arthurbarros700-cpu/Test-mobile-Cursor@cursor/bot-discord-mta-painel-5e30/marketing/demo/index.html  
+- **Demo em ecrã completo** (branch com `/` codificado como `%2F`):  
+  https://cdn.jsdelivr.net/gh/arthurbarros700-cpu/Test-mobile-Cursor@cursor%2Fbot-discord-mta-painel-5e30/marketing/demo/index.html  
 
 - **Página com moldura 16:9** (melhor em telemóvel): após ativares **GitHub Pages** (pasta `docs/` na branch `main`), usa  
   `https://<teu-user>.github.io/<repo>/demo.html`  
