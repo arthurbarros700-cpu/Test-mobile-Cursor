@@ -2,6 +2,19 @@
 
 Esta pasta contém uma **simulação visual de alta fidelidade** do painel Discord (não liga ao teu bot real) e um gerador de vídeo para **trailers / anúncios**.
 
+## Ver a demo no telemóvel (browser)
+
+Abre no Chrome/Safari — a animação corre na página (não precisas de app):
+
+- **Demo em ecrã completo:**  
+  https://cdn.jsdelivr.net/gh/arthurbarros700-cpu/Test-mobile-Cursor@cursor/bot-discord-mta-painel-5e30/marketing/demo/index.html  
+
+- **Página com moldura 16:9** (melhor em telemóvel): após ativares **GitHub Pages** (pasta `docs/` na branch `main`), usa  
+  `https://<teu-user>.github.io/<repo>/demo.html`  
+  (o ficheiro está em `docs/demo.html` no repositório).
+
+Em telemóvel, roda o ecrã para **horizontal** para ver o layout 1920×1080 sem cortar.
+
 ## Gerar o vídeo (WebM + MP4)
 
 Requisitos: Node 20+, **ffmpeg** no PATH, e Chromium do Playwright.
