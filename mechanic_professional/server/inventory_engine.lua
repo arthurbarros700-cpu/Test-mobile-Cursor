@@ -15,13 +15,24 @@ function Inventory:new()
         txn_counter = 0,
     }
     setmetatable(o, self)
-    for sku in pairs(PARTS_CATALOG) do
-        o.on_hand[sku] = math.random(3, 18)
-        o.lots[sku] = {
-            { lot = "INIT-A", qty = o.on_hand[sku] },
-        }
+    if not catalogIsMegacatalog() then
+        for sku in pairs(PARTS_CATALOG) do
+            o.on_hand[sku] = math.random(3, 18)
+            o.lots[sku] = {
+                { lot = "INIT-A", qty = o.on_hand[sku] },
+            }
+        end
     end
     return o
+end
+
+function Inventory:_ensureSku(sku)
+    if not PARTS_CATALOG[sku] then return end
+    if self.on_hand[sku] ~= nil then return end
+    self.on_hand[sku] = math.random(3, 18)
+    self.lots[sku] = {
+        { lot = "LAZY-INIT", qty = self.on_hand[sku] },
+    }
 end
 
 function Inventory:_txnId()
@@ -36,6 +47,7 @@ function Inventory:_ensureJobReserve(jobId)
 end
 
 function Inventory:available(sku)
+    self:_ensureSku(sku)
     local oh = self.on_hand[sku] or 0
     local r = 0
     for _, jobMap in pairs(self.reserved) do
@@ -127,6 +139,7 @@ function Inventory:commitForJob(jobId, sku, qty, actor)
 end
 
 function Inventory:receipt(sku, qty, actor, note)
+    self:_ensureSku(sku)
     self.on_hand[sku] = (self.on_hand[sku] or 0) + qty
     local lots = self.lots[sku]
     if lots then
@@ -173,18 +186,40 @@ function Inventory:tickInbound()
 end
 
 function Inventory:snapshot()
-    local skus = catalogSkuList()
     local rows = {}
-    for _, sku in ipairs(skus) do
+    local seen = {}
+    local function addRow(sku)
+        if seen[sku] then return end
+        seen[sku] = true
         local cat = PARTS_CATALOG[sku]
+        if not cat then return end
         rows[#rows + 1] = {
             sku = sku,
-            name = cat and cat.name or sku,
+            name = cat.name or sku,
             on_hand = self.on_hand[sku] or 0,
             available = self:available(sku),
-            reorder_point = cat and cat.reorder_point or 0,
-            supplier = cat and cat.supplier or "",
+            reorder_point = cat.reorder_point or 0,
+            supplier = cat.supplier or "",
         }
+    end
+    for _, sku in ipairs(catalogSkuList()) do
+        addRow(sku)
+    end
+    if catalogIsMegacatalog() then
+        for sku in pairs(self.on_hand) do
+            if sku:sub(1, 8) == "SKU-GEN-" then
+                addRow(sku)
+                if #rows > 900 then break end
+            end
+        end
+        for _, jm in pairs(self.reserved) do
+            for sku in pairs(jm) do
+                if sku:sub(1, 8) == "SKU-GEN-" then
+                    addRow(sku)
+                end
+                if #rows > 900 then break end
+            end
+        end
     end
     return rows
 end

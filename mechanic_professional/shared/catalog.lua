@@ -129,10 +129,21 @@ function catalogFamiliesForSku(sku)
     return p.family or {}
 end
 
+function catalogIsMegacatalog()
+    return PARTS_CATALOG["SKU-GEN-000001"] ~= nil
+end
+
+--[[
+    Lista SKUs para painel / snapshots. Com catálogo gerado em massa (somente servidor),
+    expõe apenas itens "core" (não SKU-GEN-*) para evitar dezenas de milhares de linhas na UI.
+]]
 function catalogSkuList()
     local t = {}
+    local mega = catalogIsMegacatalog()
     for sku in pairs(PARTS_CATALOG) do
-        t[#t + 1] = sku
+        if not mega or sku:sub(1, 8) ~= "SKU-GEN-" then
+            t[#t + 1] = sku
+        end
     end
     table.sort(t)
     return t

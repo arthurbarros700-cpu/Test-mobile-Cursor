@@ -30,7 +30,6 @@ local function jobToDto(job)
     }
 end
 
-addEvent("mechanic:requestBootstrap", true)
 addEventHandler("mechanic:requestBootstrap", root, function()
     local client = client
     if not isElement(client) then return end
@@ -45,12 +44,19 @@ addEventHandler("mechanic:requestBootstrap", root, function()
         end)(),
         inventory = MechanicInventory:snapshot(),
         inbound = MechanicInventory:pendingInbound(),
-        catalog = PARTS_CATALOG,
+        catalog = (function()
+            local c = {}
+            for sku, def in pairs(PARTS_CATALOG) do
+                if sku:sub(1, 8) ~= "SKU-GEN-" then
+                    c[sku] = def
+                end
+            end
+            return c
+        end)(),
     })
     sendLogSlice(client, LOG_LEVEL.DEBUG)
 end)
 
-addEvent("mechanic:createJob", true)
 addEventHandler("mechanic:createJob", root, function(plate, family, mileageKm)
     local p = client
     if not isElement(p) then return end
@@ -59,7 +65,6 @@ addEventHandler("mechanic:createJob", root, function(plate, family, mileageKm)
     sendLogSlice(p, LOG_LEVEL.INFO)
 end)
 
-addEvent("mechanic:jobTransition", true)
 addEventHandler("mechanic:jobTransition", root, function(jobId, newState)
     local p = client
     if not isElement(p) then return end
@@ -73,7 +78,6 @@ addEventHandler("mechanic:jobTransition", root, function(jobId, newState)
     sendLogSlice(p, LOG_LEVEL.DEBUG)
 end)
 
-addEvent("mechanic:tickLabor", true)
 addEventHandler("mechanic:tickLabor", root, function(jobId)
     local p = client
     if not isElement(p) then return end
@@ -84,7 +88,6 @@ addEventHandler("mechanic:tickLabor", root, function(jobId)
     end
 end)
 
-addEvent("mechanic:cancelJob", true)
 addEventHandler("mechanic:cancelJob", root, function(jobId)
     local p = client
     if not isElement(p) then return end
@@ -94,7 +97,6 @@ addEventHandler("mechanic:cancelJob", root, function(jobId)
     sendLogSlice(p, LOG_LEVEL.INFO)
 end)
 
-addEvent("mechanic:refreshLogs", true)
 addEventHandler("mechanic:refreshLogs", root, function(minLevel)
     local p = client
     if not isElement(p) then return end
@@ -102,5 +104,22 @@ addEventHandler("mechanic:refreshLogs", root, function(minLevel)
 end)
 
 addEventHandler("onResourceStart", resourceRoot, function()
-    outputDebugString("[MechanicProfessional] resource iniciado — oficina online.", 3)
+    local parts = MECHANIC_GEN_PARTS_COUNT
+    local dtc = MECHANIC_GEN_DTC_COUNT
+    local proc = MECHANIC_GEN_PROC_COUNT
+    local veh = MECHANIC_GEN_VEHICLE_COUNT
+    if parts then
+        outputDebugString(
+            string.format(
+                "[MechanicProfessional] bases geradas: %d SKUs, %d DTCs, %d procedimentos, %d perfis de veículo.",
+                parts or 0,
+                dtc or 0,
+                proc or 0,
+                veh or 0
+            ),
+            3
+        )
+    else
+        outputDebugString("[MechanicProfessional] resource iniciado — catálogo core apenas (rode node tools/gen-megadata.mjs).", 3)
+    end
 end)

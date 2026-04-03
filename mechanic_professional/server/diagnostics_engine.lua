@@ -58,7 +58,7 @@ function Diagnostics:readSensors(vehicleFamily, mileageKm, seed)
     return sensors
 end
 
-local function evalRules(sensors, family)
+local function evalRules(sensors, family, mileageKm)
     local findings = {}
     local parts = {}
     local dtc = {}
@@ -116,6 +116,19 @@ local function evalRules(sensors, family)
         end
     end
 
+    if type(DTC_REGISTRY) == "table" and MECHANIC_GEN_DTC_COUNT and MECHANIC_GEN_DTC_COUNT > 0 then
+        local idx = (math.floor(mileageKm or 0) % MECHANIC_GEN_DTC_COUNT) + 1
+        local code = string.format("G%05d", idx)
+        local row = DTC_REGISTRY[code]
+        if row then
+            dtc[#dtc + 1] = code
+            findings[#findings + 1] = "[Registro estendido] " .. tostring(row.title or code)
+            for _, sku in ipairs(row.related_skus or {}) do
+                parts[#parts + 1] = { sku = sku, qty = 1, reason = "correlação DTC " .. code }
+            end
+        end
+    end
+
     local filtered = {}
     for _, line in ipairs(parts) do
         local ok = false
@@ -138,7 +151,7 @@ end
 
 function Diagnostics:runProfile(vehicleFamily, mileageKm)
     local sensors = self:readSensors(vehicleFamily, mileageKm)
-    local findings, dtc, partsPlan = evalRules(sensors, vehicleFamily)
+    local findings, dtc, partsPlan = evalRules(sensors, vehicleFamily, mileageKm)
     return {
         sensors = sensors,
         findings = findings,

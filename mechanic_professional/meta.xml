@@ -12,6 +12,11 @@
     <script src="shared/catalog.lua" type="shared" cache="false" />
     <script src="shared/constants.lua" type="shared" cache="false" />
 
+    <script src="server/generated/parts_catalog_bulk.lua" type="server" cache="false" />
+    <script src="server/generated/dtc_registry.lua" type="server" cache="false" />
+    <script src="server/generated/service_procedures.lua" type="server" cache="false" />
+    <script src="server/generated/vehicle_profiles.lua" type="server" cache="false" />
+
     <script src="server/audit_log.lua" type="server" cache="false" />
     <script src="server/inventory_engine.lua" type="server" cache="false" />
     <script src="server/diagnostics_engine.lua" type="server" cache="false" />
