@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "video:demo": "node marketing/record-demo.mjs"
+    "video:demo": "node marketing/record-demo.mjs",
+    "video:upload-gofile": "node marketing/upload-gofile.mjs"
   },
   "engines": {
     "node": ">=20"

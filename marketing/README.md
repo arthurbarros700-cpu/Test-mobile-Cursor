@@ -4,16 +4,24 @@ Esta pasta contém uma **simulação visual de alta fidelidade** do painel Disco
 
 ## Ver a demo no telemóvel (browser)
 
-Abre no Chrome/Safari — a animação corre na página (não precisas de app):
+A demo (`marketing/demo/`) usa **escala automática** em ecrãs pequenos (`mobile-scale.js`) — deve abrir no Chrome/Safari sem ficar em branco.
 
-- **Demo em ecrã completo** (branch com `/` codificado como `%2F`):  
-  https://cdn.jsdelivr.net/gh/arthurbarros700-cpu/Test-mobile-Cursor@cursor%2Fbot-discord-mta-painel-5e30/marketing/demo/index.html  
+- **Demo animada (jsDelivr)** — após fazeres merge disto para `main`, o link estável é:  
+  `https://cdn.jsdelivr.net/gh/<user>/<repo>@main/marketing/demo/index.html`  
+  Na branch `cursor/...` o `/` do nome da branch tem de ser `%2F` no URL (frágil para partilhar).
 
-- **Página com moldura 16:9** (melhor em telemóvel): após ativares **GitHub Pages** (pasta `docs/` na branch `main`), usa  
-  `https://<teu-user>.github.io/<repo>/demo.html`  
-  (o ficheiro está em `docs/demo.html` no repositório).
+## Vídeo MP4 + Gofile (link profissional para o telemóvel)
 
-Em telemóvel, roda o ecrã para **horizontal** para ver o layout 1920×1080 sem cortar.
+O **MP4** reproduz direto na página do Gofile (melhor para marketing do que só HTML):
+
+```bash
+npm run video:demo
+npm run video:upload-gofile
+```
+
+O segundo comando imprime um URL `https://gofile.io/d/...` — abre no telemóvel e toca em **Download** / reproduz o vídeo no browser. O Gofile usa **upload anónimo**; o link pode expirar após tempo sem downloads (política do serviço).
+
+Para link permanente, usa **YouTube não listado** ou conta Gofile com token da API.
 
 ## Gerar o vídeo (WebM + MP4)
 

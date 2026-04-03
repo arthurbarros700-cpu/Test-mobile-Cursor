@@ -748,3 +748,18 @@ html, body {
 .app[data-cursor="on"] .cursor {
   opacity: 1;
 }
+
+/* Wrapper para escala em telemóvel (mobile-scale.js) */
+.scale-wrap {
+  min-height: 100vh;
+  background: #0c0d10;
+}
+
+html.demo-mobile,
+html.demo-mobile body {
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
