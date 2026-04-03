@@ -21,7 +21,9 @@
     <script src="server/inventory_engine.lua" type="server" cache="false" />
     <script src="server/diagnostics_engine.lua" type="server" cache="false" />
     <script src="server/workshop_fsm.lua" type="server" cache="false" />
+    <script src="server/demo_mode.lua" type="server" cache="false" />
     <script src="server/core.lua" type="server" cache="false" />
 
     <script src="client/panel_dx.lua" type="client" cache="false" />
+    <script src="client/demo_cinematic.lua" type="client" cache="false" />
 </meta>

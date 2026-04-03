@@ -8,6 +8,8 @@ addEvent("mechanic:onJobRemoved", true)
 addEvent("mechanic:onInventory", true)
 addEvent("mechanic:onAuditSlice", true)
 addEvent("mechanic:onActionResult", true)
+addEvent("mechanic:demoOpenPanel", false)
+addEvent("mechanic:demoSetTab", false)
 
 local show = false
 local sw, sh = guiGetScreenSize()
@@ -337,4 +339,16 @@ addEventHandler("mechanic:onActionResult", root, function(res)
     end
 end)
 
-outputChatBox("[MechanicPro] F2 painel | F3-F8 família | F9 nova OS | F10 cancelar OS selecionada", 0, 200, 200)
+addEventHandler("mechanic:demoOpenPanel", root, function()
+    show = true
+    showCursor(true)
+    triggerServerEvent("mechanic:requestBootstrap", localPlayer)
+end)
+
+addEventHandler("mechanic:demoSetTab", root, function(t)
+    if type(t) == "string" and (t == "os" or t == "inv" or t == "log") then
+        tab = t
+    end
+end)
+
+outputChatBox("[MechanicPro] F2 painel | F11 demo | F3-F8 família | F9 nova OS | F10 cancelar", 0, 200, 200)
