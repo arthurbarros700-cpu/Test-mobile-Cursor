@@ -16,6 +16,7 @@ const ROOT = path.join(__dirname, "..");
 const HTML = path.join(ROOT, "html", "index_record.html");
 const OUT_DIR = path.join(ROOT, "..", "mechanic_professional", "artifacts");
 const MP4 = path.join(OUT_DIR, "spartan_motorworks_demo.mp4");
+const MP4_SILENT = path.join(OUT_DIR, "_spartan_video_silent.mp4");
 
 if (!fs.existsSync(HTML)) {
   console.error("Missing", HTML);
@@ -71,7 +72,23 @@ if (!webmPath || !fs.existsSync(webmPath)) {
 
 const ff = spawnSync(
   "ffmpeg",
-  ["-y", "-i", webmPath, "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", MP4],
+  [
+    "-y",
+    "-i",
+    webmPath,
+    "-c:v",
+    "libx264",
+    "-preset",
+    "medium",
+    "-crf",
+    "20",
+    "-pix_fmt",
+    "yuv420p",
+    "-an",
+    "-movflags",
+    "+faststart",
+    MP4_SILENT,
+  ],
   { stdio: "inherit" }
 );
 if (ff.status !== 0) process.exit(ff.status ?? 1);
@@ -79,4 +96,13 @@ try {
   fs.unlinkSync(webmPath);
 } catch (_) {}
 
-console.log("Pronto:", MP4);
+const mux = spawnSync(process.execPath, [path.join(__dirname, "mux-phonk-audio.mjs"), MP4_SILENT, MP4], {
+  stdio: "inherit",
+  env: { ...process.env },
+});
+if (mux.status !== 0) process.exit(mux.status ?? 1);
+try {
+  fs.unlinkSync(MP4_SILENT);
+} catch (_) {}
+
+console.log("Pronto (vídeo + trilha phonk/funk procedural ou SPARTAN_DEMO_MUSIC):", MP4);
