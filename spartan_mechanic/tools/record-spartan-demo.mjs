@@ -2,7 +2,7 @@
 /**
  * Grava demo 1080p do painel NUI Spartan (index_record.html).
  * npm install && npx playwright install chromium && npm run record-demo
- * Saída: ../mechanic_professional/artifacts/spartan_motorworks_demo.mp4
+ * Saída: ../mechanic_professional/artifacts/spartan_motorworks_demo_v2.mp4
  */
 
 import { chromium } from "playwright";
@@ -15,7 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, "..");
 const HTML = path.join(ROOT, "html", "index_record.html");
 const OUT_DIR = path.join(ROOT, "..", "mechanic_professional", "artifacts");
-const MP4 = path.join(OUT_DIR, "spartan_motorworks_demo.mp4");
+const MP4 = path.join(OUT_DIR, "spartan_motorworks_demo_v2.mp4");
 const MP4_SILENT = path.join(OUT_DIR, "_spartan_video_silent.mp4");
 
 if (!fs.existsSync(HTML)) {

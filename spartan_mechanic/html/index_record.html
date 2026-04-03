@@ -27,6 +27,14 @@
               <span class="nav-ic">◈</span>
               Ordens
             </button>
+            <button type="button" class="nav-btn" data-tab="dashboard">
+              <span class="nav-ic">▤</span>
+              Painel
+            </button>
+            <button type="button" class="nav-btn" data-tab="ops">
+              <span class="nav-ic">⚙</span>
+              Operações
+            </button>
             <button type="button" class="nav-btn" data-tab="stock">
               <span class="nav-ic">▣</span>
               Estoque
@@ -91,24 +99,170 @@
             </div>
 
             <div class="card glass detail-card" id="detail-card" hidden>
-              <div class="card-head">
-                <h2 id="detail-id">—</h2>
+              <div class="card-head detail-head-wrap">
+                <div>
+                  <h2 id="detail-id">—</h2>
+                  <div class="meta-chips" id="detail-meta"></div>
+                </div>
                 <div class="state-track" id="state-track"></div>
               </div>
-              <div class="detail-grid">
-                <div class="detail-col">
-                  <h3 class="micro-title">Diagnóstico</h3>
+              <div class="shortcut-bar" id="shortcut-bar"></div>
+              <div class="detail-mega">
+                <div class="detail-col detail-pane">
+                  <h3 class="micro-title">Cliente &amp; oficina</h3>
+                  <div class="compact-form">
+                    <label class="field field-inline"><span>Nome</span><input type="text" id="crm-name" placeholder="Cliente" /></label>
+                    <label class="field field-inline"><span>Telefone</span><input type="text" id="crm-phone" placeholder="(11) 90000-0000" /></label>
+                    <label class="field field-inline"><span>VIN</span><input type="text" id="crm-vin" maxlength="17" placeholder="17 caracteres" /></label>
+                    <div class="row-2">
+                      <label class="field"><span>Prioridade</span>
+                        <select id="crm-prio"><option value="low">Baixa</option><option value="normal" selected>Normal</option><option value="high">Alta</option><option value="urgent">Urgente</option></select>
+                      </label>
+                      <label class="field"><span>Baia</span><input type="text" id="crm-bay" placeholder="B1" /></label>
+                    </div>
+                    <div class="btn-row-tight">
+                      <button type="button" class="btn-sm" id="btn-crm-save">Salvar CRM</button>
+                      <button type="button" class="btn-sm" id="btn-vin-save">Gravar VIN</button>
+                      <button type="button" class="btn-sm" id="btn-prio-save">Prioridade</button>
+                      <button type="button" class="btn-sm" id="btn-bay-save">Baia</button>
+                    </div>
+                    <div class="flag-row" id="flag-row"></div>
+                  </div>
+                  <h3 class="micro-title mt">Notas rápidas</h3>
+                  <div class="note-stack" id="note-list"></div>
+                  <label class="field"><span>Nova nota</span><textarea id="crm-note" rows="2" placeholder="Observação interna…"></textarea></label>
+                  <button type="button" class="btn-sm btn-sm-wide" id="btn-note-add">Adicionar nota</button>
+                </div>
+                <div class="detail-col detail-pane">
+                  <h3 class="micro-title">Diagnóstico &amp; plano</h3>
                   <div class="dtc-row" id="detail-dtc"></div>
                   <div class="findings" id="detail-findings"></div>
-                </div>
-                <div class="detail-col">
-                  <h3 class="micro-title">Plano de peças</h3>
+                  <div class="row-2 mt">
+                    <label class="field"><span>DTC manual</span><input type="text" id="diag-dtc" placeholder="P0420" /></label>
+                    <button type="button" class="btn-sm align-end" id="btn-diag-dtc">+ DTC</button>
+                  </div>
+                  <label class="field"><span>Achado</span><input type="text" id="diag-finding" placeholder="Descrever achado…" /></label>
+                  <button type="button" class="btn-sm" id="btn-diag-finding">Registrar achado</button>
+                  <h3 class="micro-title mt">Plano de peças</h3>
                   <ul class="parts-ul" id="detail-parts"></ul>
-                  <div class="action-row">
+                  <div class="plan-tools">
+                    <label class="field"><span>SKU</span><select id="plan-sku"></select></label>
+                    <label class="field"><span>Qtd</span><input type="number" id="plan-qty" min="1" max="99" value="1" /></label>
+                    <button type="button" class="btn-sm" id="btn-plan-add">+ Linha</button>
+                    <label class="field"><span>Remover índice</span><input type="number" id="plan-rm-idx" min="1" placeholder="1" /></label>
+                    <button type="button" class="btn-sm" id="btn-plan-rm">Remover</button>
+                  </div>
+                  <div class="btn-row-tight mt">
+                    <button type="button" class="btn-sm btn-accent" id="btn-plan-oil">Kit óleo</button>
+                    <button type="button" class="btn-sm btn-accent" id="btn-plan-brake">Pastilhas</button>
+                    <button type="button" class="btn-sm btn-danger-soft" id="btn-plan-clear">Limpar plano</button>
+                    <button type="button" class="btn-sm" id="btn-qc-reinspect">Reinspecionar QC</button>
+                    <button type="button" class="btn-sm" id="btn-duplicate-os">Duplicar rascunho</button>
+                  </div>
+                </div>
+                <div class="detail-col detail-pane">
+                  <h3 class="micro-title">Tarefas</h3>
+                  <div class="task-list" id="task-list"></div>
+                  <div class="row-2">
+                    <label class="field field-full"><span>Nova tarefa</span><input type="text" id="task-title" placeholder="Ex.: conferir fluidos" /></label>
+                    <button type="button" class="btn-sm align-end" id="btn-task-add">+ Tarefa</button>
+                  </div>
+                  <h3 class="micro-title mt">Orçamento &amp; tempo</h3>
+                  <div class="row-2">
+                    <label class="field"><span>Mão de obra ($)</span><input type="number" id="est-labor" min="0" step="10" /></label>
+                    <label class="field"><span>Peças ($)</span><input type="number" id="est-parts" min="0" step="10" /></label>
+                  </div>
+                  <div class="estimate-total" id="est-total">Total estimado: —</div>
+                  <button type="button" class="btn-sm" id="btn-est-save">Salvar orçamento</button>
+                  <div class="row-2 mt">
+                    <label class="field"><span>Horas oficina</span><input type="number" id="shop-hours" min="0" max="24" step="0.5" value="1" /></label>
+                    <button type="button" class="btn-sm align-end" id="btn-shop-hours">Lançar horas</button>
+                  </div>
+                  <div class="billing-row">
+                    <label class="chk"><input type="checkbox" id="bill-paid" /> Pago</label>
+                    <button type="button" class="btn-sm" id="btn-paid-save">Atualizar pagamento</button>
+                  </div>
+                  <div class="row-2 mt">
+                    <label class="field"><span>Garantia (dias)</span><input type="number" id="warranty-days" min="0" max="3650" value="90" /></label>
+                    <button type="button" class="btn-sm align-end" id="btn-warranty">Definir garantia</button>
+                  </div>
+                  <div class="action-row detail-actions">
                     <button type="button" class="btn-ghost-inline" id="btn-cancel-os">Cancelar OS</button>
                     <button type="button" class="btn-gold" id="btn-action">—</button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel tab-panel" id="tab-dashboard">
+            <div class="dash-hero">
+              <div>
+                <h2 class="dash-title">Centro de comando</h2>
+                <p class="dash-sub">KPIs ao vivo, risco de frota e performance do turno.</p>
+              </div>
+              <div class="dash-throughput" id="dash-throughput-wrap">
+                <span class="tp-label">Throughput</span>
+                <div class="tp-ring"><span id="dash-throughput">0</span></div>
+              </div>
+            </div>
+            <div class="kpi-grid" id="kpi-grid"></div>
+            <div class="grid-2 dash-bottom">
+              <div class="card glass">
+                <div class="card-head"><h2>SLA / alertas</h2><span class="badge warn" id="sla-count">0</span></div>
+                <div class="sla-list" id="sla-list"></div>
+              </div>
+              <div class="card glass">
+                <div class="card-head"><h2>Leaderboard (simulado)</h2><span class="badge muted">Turno</span></div>
+                <table class="mini-table">
+                  <thead><tr><th>Equipe</th><th>OS / sem.</th><th>QC méd.</th></tr></thead>
+                  <tbody id="leader-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel tab-panel" id="tab-ops">
+            <div class="grid-2 ops-grid">
+              <div class="card glass">
+                <div class="card-head"><h2>Inventário &amp; compras</h2><span class="badge">Back-office</span></div>
+                <div class="compact-form">
+                  <label class="field"><span>Entrada manual (SKU)</span><select id="ops-sku-receive"></select></label>
+                  <label class="field"><span>Quantidade</span><input type="number" id="ops-qty-receive" min="1" value="5" /></label>
+                  <button type="button" class="btn-primary btn-compact" id="btn-inv-receive">Dar entrada</button>
+                  <hr class="sep" />
+                  <div class="row-2">
+                    <label class="field"><span>Ajuste Δ</span><input type="number" id="ops-delta" value="-1" /></label>
+                    <label class="field"><span>Motivo</span><input type="text" id="ops-reason" placeholder="quebra / perda" /></label>
+                  </div>
+                  <button type="button" class="btn-sm" id="btn-inv-adjust">Ajustar estoque</button>
+                  <div class="row-2 mt">
+                    <label class="field"><span>Contagem física</span><input type="number" id="ops-counted" min="0" placeholder="contados" /></label>
+                    <button type="button" class="btn-sm align-end" id="btn-inv-cycle">Contagem cíclica</button>
+                  </div>
+                  <hr class="sep" />
+                  <div class="row-2">
+                    <label class="field"><span>PO — SKU</span><select id="ops-sku-po"></select></label>
+                    <label class="field"><span>Qtd</span><input type="number" id="ops-po-qty" min="1" value="10" /></label>
+                  </div>
+                  <button type="button" class="btn-sm btn-accent" id="btn-po">Simular pedido (PO)</button>
+                </div>
+              </div>
+              <div class="card glass">
+                <div class="card-head"><h2>Recebimento inbound</h2><span class="badge muted">FIFO</span></div>
+                <p class="ops-hint">Confirme o primeiro lote da fila ou limpe pedidos simulados.</p>
+                <div class="btn-row-tight">
+                  <button type="button" class="btn-primary btn-compact" id="btn-inbound-pop">Receber 1º inbound</button>
+                  <button type="button" class="btn-ghost-inline btn-inline-soft" id="btn-inbound-clear">Limpar fila</button>
+                </div>
+                <hr class="sep" />
+                <h3 class="micro-title">Ferramentas globais</h3>
+                <div class="tool-grid" id="global-tool-grid">
+                  <button type="button" class="tool-tile" data-spartan="seed_demo">Popular demo</button>
+                  <button type="button" class="tool-tile" data-spartan="report_console">Log KPI (console)</button>
+                  <button type="button" class="tool-tile" data-spartan="export_csv">Exportar CSV</button>
+                </div>
+                <p class="ops-hint small">Export CSV envia dados ao clipboard do cliente (FiveM).</p>
               </div>
             </div>
           </section>
