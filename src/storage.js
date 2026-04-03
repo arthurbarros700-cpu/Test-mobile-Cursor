@@ -13,6 +13,8 @@ const defaultState = {
   ticketCategoryId: null,
   staffRoleId: null,
   setupDoneAt: null,
+  /** Texto opcional usado pelo botão “Mensagem de encorajamento” (secção Comunidade). */
+  encourageMessage: null,
 };
 
 async function ensureDir() {

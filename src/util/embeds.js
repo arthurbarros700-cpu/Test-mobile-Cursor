@@ -11,25 +11,42 @@ export function panelEmbed() {
     .setTitle("Painel de controlo do servidor")
     .setDescription(
       [
-        "Este painel concentra **moderação**, **estrutura do Discord**, **tickets** e a **ponte com o MTA**.",
+        "Arquitetura **modular**: servidor, comunidade, MTA, ferramentas e tickets em módulos separados.",
         "",
-        "Escolha uma secção no menu abaixo. Apenas **staff** ou **donos** podem usar funções administrativas.",
+        "Inclui **servidor**, **moderação**, **tickets**, **MTA**, **comunidade** (votações, sorteios) e **ferramentas staff** (estatísticas, auditoria, convites, embeds).",
+        "",
+        "Apenas **staff** ou **donos** usam funções administrativas; membros podem votar, participar em sorteios e abrir tickets.",
       ].join("\n")
     )
     .addFields(
       {
         name: "Servidor",
-        value: "Canais, categorias, cargos e sincronização automática.",
+        value: "Setup, regras, permissões.",
         inline: true,
       },
       {
         name: "Moderação",
-        value: "Expulsões, timeouts, limpeza de mensagens e registos.",
+        value: "Expulsões, timeouts, limpeza.",
+        inline: true,
+      },
+      {
+        name: "Comunidade",
+        value: "Votações, sorteios, mensagens motivacionais.",
         inline: true,
       },
       {
         name: "MTA",
-        value: "Anúncios e eventos enviados do jogo para o Discord.",
+        value: "Ponte HTTP e testes.",
+        inline: true,
+      },
+      {
+        name: "Ferramentas",
+        value: "Stats, auditoria, convites, cargos, embeds.",
+        inline: true,
+      },
+      {
+        name: "Tickets",
+        value: "Suporte privado.",
         inline: true,
       }
     )

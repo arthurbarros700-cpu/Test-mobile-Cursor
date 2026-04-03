@@ -1,6 +1,8 @@
 # Bot Discord + MTA (painel interativo)
 
-Bot em **Node.js** (discord.js v14) para gerir o servidor Discord através de um **painel com menus e botões** (sem comandos de texto nem slash commands). Inclui **setup automático** de categorias, canais e cargos, **tickets**, **moderação**, **boas-vindas / logs** e uma **ponte HTTP** para o **MTA:SA** publicar anúncios no Discord.
+Bot em **Node.js** (discord.js v14) para gerir o servidor Discord através de um **painel com menus e botões** (sem comandos de texto nem slash commands). O código está **modular**: cada área vive em `src/scripts/` e o `interaction-hub` encadeia os módulos.
+
+Inclui **setup automático** de categorias, canais e cargos, **tickets**, **moderação**, **comunidade** (votações com reações, sorteios com botão participar, mensagem de encorajamento guardada), **ferramentas staff** (estatísticas, buffer de auditoria, top convites, export de cargos, construtor de embed em 3 passos), **boas-vindas / logs** e **ponte HTTP** para o **MTA:SA**.
 
 ## Requisitos
 
@@ -17,7 +19,7 @@ Bot em **Node.js** (discord.js v14) para gerir o servidor Discord através de um
    - `BRIDGE_SECRET` — chave partilhada com o resource MTA
    - `BRIDGE_PORT` — porta HTTP da ponte (padrão `3750`)
 
-2. Convide o bot com permissões de **administrador** (ou equivalente: gerir canais, cargos, expulsar, banir, moderar).
+2. Convide o bot com permissões de **administrador** (ou equivalente: gerir canais, cargos, expulsar, banir, moderar). Para **top convites** e deteção fina de kicks na auditoria em RAM, o bot também precisa de **Ver registo de auditoria** e **Gerir servidor**.
 
 3. Instale e arranque:
 
@@ -41,7 +43,9 @@ Copie a pasta `mta-resource` para `resources/discord_bridge`, ajuste `config.lua
 ## Estrutura do projeto
 
 - `src/index.js` — cliente Discord, painel fixo, eventos de entrada/saída
-- `src/handlers/panel.js` — interações do painel
+- `src/core/interaction-hub.js` — despacho de interações para os scripts
+- `src/scripts/` — módulos do painel (`panel-router`, `server-script`, `moderation-script`, `community-script`, `tickets-script`, `mta-script`, `tools-script`); ordem em `src/scripts/index.js`
+- `src/services/audit-log.js` — buffer em RAM de eventos de moderação (limpa ao reiniciar)
 - `src/guild/setup.js` — modelo de servidor (categorias, permissões, tickets)
 - `src/bridge/http.js` — API para o MTA
 

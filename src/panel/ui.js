@@ -24,6 +24,12 @@ export function buildMainPanelRows() {
         emoji: "🛡️",
       },
       {
+        label: "Comunidade",
+        value: "community",
+        description: "Votações, sorteios, encorajamento",
+        emoji: "🎉",
+      },
+      {
         label: "Tickets",
         value: "tickets",
         description: "Suporte privado para jogadores",
@@ -34,6 +40,12 @@ export function buildMainPanelRows() {
         value: "mta",
         description: "Ponte jogo → Discord",
         emoji: "🎮",
+      },
+      {
+        label: "Ferramentas staff",
+        value: "tools",
+        description: "Stats, auditoria, convites, embeds",
+        emoji: "🔧",
       },
       {
         label: "Informação",
@@ -110,6 +122,25 @@ export function moderationUserRows(targetId) {
   ];
 }
 
+export function communityRows() {
+  return [
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("panel:poll")
+        .setLabel("Votação rápida (👍👎)")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("panel:giveaway")
+        .setLabel("Sorteio (1 vencedor)")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("panel:encourage")
+        .setLabel("Mensagem de encorajamento")
+        .setStyle(ButtonStyle.Secondary)
+    ),
+  ];
+}
+
 export function ticketRows() {
   return [
     new ActionRowBuilder().addComponents(
@@ -136,6 +167,35 @@ export function mtaRows() {
         .setCustomId("panel:mta-help")
         .setLabel("Como ligar o MTA")
         .setStyle(ButtonStyle.Secondary)
+    ),
+  ];
+}
+
+export function toolsRows() {
+  return [
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("panel:stats")
+        .setLabel("Estatísticas do servidor")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("panel:audit")
+        .setLabel("Auditoria (últimas ações)")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("panel:invites")
+        .setLabel("Top convites")
+        .setStyle(ButtonStyle.Secondary)
+    ),
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("panel:roles-export")
+        .setLabel("Exportar lista de cargos")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("panel:embed-builder")
+        .setLabel("Construtor de embed (3 passos)")
+        .setStyle(ButtonStyle.Primary)
     ),
   ];
 }

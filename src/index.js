@@ -6,11 +6,13 @@ import {
 } from "discord.js";
 import { loadConfig, assertConfig } from "./config.js";
 import { loadStorage, saveStorage } from "./storage.js";
-import { registerPanelHandlers } from "./handlers/panel.js";
+import { registerInteractionHub } from "./core/interaction-hub.js";
+import { scriptModules } from "./scripts/index.js";
 import { createBridgeServer } from "./bridge/http.js";
 import { panelEmbed } from "./util/embeds.js";
 import { buildMainPanelRows } from "./panel/ui.js";
 import { successEmbed } from "./util/embeds.js";
+import { registerAuditListeners } from "./services/audit-log.js";
 
 const baseConfig = loadConfig();
 assertConfig(baseConfig);
@@ -37,6 +39,12 @@ async function refreshStorage() {
   storageCache = await loadStorage();
 }
 
+const ctx = {
+  getConfig,
+  getStorage: () => storageCache,
+  refreshStorage,
+};
+
 function getGuild() {
   return client.guilds.cache.get(getConfig().guildId) ?? null;
 }
@@ -58,7 +66,8 @@ const client = new Client({
   partials: [Partials.GuildMember],
 });
 
-registerPanelHandlers(client, getConfig, () => storageCache, refreshStorage);
+registerInteractionHub(client, ctx, scriptModules);
+registerAuditListeners(client, () => getConfig().guildId);
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`Autenticado como ${c.user.tag}`);
