@@ -42,21 +42,28 @@
           <span class="d-channels__chev">▼</span>
         </header>
         <div class="d-cat">STAFF</div>
-        <div class="d-ch d-ch--active"><span class="d-hash">#</span> painel-bot</div>
+        <div class="d-ch d-ch--active" id="chPanel"><span class="d-hash">#</span> painel-bot</div>
         <div class="d-cat">INFORMAÇÃO</div>
-        <div class="d-ch"><span class="d-hash">#</span> anúncios</div>
-        <div class="d-ch"><span class="d-hash">#</span> regras</div>
+        <div class="d-ch" id="chAnnounce"><span class="d-hash">#</span> anúncios</div>
+        <div class="d-ch" id="chRegras"><span class="d-hash">#</span> regras</div>
+        <div class="d-cat">COMUNIDADE</div>
+        <div class="d-ch" id="chGeral"><span class="d-hash">#</span> geral</div>
         <div class="d-cat">MTA</div>
         <div class="d-ch"><span class="d-hash">#</span> chat-mta</div>
+        <div class="d-cat">TICKETS</div>
+        <div class="d-ch" id="chTicket"><span class="d-hash">#</span> ticket-player</div>
+        <div class="d-cat">STAFF LOG</div>
+        <div class="d-ch" id="chStaff"><span class="d-hash">#</span> staff-alertas</div>
       </aside>
       <main class="d-main">
         <header class="d-toolbar">
           <div class="d-toolbar__hash">#</div>
-          <span class="d-toolbar__title">painel-bot</span>
+          <span class="d-toolbar__title" id="toolbarTitle">painel-bot</span>
           <div class="d-toolbar__spacer"></div>
           <div class="d-toolbar__pill">Canal privado · Staff</div>
         </header>
-        <div class="d-messages">
+        <div class="d-messages" id="messagesArea">
+          <div class="channel-view channel-view--active" id="cvPanel">
           <div class="d-msg d-msg--bot">
             <div class="d-avatar d-avatar--bot">B</div>
             <div class="d-msg__body">
@@ -95,13 +102,147 @@
             </div>
           </div>
 
-          <!-- Ephemeral mock -->
           <div class="d-ephemeral" id="ephemeral">
             <div class="d-ephemeral__label">Só você pode ver isto · Ignorar mensagem</div>
             <div class="d-ephemeral__card">
               <p class="d-ephemeral__title" id="ephTitle">Secção ativa</p>
               <p class="d-ephemeral__text" id="ephText">…</p>
+              <div class="d-user-row" id="ephUserRow" hidden>
+                <span class="d-user-pill"><span class="d-user-av">P</span> PlayerOne#2048</span>
+                <span class="d-user-hint">1 utilizador selecionado</span>
+              </div>
               <div class="d-btns" id="ephBtns"></div>
+            </div>
+          </div>
+          </div>
+
+          <div class="channel-view" id="cvRegras" hidden>
+            <div class="d-msg d-msg--bot">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:35</time></div>
+                <div class="d-embed">
+                  <div class="d-embed__accent"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Regras da comunidade</h3>
+                    <p class="d-embed__desc">Respeito mútuo · Sem cheats · Tickets para apelar decisões da staff.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="channel-view" id="cvAnnounce" hidden>
+            <div class="d-msg d-msg--bot">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:41</time></div>
+                <div class="d-embed d-embed--green">
+                  <div class="d-embed__accent d-embed__accent--green"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Evento ao vivo — Corrida cidade</h3>
+                    <p class="d-embed__desc">Início em <strong>5 minutos</strong>. Prémio: <strong>$50.000</strong> in-game. Boa sorte!</p>
+                    <footer class="d-embed__foot">Enviado via ponte HTTP · MTA:SA</footer>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="channel-view" id="cvGeral" hidden>
+            <div class="d-msg">
+              <div class="d-avatar">S</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">Staff_Lena</span> <time>hoje às 14:44</time></div>
+                <div class="d-plain">Queremos o vosso feedback sobre o novo sistema de economia.</div>
+              </div>
+            </div>
+            <div class="d-msg d-msg--bot">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:44</time></div>
+                <div class="d-embed">
+                  <div class="d-embed__accent"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Votação — Economia v2</h3>
+                    <p class="d-embed__desc">Aprovam o equilíbrio dos preços nos negócios? Reajam abaixo.</p>
+                    <footer class="d-embed__foot">Criada por Staff_Lena · Painel</footer>
+                  </div>
+                </div>
+                <div class="d-reactions" id="pollReactions">
+                  <span class="d-react"><span class="d-react__emoji">👍</span> <span class="d-react__n">142</span></span>
+                  <span class="d-react"><span class="d-react__emoji">👎</span> <span class="d-react__n">18</span></span>
+                  <span class="d-react"><span class="d-react__emoji">👀</span> <span class="d-react__n">56</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="d-msg d-msg--bot" id="gwMsg" hidden>
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:46</time></div>
+                <div class="d-embed d-embed--gold">
+                  <div class="d-embed__accent d-embed__accent--gold"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Sorteio</h3>
+                    <p class="d-embed__desc"><strong>Prémio:</strong> VIP 7 dias<br />Termina em 24h — clique em <strong>Participar</strong>.</p>
+                  </div>
+                </div>
+                <div class="d-btns d-btns--inline"><button class="d-btn d-btn--success" type="button">Participar</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="channel-view" id="cvTicket" hidden>
+            <div class="d-msg">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:52</time></div>
+                <div class="d-plain d-plain--mention">@Staff — novo ticket.</div>
+                <div class="d-embed">
+                  <div class="d-embed__accent"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Ticket de suporte</h3>
+                    <p class="d-embed__desc">Olá <strong>PlayerOne</strong>, descreva o problema. A equipa foi notificada.</p>
+                  </div>
+                </div>
+                <div class="d-btns d-btns--inline"><button class="d-btn d-btn--danger" type="button" id="ticketCloseDemo">Fechar ticket</button></div>
+              </div>
+            </div>
+            <div class="d-msg" id="ticketUserMsg" hidden>
+              <div class="d-avatar">P</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">PlayerOne</span> <time>hoje às 14:52</time></div>
+                <div class="d-plain">Perdi o veículo após reconnect — podem verificar o log?</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="channel-view" id="cvStaff" hidden>
+            <div class="d-msg d-msg--bot">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:48</time></div>
+                <div class="d-embed d-embed--compact">
+                  <div class="d-embed__accent"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">Registo: Painel</h3>
+                    <p class="d-embed__desc"><strong>to24</strong> em PlayerOne#2048 por Staff_Lena</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="d-msg d-msg--bot">
+              <div class="d-avatar d-avatar--bot">B</div>
+              <div class="d-msg__body">
+                <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:49</time></div>
+                <div class="d-embed d-embed--compact d-embed--ok">
+                  <div class="d-embed__accent d-embed__accent--green"></div>
+                  <div class="d-embed__inner">
+                    <h3 class="d-embed__title">MTA → Staff</h3>
+                    <p class="d-embed__desc">Anti-cheat: tentativa de speedhack bloqueada — serial hash <code class="d-code">a7f3…9c2</code></p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -110,12 +251,60 @@
 
     <!-- Feature overlays -->
     <div class="overlay overlay--mta" id="ovMta">
-      <div class="code-window">
-        <div class="code-window__bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="code-window__title">POST /mta/announce</span></div>
-        <pre class="code-window__body"><code><span class="k">curl</span> -X POST http://<span class="s">IP:3750</span>/mta/announce \
+      <div class="code-window code-window--wide">
+        <div class="code-window__bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <div class="code-tabs">
+            <span class="code-tab code-tab--on" id="tabCurl">HTTP</span>
+            <span class="code-tab" id="tabLua">MTA Lua</span>
+          </div>
+        </div>
+        <pre class="code-window__body" id="codeBody"><code id="codeInner"><span class="k">curl</span> -X POST http://<span class="s">IP:3750</span>/mta/announce \
   -H <span class="s">"x-bridge-secret: ••••"</span> \
   -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{"title":"Evento","description":"Servidor online!"}'</span></code></pre>
+      </div>
+    </div>
+
+    <div class="overlay overlay--staffpost" id="ovStaffPost">
+      <div class="code-window">
+        <div class="code-window__bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="code-window__title">POST /mta/staff</span></div>
+        <pre class="code-window__body"><code><span class="k">fetchRemote</span>(bridgeURL .. <span class="s">"/mta/staff"</span>, {
+  method = <span class="s">"POST"</span>,
+  headers = { [<span class="s">"x-bridge-secret"</span>] = secret },
+  postData = <span class="s">'{"message":"Anti-cheat: alerta"}'</span>
+}, callback)</code></pre>
+      </div>
+    </div>
+
+    <div class="overlay overlay--audit" id="ovAudit">
+      <div class="audit-card">
+        <h4>Auditoria · buffer em RAM</h4>
+        <ul class="audit-list" id="auditList">
+          <li><span class="audit-t">14:48</span> Timeout 24h · PlayerOne</li>
+          <li><span class="audit-t">14:47</span> Ban · xX_Cheat_Xx</li>
+          <li><span class="audit-t">14:45</span> Kick · spammer</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="overlay overlay--invites" id="ovInvites">
+      <div class="invites-card">
+        <h4>Convites — top usos</h4>
+        <ol class="invites-list">
+          <li><code>discord.gg/mta-rp</code> · <strong>412</strong> · Lena</li>
+          <li><code>discord.gg/mta-news</code> · <strong>201</strong> · Bot</li>
+          <li><code>discord.gg/mta-temp</code> · <strong>89</strong> · João</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="overlay overlay--roles" id="ovRoles">
+      <div class="roles-card">
+        <h4>Exportação de cargos</h4>
+        <pre class="roles-pre">Staff · 982341… · #f0b232 · 12 membros
+Moderador · 112903… · #ed4245 · 8 membros
+Jogador MTA · 440012… · #5865f2 · 2140 membros</pre>
       </div>
     </div>
 
@@ -135,6 +324,24 @@
       <h2>Pronto para escalar a tua comunidade?</h2>
       <p>Open source · Painel modular · Integração MTA nativa</p>
       <div class="outro__cta">mta-discord-panel-bot</div>
+    </div>
+
+    <div class="chapter-bar" id="chapterBar" aria-hidden="true">
+      <span class="chapter-bar__k">Capítulo</span>
+      <span class="chapter-bar__t" id="chapterText">—</span>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal__title" id="modalTitle">Modal</div>
+        <div class="modal__fields" id="modalFields"></div>
+        <div class="modal__actions">
+          <button type="button" class="d-btn d-btn--secondary" id="modalCancel">Cancelar</button>
+          <button type="button" class="d-btn d-btn--primary" id="modalSubmit">Enviar</button>
+        </div>
+      </div>
     </div>
 
     <!-- Fake cursor -->

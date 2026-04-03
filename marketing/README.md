@@ -23,6 +23,8 @@ O segundo comando imprime um URL `https://gofile.io/d/...` — abre no telemóve
 
 Para link permanente, usa **YouTube não listado** ou conta Gofile com token da API.
 
+A demo animada (`marketing/demo/timeline.js`) dura **~2 minutos** e percorre fluxos completos: setup, regras, MTA (curl + Lua), staff log, ferramentas (stats, auditoria, convites, cargos, embed em 3 passos), moderação com utilizador selecionado, comunidade (votação + reações + sorteio), tickets e outro.
+
 ## Gerar o vídeo (WebM + MP4)
 
 Requisitos: Node 20+, **ffmpeg** no PATH, e Chromium do Playwright.

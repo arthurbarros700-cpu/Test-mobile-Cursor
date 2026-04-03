@@ -1,6 +1,8 @@
 # Roteiro de voz — vídeo marketing (PT-PT / PT-BR)
 
-Duração alvo: **~40–45 segundos**. Ritmo confiante, tom B2B / produto. Música: eletrónica corporativa discreta (sem competir com a voz).
+A demo gravada (`npm run video:demo`) tem **~2 minutos** — expande este roteiro ou grava por **capítulos** (o vídeo mostra barra “Capítulo …” em baixo).
+
+Duração alvo (versão curta): **~40–45 s**. Versão longa: **~2 min** alinhada aos capítulos da timeline. Ritmo confiante, tom B2B. Música: eletrónica corporativa discreta.
 
 ---
 

@@ -63,11 +63,11 @@ async function main() {
   await page.waitForFunction(
     () => window.__DEMO_DONE__ === true,
     undefined,
-    { timeout: 120000, polling: 250 }
+    { timeout: 240000, polling: 250 }
   );
 
   // Dar tempo ao Playwright para flush completo do WebM antes de fechar o contexto
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(5000);
   await context.close();
   await browser.close();
   server.close();
