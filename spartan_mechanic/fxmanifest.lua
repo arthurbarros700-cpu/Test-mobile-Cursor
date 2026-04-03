@@ -18,6 +18,7 @@ client_scripts {
 
 server_scripts {
     'server/workshop.lua',
+    'server/features.lua',
 }
 
 ui_page 'html/index.html'

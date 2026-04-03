@@ -2,7 +2,7 @@
 
 local Audit = { entries = {}, seq = 0, max = 200 }
 
-local function audit(level, category, message, ctx)
+function audit(level, category, message, ctx)
     Audit.seq = Audit.seq + 1
     local e = {
         id = Audit.seq,
@@ -19,7 +19,7 @@ local function audit(level, category, message, ctx)
     print(('[spartan_mechanic] [%s] %s'):format(category, message))
 end
 
-local Inventory = {
+Inventory = {
     on_hand = {},
     reserved = {},
     inbound = {},
@@ -29,7 +29,7 @@ for sku in pairs(PARTS_CATALOG) do
     Inventory.on_hand[sku] = math.random(4, 18)
 end
 
-local function reservedTotalSku(sku)
+function reservedTotalSku(sku)
     local t = 0
     for _, jm in pairs(Inventory.reserved) do
         t = t + (jm[sku] or 0)
@@ -37,11 +37,11 @@ local function reservedTotalSku(sku)
     return t
 end
 
-local function availableSku(sku)
+function availableSku(sku)
     return (Inventory.on_hand[sku] or 0) - reservedTotalSku(sku)
 end
 
-local Workshop = { jobs = {}, id_seq = 1000 }
+Workshop = { jobs = {}, id_seq = 1000 }
 
 local VALID = {
     [JOB_STATE.INTAKE] = { [JOB_STATE.DIAGNOSTIC] = true },
@@ -53,7 +53,7 @@ local VALID = {
     [JOB_STATE.CLOSED] = {},
 }
 
-local function runDiagnostic(family, mileage)
+function runDiagnostic(family, mileage)
     local parts = {}
     local dtc = {}
     local findings = {}
@@ -86,14 +86,14 @@ local function runDiagnostic(family, mileage)
     return { dtc = dtc, findings = findings, parts_plan = filtered }
 end
 
-local function releaseJobReserves(jobId, actor)
+function releaseJobReserves(jobId, actor)
     local jm = Inventory.reserved[jobId]
     if not jm then return end
     audit(2, 'INVENTORY', 'Reservas liberadas', { job_id = jobId, actor = actor })
     Inventory.reserved[jobId] = nil
 end
 
-local function reserveAll(jobId, plan, actor)
+function reserveAll(jobId, plan, actor)
     if not Inventory.reserved[jobId] then Inventory.reserved[jobId] = {} end
     for _, line in ipairs(plan) do
         if availableSku(line.sku) < line.qty then
@@ -109,7 +109,7 @@ local function reserveAll(jobId, plan, actor)
     return true
 end
 
-local function commitAll(jobId, plan, actor)
+function commitAll(jobId, plan, actor)
     local jm = Inventory.reserved[jobId] or {}
     for _, line in ipairs(plan) do
         local held = jm[line.sku] or 0
@@ -121,14 +121,14 @@ local function commitAll(jobId, plan, actor)
     return true
 end
 
-local function canOpen(src)
+function canOpen(src)
     if IsPlayerAceAllowed(src, Config.AceBypass) then return true end
     if not Config.RequiredJob then return true end
     -- ESX / QBCore: integrar aqui; por padrão permite se não houver framework
     return true
 end
 
-local function jobDto(job)
+function jobDto(job)
     if not job then return nil end
     return {
         id = job.id,
@@ -141,10 +141,23 @@ local function jobDto(job)
         mechanic = job.mechanic,
         parts_plan = job.parts_plan,
         diagnostic = job.diagnostic,
+        customer_name = job.customer_name,
+        customer_phone = job.customer_phone,
+        priority = job.priority,
+        bay_id = job.bay_id,
+        notes = job.notes,
+        tasks = job.tasks,
+        hours_shop = job.hours_shop,
+        estimate_labor = job.estimate_labor,
+        estimate_parts = job.estimate_parts,
+        paid = job.paid,
+        warranty_until = job.warranty_until,
+        vin = job.vin,
+        flags = job.flags,
     }
 end
 
-local function inventorySnapshot()
+function inventorySnapshot()
     local rows = {}
     for sku, def in pairs(PARTS_CATALOG) do
         rows[#rows + 1] = {
@@ -160,7 +173,7 @@ local function inventorySnapshot()
     return rows
 end
 
-local function listOpenJobsDto()
+function listOpenJobsDto()
     local list = {}
     for _, j in pairs(Workshop.jobs) do
         if j.state ~= JOB_STATE.CLOSED then list[#list + 1] = jobDto(j) end
@@ -169,14 +182,18 @@ local function listOpenJobsDto()
     return list
 end
 
-local function broadcastUi()
-    TriggerClientEvent('spartan_mechanic:state', -1, {
+function broadcastUi()
+    local payload = {
         jobs = listOpenJobsDto(),
         inventory = inventorySnapshot(),
         inbound = Inventory.inbound,
         catalog = PARTS_CATALOG,
         logs = Audit.entries,
-    })
+    }
+    if SME and SME.enrichBroadcast then
+        SME.enrichBroadcast(payload)
+    end
+    TriggerClientEvent('spartan_mechanic:state', -1, payload)
 end
 
 RegisterNetEvent('spartan_mechanic:requestOpen', function()
@@ -185,7 +202,7 @@ RegisterNetEvent('spartan_mechanic:requestOpen', function()
         TriggerClientEvent('spartan_mechanic:notify', src, 'error', 'Sem permissão para o painel da oficina.')
         return
     end
-    TriggerClientEvent('spartan_mechanic:state', src, {
+    local payload = {
         open = true,
         locale = Config.Locale,
         jobs = listOpenJobsDto(),
@@ -193,7 +210,9 @@ RegisterNetEvent('spartan_mechanic:requestOpen', function()
         inbound = Inventory.inbound,
         catalog = PARTS_CATALOG,
         logs = Audit.entries,
-    })
+    }
+    if SME and SME.enrichBroadcast then SME.enrichBroadcast(payload) end
+    TriggerClientEvent('spartan_mechanic:state', src, payload)
 end)
 
 RegisterNetEvent('spartan_mechanic:createJob', function(plate, family, mileage)
@@ -213,6 +232,19 @@ RegisterNetEvent('spartan_mechanic:createJob', function(plate, family, mileage)
         parts_plan = {},
         qc_score = nil,
         mechanic = name,
+        customer_name = 'Cliente',
+        customer_phone = '',
+        priority = 'normal',
+        bay_id = nil,
+        notes = {},
+        tasks = {},
+        hours_shop = 0,
+        estimate_labor = 0,
+        estimate_parts = 0,
+        paid = false,
+        warranty_until = nil,
+        vin = '',
+        flags = {},
     }
     Workshop.jobs[id] = job
     audit(2, 'WORKSHOP', 'OS aberta', { job_id = id, plate = job.plate, actor = name })
