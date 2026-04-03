@@ -1,0 +1,12 @@
+{
+  "name": "mechanic-professional-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "record-demo": "node tools/record-panel-demo.mjs",
+    "install-browser": "npx playwright install chromium"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920" />
+    <title>MechanicProfessional — Demo visual</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="scene">
+      <div id="hud-top">
+        <div class="brand">MECHANIC PRO</div>
+        <div class="tag">Simulação visual do painel DX + FSM + estoque + auditoria (MTA resource)</div>
+      </div>
+      <div id="fsm-badge">
+        <strong>FSM</strong> INTAKE → DIAGNOSTIC → PARTS_PULL → LABOR → QC → READY → CLOSED<br />
+        <span id="fsm-current">—</span>
+      </div>
+      <div id="toast"></div>
+      <div id="panel-wrap">
+        <div class="panel-header">Painel da oficina — FSM + estoque + diagnóstico</div>
+        <div class="tabs">
+          <div class="tab active" data-tab="os">Ordens de serviço</div>
+          <div class="tab" data-tab="inv">Estoque</div>
+          <div class="tab" data-tab="log">Logs / auditoria</div>
+        </div>
+        <div class="panel-body">
+          <div id="view-os">
+            <div class="subtitle">Nova OS · <kbd>F3</kbd>–<kbd>F8</kbd> família · <kbd>F9</kbd> criar · <kbd>F10</kbd> cancelar</div>
+            <div class="inner-panel">
+              <div class="hint-row">Demonstração automática — espelha o fluxo do servidor MTA (<code>mechanicdemo</code>).</div>
+              <div style="font-weight: 700; margin-bottom: 8px">OS abertas</div>
+              <div class="job-list" id="job-list"></div>
+              <div class="split" id="job-detail-wrap" style="display: none; margin-top: 12px">
+                <div class="detail-col">
+                  <h3 id="detail-title">—</h3>
+                  <div class="dtc" id="detail-dtc"></div>
+                  <div class="findings" id="detail-findings"></div>
+                </div>
+                <div class="detail-col">
+                  <div style="font-size: 12px; color: var(--muted); margin-bottom: 6px">Plano de peças</div>
+                  <div class="parts-list" id="detail-parts"></div>
+                  <div class="action-btn pulse" id="action-btn">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="view-inv" style="display: none">
+            <div class="subtitle">Estoque físico, disponível (após reservas) e pedidos inbound</div>
+            <div class="inner-panel">
+              <table class="inv-table">
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Disponível</th>
+                    <th>Físico</th>
+                    <th>Mínimo</th>
+                  </tr>
+                </thead>
+                <tbody id="inv-body"></tbody>
+              </table>
+              <div class="inbound-block">
+                <h4>Pedidos em trânsito (simulado)</h4>
+                <div id="inbound-list" style="color: var(--muted); font-size: 12px"></div>
+              </div>
+            </div>
+          </div>
+          <div id="view-log" style="display: none">
+            <div class="subtitle">MechanicAudit — fatias recentes (níveis DEBUG…CRITICAL)</div>
+            <div class="inner-panel">
+              <div class="log-scroll" id="log-scroll"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="narrator">
+        <div class="phase" id="narr-phase">—</div>
+        <div id="narr-text">Carregando roteiro…</div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
