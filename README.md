@@ -49,6 +49,10 @@ Copie a pasta `mta-resource` para `resources/discord_bridge`, ajuste `config.lua
 - `src/guild/setup.js` — modelo de servidor (categorias, permissões, tickets)
 - `src/bridge/http.js` — API para o MTA
 
+## Vídeo de marketing
+
+Na pasta `marketing/` há uma **demo animada** estilo Discord (1920×1080) e o script `npm run video:demo` gera `marketing/output/bot-demo-marketing.mp4`. Ver `marketing/README.md` e `marketing/VOICEOVER-PT.md` para narração.
+
 ## Nota sobre “botbja discou”
 
 Se se referia a **Discord Bot Maker** ou outra ferramenta visual: este repositório é código **open-source** em Node.js, com o mesmo tipo de fluxo (componentes interativos + automação), adequado a hospedagem própria e integração MTA.

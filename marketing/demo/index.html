@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTA Panel Bot — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app" data-phase="intro">
+    <!-- Intro full bleed -->
+    <section class="intro" aria-hidden="true">
+      <div class="intro__grid"></div>
+      <div class="intro__glow"></div>
+      <div class="intro__content">
+        <p class="intro__eyebrow">Solução enterprise para comunidades MTA</p>
+        <h1 class="intro__title">Painel Discord<br /><span class="intro__accent">sem comandos</span></h1>
+        <p class="intro__sub">Moderação · Tickets · Ponte MTA · Comunidade — tudo em componentes interativos.</p>
+        <div class="intro__badges">
+          <span class="badge">Node.js</span>
+          <span class="badge">discord.js v14</span>
+          <span class="badge">HTTP Bridge</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fake Discord -->
+    <div class="discord">
+      <aside class="d-servers">
+        <div class="d-server d-server--active" title="Servidor">M</div>
+        <div class="d-server d-server--dim"></div>
+        <div class="d-server d-server--dim"></div>
+      </aside>
+      <aside class="d-channels">
+        <header class="d-channels__head">
+          <span class="d-channels__name">Meu Servidor MTA</span>
+          <span class="d-channels__chev">▼</span>
+        </header>
+        <div class="d-cat">STAFF</div>
+        <div class="d-ch d-ch--active"><span class="d-hash">#</span> painel-bot</div>
+        <div class="d-cat">INFORMAÇÃO</div>
+        <div class="d-ch"><span class="d-hash">#</span> anúncios</div>
+        <div class="d-ch"><span class="d-hash">#</span> regras</div>
+        <div class="d-cat">MTA</div>
+        <div class="d-ch"><span class="d-hash">#</span> chat-mta</div>
+      </aside>
+      <main class="d-main">
+        <header class="d-toolbar">
+          <div class="d-toolbar__hash">#</div>
+          <span class="d-toolbar__title">painel-bot</span>
+          <div class="d-toolbar__spacer"></div>
+          <div class="d-toolbar__pill">Canal privado · Staff</div>
+        </header>
+        <div class="d-messages">
+          <div class="d-msg d-msg--bot">
+            <div class="d-avatar d-avatar--bot">B</div>
+            <div class="d-msg__body">
+              <div class="d-msg__meta"><span class="d-msg__author">MTA Panel Bot</span> <span class="d-msg__app">APP</span> <time>hoje às 14:32</time></div>
+              <div class="d-embed">
+                <div class="d-embed__accent"></div>
+                <div class="d-embed__inner">
+                  <h3 class="d-embed__title">Painel de controlo do servidor</h3>
+                  <p class="d-embed__desc">Arquitetura <strong>modular</strong>: servidor, comunidade, MTA, ferramentas e tickets em módulos separados.</p>
+                  <div class="d-embed__fields">
+                    <div><span class="ef">Servidor</span><span class="ev">Setup, regras</span></div>
+                    <div><span class="ef">Moderação</span><span class="ev">Timeouts, purge</span></div>
+                    <div><span class="ef">Comunidade</span><span class="ev">Votos, sorteios</span></div>
+                    <div><span class="ef">MTA</span><span class="ev">Ponte HTTP</span></div>
+                    <div><span class="ef">Ferramentas</span><span class="ev">Stats, embeds</span></div>
+                    <div><span class="ef">Tickets</span><span class="ev">Suporte 1:1</span></div>
+                  </div>
+                  <footer class="d-embed__foot">Sem comandos de texto — apenas componentes interativos · hoje às 14:32</footer>
+                </div>
+              </div>
+              <div class="d-select-wrap">
+                <div class="d-select" id="fakeSelect">
+                  <span class="d-select__ph">Escolha uma secção do painel…</span>
+                  <span class="d-select__chev">▾</span>
+                </div>
+                <div class="d-dropdown" id="dropdown">
+                  <div class="d-opt" data-opt="server"><span class="d-opt__emoji">🏛️</span> Servidor &amp; estrutura</div>
+                  <div class="d-opt" data-opt="mod"><span class="d-opt__emoji">🛡️</span> Moderação</div>
+                  <div class="d-opt" data-opt="community"><span class="d-opt__emoji">🎉</span> Comunidade</div>
+                  <div class="d-opt" data-opt="tickets"><span class="d-opt__emoji">🎫</span> Tickets</div>
+                  <div class="d-opt" data-opt="mta"><span class="d-opt__emoji">🎮</span> MTA &amp; anúncios</div>
+                  <div class="d-opt" data-opt="tools"><span class="d-opt__emoji">🔧</span> Ferramentas staff</div>
+                  <div class="d-opt" data-opt="info"><span class="d-opt__emoji">ℹ️</span> Informação</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ephemeral mock -->
+          <div class="d-ephemeral" id="ephemeral">
+            <div class="d-ephemeral__label">Só você pode ver isto · Ignorar mensagem</div>
+            <div class="d-ephemeral__card">
+              <p class="d-ephemeral__title" id="ephTitle">Secção ativa</p>
+              <p class="d-ephemeral__text" id="ephText">…</p>
+              <div class="d-btns" id="ephBtns"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Feature overlays -->
+    <div class="overlay overlay--mta" id="ovMta">
+      <div class="code-window">
+        <div class="code-window__bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="code-window__title">POST /mta/announce</span></div>
+        <pre class="code-window__body"><code><span class="k">curl</span> -X POST http://<span class="s">IP:3750</span>/mta/announce \
+  -H <span class="s">"x-bridge-secret: ••••"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"title":"Evento","description":"Servidor online!"}'</span></code></pre>
+      </div>
+    </div>
+
+    <div class="overlay overlay--stats" id="ovStats">
+      <div class="stats-card">
+        <h4>Estatísticas · Meu Servidor MTA</h4>
+        <div class="stats-grid">
+          <div><b>2.847</b><span>Membros</span></div>
+          <div><b>124</b><span>Canais texto</span></div>
+          <div><b>18</b><span>Cargos</span></div>
+          <div><b>Nível 2</b><span>Boost</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outro" id="outro">
+      <h2>Pronto para escalar a tua comunidade?</h2>
+      <p>Open source · Painel modular · Integração MTA nativa</p>
+      <div class="outro__cta">mta-discord-panel-bot</div>
+    </div>
+
+    <!-- Fake cursor -->
+    <div class="cursor" id="cursor" aria-hidden="true"></div>
+  </div>
+  <script type="module" src="timeline.js"></script>
+</body>
+</html>

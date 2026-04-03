@@ -4,3 +4,5 @@ data/*.json
 !data/.gitkeep
 *.log
 .DS_Store
+marketing/output/*.webm
+marketing/output/*.mp4
