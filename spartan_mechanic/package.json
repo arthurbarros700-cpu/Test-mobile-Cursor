@@ -1,0 +1,11 @@
+{
+  "name": "spartan-mechanic-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "record-demo": "node tools/record-spartan-demo.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

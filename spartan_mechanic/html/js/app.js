@@ -24,7 +24,7 @@ const STATE_ORDER = [
 
 const FAMILIES = ["COMPACT", "SEDAN", "SUV", "SPORT", "COMMERCIAL", "MOTORCYCLE"];
 
-let state = {
+window.__SPARTAN_STATE__ = {
   jobs: [],
   inventory: [],
   inbound: [],
@@ -33,6 +33,7 @@ let state = {
   selectedId: null,
   locale: {},
 };
+const state = window.__SPARTAN_STATE__;
 
 function GetParentResourceName() {
   try {
@@ -319,3 +320,29 @@ document.addEventListener("keydown", (e) => {
 
 setInterval(tickClock, 1000);
 initFamilies();
+
+window.__SPARTAN_RECORD__ = {
+  open() {
+    document.getElementById("app").classList.remove("hidden");
+    setTab("orders");
+    tickClock();
+  },
+  bootstrap: applyBootstrap,
+  refresh() {
+    renderJobs();
+    renderDetail();
+    renderInventory();
+    renderAudit();
+  },
+  selectJob(id) {
+    state.selectedId = id;
+    renderJobs();
+    renderDetail();
+  },
+  clickAction() {
+    const b = document.getElementById("btn-action");
+    if (b && !b.disabled) b.click();
+  },
+  setTab,
+  showToast,
+};

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spartan Motorworks — Record</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div id="app" class="hidden">
+      <div class="backdrop"></div>
+      <div class="shell">
+        <aside class="rail">
+          <div class="brand-block">
+            <div class="brand-mark">Σ</div>
+            <div class="brand-text">
+              <span class="brand-name" id="brand-name">SPARTAN</span>
+              <span class="brand-sub" id="brand-sub">Motorworks</span>
+            </div>
+          </div>
+          <p class="rail-tagline" id="rail-tagline">Sistema integrado de OS</p>
+          <nav class="rail-nav">
+            <button type="button" class="nav-btn active" data-tab="orders">
+              <span class="nav-ic">◈</span>
+              Ordens
+            </button>
+            <button type="button" class="nav-btn" data-tab="stock">
+              <span class="nav-ic">▣</span>
+              Estoque
+            </button>
+            <button type="button" class="nav-btn" data-tab="audit">
+              <span class="nav-ic">◎</span>
+              Auditoria
+            </button>
+          </nav>
+          <div class="rail-footer">
+            <div class="fsm-mini">
+              <span class="fsm-label">Pipeline</span>
+              <span class="fsm-chain">INTAKE → DIAG → PULL → LABOR → QC → READY</span>
+            </div>
+            <button type="button" class="btn-ghost" id="btn-close">Fechar · ESC</button>
+          </div>
+        </aside>
+
+        <main class="stage">
+          <header class="topbar">
+            <div class="topbar-left">
+              <h1 id="page-title">Ordens de serviço</h1>
+              <p class="page-desc" id="page-desc">Gerencie FSM, diagnóstico e plano de peças em tempo real.</p>
+            </div>
+            <div class="topbar-right">
+              <div class="clock-pill" id="clock-pill">—</div>
+              <div class="status-pill online">Servidor sincronizado</div>
+            </div>
+          </header>
+
+          <section class="panel tab-panel active" id="tab-orders">
+            <div class="grid-2">
+              <div class="card glass">
+                <div class="card-head">
+                  <h2>Nova ordem</h2>
+                  <span class="badge">Recepção</span>
+                </div>
+                <div class="form-grid">
+                  <label class="field">
+                    <span>Placa</span>
+                    <input type="text" id="in-plate" placeholder="ABC1D23" maxlength="8" />
+                  </label>
+                  <label class="field">
+                    <span>Família</span>
+                    <select id="in-family"></select>
+                  </label>
+                  <label class="field field-full">
+                    <span>Quilometragem</span>
+                    <input type="number" id="in-km" placeholder="85000" min="0" />
+                  </label>
+                </div>
+                <button type="button" class="btn-primary" id="btn-create">Registrar OS</button>
+              </div>
+
+              <div class="card glass">
+                <div class="card-head">
+                  <h2>Fila ativa</h2>
+                  <span class="badge muted" id="job-count">0 abertas</span>
+                </div>
+                <div class="job-scroll" id="job-list"></div>
+              </div>
+            </div>
+
+            <div class="card glass detail-card" id="detail-card" hidden>
+              <div class="card-head">
+                <h2 id="detail-id">—</h2>
+                <div class="state-track" id="state-track"></div>
+              </div>
+              <div class="detail-grid">
+                <div class="detail-col">
+                  <h3 class="micro-title">Diagnóstico</h3>
+                  <div class="dtc-row" id="detail-dtc"></div>
+                  <div class="findings" id="detail-findings"></div>
+                </div>
+                <div class="detail-col">
+                  <h3 class="micro-title">Plano de peças</h3>
+                  <ul class="parts-ul" id="detail-parts"></ul>
+                  <div class="action-row">
+                    <button type="button" class="btn-ghost-inline" id="btn-cancel-os">Cancelar OS</button>
+                    <button type="button" class="btn-gold" id="btn-action">—</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel tab-panel" id="tab-stock">
+            <div class="card glass full">
+              <div class="card-head">
+                <h2>Inventário Spartan</h2>
+                <span class="badge">Disponível = físico − reservas</span>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Peça</th>
+                      <th>Disponível</th>
+                      <th>Físico</th>
+                      <th>Mín.</th>
+                      <th>Fornecedor</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inv-body"></tbody>
+                </table>
+              </div>
+              <div class="inbound-section">
+                <h3 class="micro-title">Inbound / reposição</h3>
+                <div id="inbound-list" class="inbound-chips"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel tab-panel" id="tab-audit">
+            <div class="card glass full">
+              <div class="card-head">
+                <h2>Trilha de auditoria</h2>
+                <span class="badge">Correlacionado à OS</span>
+              </div>
+              <div class="audit-scroll" id="audit-list"></div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div id="toast" class="toast hidden"></div>
+    </div>
+    <script src="js/app.js"></script>
+    <script src="record_demo.js"></script>
+    <script>
+      if (new URLSearchParams(location.search).get("autostart") === "1") {
+        runSpartanRecordDemo().catch(console.error);
+      }
+    </script>
+  </body>
+</html>
