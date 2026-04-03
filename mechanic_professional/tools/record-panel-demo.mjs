@@ -39,11 +39,12 @@ const context = await browser.newContext({
 });
 
 const page = await context.newPage();
-await page.goto(fileUrl + "?autostart=0", { waitUntil: "load", timeout: 60000 });
+page.setDefaultTimeout(2 * 60 * 60 * 1000);
+await page.goto(fileUrl + "?autostart=0", { waitUntil: "load", timeout: 120000 });
 
-await page.waitForFunction(() => typeof window.runMechanicDemo === "function", { timeout: 30000 });
+await page.waitForFunction(() => typeof window.runMechanicDemo === "function", { timeout: 60000 });
 
-console.log("Running visual demo (~5–6 min)…");
+console.log("Running visual demo (roteiro longo — megabase 258 scripts + FSM)…");
 await page.evaluate(async () => {
   await window.runMechanicDemo();
 });

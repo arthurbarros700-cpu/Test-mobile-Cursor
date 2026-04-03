@@ -1,6 +1,6 @@
 /**
- * Simulação visual do painel MechanicProfessional (espelho do fluxo MTA).
- * window.runMechanicDemo() — Promise, duração ~5min20s
+ * Simulação visual — apresentação completa: FSM, estoque, auditoria,
+ * megabase em 258 scripts (8×32 chunks + bootstrap/finalize), MechanicReference.
  */
 
 const JOB_STATE = {
@@ -45,10 +45,20 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-/** Multiplicador para aproximar ~5–6 min de vídeo (gravador Playwright). */
-const DEMO_PACE = 1.88;
+/** Ritmo do vídeo (Playwright). Aumente para trailer mais longo. */
+const DEMO_PACE = 2.45;
 function wait(ms) {
   return sleep(Math.floor(ms * DEMO_PACE));
+}
+
+function setArchDomain(hotKey, line) {
+  document.querySelectorAll(".arch-domains li").forEach((li) => li.classList.remove("hot"));
+  if (hotKey) {
+    const el = document.querySelector(`.arch-domains li[data-d="${hotKey}"]`);
+    if (el) el.classList.add("hot");
+  }
+  const act = document.getElementById("arch-active");
+  if (act) act.textContent = line || "—";
 }
 
 function log(level, category, message, ctx) {
@@ -131,6 +141,27 @@ function renderDetail() {
   } else {
     document.getElementById("detail-dtc").textContent = "";
     document.getElementById("detail-findings").textContent = "Aguardando diagnóstico…";
+  }
+  const refEl = document.getElementById("ref-cross");
+  if (job.ref_context && refEl) {
+    const rc = job.ref_context;
+    const lines = [];
+    if (rc.tsb && rc.tsb.title) lines.push("TSB: " + rc.tsb.title);
+    if (rc.torque && rc.torque.torque_nm != null) {
+      lines.push(`Torque: ${rc.torque.torque_nm} Nm · ${rc.torque.assembly || ""}`);
+    }
+    if (rc.flat_labor && rc.flat_labor.flat_hours) {
+      lines.push(`Flat-rate: ${rc.flat_labor.flat_hours} h · ${rc.flat_labor.op_family || ""}`);
+    }
+    if (rc.vehicle_ref && rc.vehicle_ref.label) lines.push("Perfil: " + rc.vehicle_ref.label);
+    if (lines.length) {
+      refEl.style.display = "block";
+      refEl.innerHTML = "<strong>ReferenceLibrary · contexto cruzado</strong>" + lines.map((l) => "<div>" + l + "</div>").join("");
+    } else {
+      refEl.style.display = "none";
+    }
+  } else if (refEl) {
+    refEl.style.display = "none";
   }
   const partsEl = document.getElementById("detail-parts");
   partsEl.innerHTML = "";
@@ -254,15 +285,41 @@ async function runMechanicDemo() {
   state.selectedId = null;
   initInventory();
 
-  setNarrator("INTRO", "Bem-vindo à demonstração visual do MechanicProfessional — painel DX, FSM e estoque como no resource MTA.");
-  setFsmHint("Estado inicial: sem OS ativa.");
+  setNarrator(
+    "APRESENTAÇÃO",
+    "MechanicProfessional — tour completo: 258 scripts de dados no servidor, oito domínios em chunks de 32 arquivos, bootstrap e finalize, mais lógica audit_log, inventory, diagnostics, workshop FSM, demo_mode e core."
+  );
+  setFsmHint("Resource MTA — carregamento sequencial no meta.xml.");
+  setArchDomain(null, "Ordem: bootstrap → chunks part_001…torque_032 → finalize");
   setTab("os");
   renderInventory();
   renderLogs();
   renderJobs();
   renderDetail();
 
-  await wait(3500);
+  await wait(5000);
+
+  const scan = ["parts", "dtc", "proc", "veh", "sup", "labor", "tsb", "torque"];
+  for (const d of scan) {
+    setArchDomain(d, `Carregando domínio · chunks/${d}_*.lua → tabela global`);
+    setNarrator(
+      "MEGABASE",
+      `Cada pasta chunks contém 32 arquivos. Exemplo: server/generated/chunks/${d}/ — preenche uma tabela mestre sem monolito único; meta.xml lista todos os scripts na ordem correta.`
+    );
+    await wait(4200);
+  }
+  setArchDomain("parts", "Catálogo SKU-GEN-* com supplier SUP-****** alinhado a SUPPLIERS_MASTER.");
+  setNarrator(
+    "INTEGRAÇÃO",
+    "Peças referenciam fornecedores por código. DTCs e TSBs apontam SKUs e procedimentos. O cliente não baixa esses 250k+ de linhas — só snapshots enxutos no bootstrap do painel."
+  );
+  await wait(14000);
+
+  setNarrator("PAINEL DX", "Agora o fluxo operacional: FSM, reservas, commit no QC, logs correlacionados a job_id — igual ao Lua do cliente MTA.");
+  setArchDomain(null, "—");
+  setFsmHint("Estado inicial: sem OS ativa.");
+
+  await wait(6000);
 
   setNarrator("OS · RECEPÇÃO", "Abrimos a ordem DEMO7K2 — SUV, 188000 km — equivalente a MechanicWorkshop:createJob no servidor.");
   const job = {
@@ -301,21 +358,36 @@ async function runMechanicDemo() {
     { sku: "SKU-ENG-FILTER", qty: 1 },
     { sku: "SKU-GEN-000001", qty: 1 },
   ];
+  job.ref_context = {
+    tsb: { title: "TSB-000847 — chunk tsb_027.lua · calibração / torque" },
+    torque: { torque_nm: 112, assembly: "Freio" },
+    flat_labor: { flat_hours: "1.85", op_family: "BRK" },
+    vehicle_ref: { label: "AstraMotors modelo 2412 série K · VP-002400" },
+  };
   log(LOG_LEVEL.INFO, "DIAG", "Diagnóstico concluído", { job_id: job.id });
-  setFsmHint("DIAGNOSTIC — plano de peças visível no painel.");
+  log(LOG_LEVEL.INFO, "REFERENCE", "MechanicReference:snapshotForJob", { job_id: job.id });
+  setFsmHint("DIAGNOSTIC — plano + ref_context (TSB, torque, flat-rate, VP).");
+  setArchDomain("tsb", "DTC correlaciona TSB e SKU em chunks distintos.");
   renderJobs();
   renderDetail();
 
-  await wait(14000);
+  await wait(16000);
   setTab("log");
-  setNarrator("AUDITORIA", "MechanicAudit registra cada passo com nível e contexto — mesma ideia do outputDebugString + eventos ao cliente.");
+  setNarrator(
+    "AUDITORIA",
+    "MechanicAudit: níveis DEBUG a CRITICAL, contexto JSON no servidor, fatias enviadas ao cliente. Cada reserva e commit de estoque gera rastreabilidade."
+  );
   await wait(3000);
   renderLogs();
 
-  await wait(11000);
+  await wait(12000);
   setTab("inv");
-  setNarrator("ESTOQUE", "Coluna Disponível = físico − todas as reservas ativas. PARTS_PULL chama reserve por SKU.");
-  await wait(4000);
+  setNarrator(
+    "ESTOQUE",
+    "Motor de inventário: on_hand, reserved por OS, inbound simulado, lazy init para SKU-GEN quando a peça entra no fluxo — mesmo comportamento do inventory_engine.lua."
+  );
+  setArchDomain("parts", "Reserva consulta PARTS_CATALOG carregado pelos 32 chunks de peças.");
+  await wait(6000);
 
   setTab("os");
   job.state = JOB_STATE.PARTS_PULL;
@@ -329,17 +401,25 @@ async function runMechanicDemo() {
   renderDetail();
   renderInventory();
 
-  await wait(13000);
+  await wait(14000);
 
   setTab("inv");
-  setNarrator("INBOUND", "Quando o físico cruza o mínimo, o motor dispara pedido simulado — fila inbound no painel.");
+  setNarrator(
+    "PROCUREMENT",
+    "Pedido automático quando o saldo cruza reorder_point — lead time dos chunks de catálogo alimenta a fila inbound exibida aqui."
+  );
+  setArchDomain("sup", "Fornecedor SUP-****** resolvível em SUPPLIERS_MASTER (32× chunks).");
   state.inbound.push({ sku: "SKU-BRK-PAD-F", qty: 12, eta: 25.4 });
   renderInventory();
 
-  await wait(12000);
+  await wait(14000);
 
   setTab("os");
-  setNarrator("LABOR", "Mão de obra: nove eventos tickLabor de +12% — igual ao clique no botão cyan do painel MTA.");
+  setNarrator(
+    "LABOR + FLAT-RATE",
+    "tickLabor no servidor nove vezes (+12%). Paralelamente, LABOR_FLAT_RATE nos chunks define horas-padrão por família de operação — referência para orçamento."
+  );
+  setArchDomain("labor", "Chunks labor_flat/*.lua — L-FLT-* por família BRK/ENG/…");
   job.state = JOB_STATE.LABOR;
   job.labor_progress = 0;
   renderJobs();
@@ -364,7 +444,7 @@ async function runMechanicDemo() {
   renderDetail();
   renderInventory();
 
-  await wait(12000);
+  await wait(14000);
 
   job.state = JOB_STATE.READY;
   log(LOG_LEVEL.INFO, "WORKSHOP", "Transição READY", { job_id: job.id });
@@ -373,10 +453,14 @@ async function runMechanicDemo() {
   renderJobs();
   renderDetail();
 
-  await wait(12000);
+  await wait(14000);
 
   setTab("log");
-  setNarrator("ENCERRAMENTO", "CLOSED: releaseJob limpa reservas remanescentes e a OS sai da lista ativa.");
+  setNarrator(
+    "ENCERRAMENTO",
+    "CLOSED: releaseJob no inventário; finalize_megabase.lua já definiu MECHANIC_GEN_*_COUNT após o último chunk — painel remove a OS da lista ativa."
+  );
+  setArchDomain(null, "Ciclo de OS encerrado — dados mestres permanecem em memória no servidor.");
   await wait(3000);
 
   setTab("os");
@@ -391,9 +475,13 @@ async function runMechanicDemo() {
   renderInventory();
   renderLogs();
 
-  await wait(10000);
+  await wait(12000);
 
-  setNarrator("SEGUNDA OS + CANCELAR", "OS XPT0K9: fluxo até PARTS_PULL com reserva; cancelJob reproduz o F10 — rollback de reservas.");
+  setNarrator(
+    "SEGUNDA OS + CANCELAR",
+    "OS XPT0K9: createJob → diagnóstico → PARTS_PULL com reserva; cancelJob como F10 — rollback atômico das reservas dessa OS."
+  );
+  setArchDomain("dtc", "DTC_REGISTRY em 32 chunks — correlação com procedimentos em procedures/*");
   const j2 = {
     id: "OS-1002",
     plate: "XPT0K9",
@@ -440,25 +528,36 @@ async function runMechanicDemo() {
   renderInventory();
   renderLogs();
 
-  await wait(12000);
+  await wait(14000);
 
   setTab("inv");
-  setNarrator("ESCALA", "Catálogo massivo (SKU-GEN-*) fica em server/generated; o cliente MTA recebe só snapshot enxuto + linhas ativas.");
+  setNarrator(
+    "ESCALA & SEGURANÇA",
+    "~253 mil linhas Lua só no servidor; 258 entradas no meta.xml. Para produção, avalie CHUNK_FILES menor ou carregamento sob demanda — aqui priorizamos transparência e modularidade."
+  );
+  setArchDomain("torque", "TORQUE_SPECS — 32 chunks, cruzamento com TSB e procedimentos.");
   renderInventory();
 
-  await wait(14000);
+  await wait(16000);
 
   setTab("log");
-  setNarrator("FERRAMENTAS", "Regenerar base: node tools/gen-megadata.mjs. Vídeo técnico: node tools/record-panel-demo.mjs (Playwright).");
+  setNarrator(
+    "TOOLCHAIN",
+    "Regenerar megabase: node tools/gen-megadata.mjs (TARGET_LINES, CHUNK_FILES). Demo in-game: /mechanicdemo ou F11. Este vídeo: npm run record-demo (Playwright + ffmpeg)."
+  );
   renderLogs();
 
-  await wait(14000);
+  await wait(16000);
 
   setTab("os");
-  setNarrator("FIM", "No jogo real: F2 painel, F11 ou /mechanicdemo para o roteiro no servidor. Obrigado por assistir.");
+  setNarrator(
+    "ENCERRAMENTO",
+    "Resumo: oito bibliotecas em chunks, reference_library, painel DX com ref_context, FSM, estoque com reserva/commit, demo_mode e core RPC — stack completa MechanicProfessional."
+  );
   setFsmHint("Demonstração visual concluída.");
+  setArchDomain(null, "Obrigado — MechanicProfessional.");
 
-  await wait(8000);
+  await wait(12000);
   window.__MECHANIC_DEMO_DONE = true;
 }
 

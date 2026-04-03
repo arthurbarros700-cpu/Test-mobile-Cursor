@@ -16,6 +16,22 @@
         <strong>FSM</strong> INTAKE → DIAGNOSTIC → PARTS_PULL → LABOR → QC → READY → CLOSED<br />
         <span id="fsm-current">—</span>
       </div>
+      <div id="arch-panel" class="arch-panel">
+        <div class="arch-title">Servidor · megabase em chunks</div>
+        <div class="arch-meta"><span id="arch-scripts">258</span> scripts · <span id="arch-lines">~253k</span> linhas Lua geradas</div>
+        <ul class="arch-domains" id="arch-domains">
+          <li data-d="parts">parts <span class="chunk">×32</span></li>
+          <li data-d="dtc">dtc <span class="chunk">×32</span></li>
+          <li data-d="proc">procedures <span class="chunk">×32</span></li>
+          <li data-d="veh">vehicles <span class="chunk">×32</span></li>
+          <li data-d="sup">suppliers <span class="chunk">×32</span></li>
+          <li data-d="labor">labor_flat <span class="chunk">×32</span></li>
+          <li data-d="tsb">tsb <span class="chunk">×32</span></li>
+          <li data-d="torque">torque <span class="chunk">×32</span></li>
+        </ul>
+        <div class="arch-foot">+ bootstrap_megabase.lua · finalize_megabase.lua</div>
+        <div class="arch-active" id="arch-active">—</div>
+      </div>
       <div id="toast"></div>
       <div id="panel-wrap">
         <div class="panel-header">Painel da oficina — FSM + estoque + diagnóstico</div>
@@ -36,6 +52,7 @@
                   <h3 id="detail-title">—</h3>
                   <div class="dtc" id="detail-dtc"></div>
                   <div class="findings" id="detail-findings"></div>
+                  <div class="ref-cross" id="ref-cross" style="display: none"></div>
                 </div>
                 <div class="detail-col">
                   <div style="font-size: 12px; color: var(--muted); margin-bottom: 6px">Plano de peças</div>
