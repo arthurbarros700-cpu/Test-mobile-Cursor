@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "gen-extended-ops-demo": "node tools/gen-extended-ops-demo.mjs",
+    "prerecord-demo": "node tools/gen-extended-ops-demo.mjs",
     "record-demo": "node tools/record-spartan-demo.mjs"
   },
   "devDependencies": {
