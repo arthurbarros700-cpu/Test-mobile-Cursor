@@ -209,6 +209,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   background: linear-gradient(165deg, rgba(18, 20, 26, 0.98) 0%, rgba(10, 11, 14, 0.99) 100%);
 }
 
@@ -266,12 +267,23 @@ body {
 .panel {
   display: none;
   flex: 1;
-  overflow: auto;
-  padding: 20px 28px 28px;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
 }
 
 .panel.active {
-  display: block;
+  display: flex;
+}
+
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 20px 28px 28px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card {
@@ -1193,4 +1205,54 @@ textarea:focus {
 .tool-tile:hover {
   border-color: var(--gold-dim);
   background: rgba(212, 175, 55, 0.08);
+}
+
+.fiscal-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fiscal-shop-card .fiscal-pre {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  font-family: ui-monospace, monospace;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.fiscal-preview {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  max-height: 280px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: ui-monospace, monospace;
+}
+
+.fiscal-preview .fp-head {
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: var(--font);
+}
+
+.ext-op-quick {
+  margin-top: 12px;
+}
+
+.ext-op-row {
+  margin-top: 8px;
 }

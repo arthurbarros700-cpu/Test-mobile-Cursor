@@ -19,6 +19,7 @@ client_scripts {
 server_scripts {
     'server/workshop.lua',
     'server/features.lua',
+    'server/feat_extended.lua',
 }
 
 ui_page 'html/index.html'

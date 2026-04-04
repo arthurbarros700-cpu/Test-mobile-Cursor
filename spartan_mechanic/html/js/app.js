@@ -34,8 +34,28 @@ window.__SPARTAN_STATE__ = {
   locale: {},
   dashboard: null,
   tools: null,
+  fiscal_shop: null,
+  extended_ops: null,
 };
 const state = window.__SPARTAN_STATE__;
+
+const FALLBACK_EXTENDED_OPS = [
+  "nfIssue",
+  "nfDraftImportFromPartsPlan",
+  "nfDraftImportLaborFromEstimate",
+  "exportJobSummaryText",
+  "exportFiscalShopCard",
+  "qcRoadtestFlag",
+  "shopShiftHandover",
+  "billPixRefGenerate",
+  "policyPrivacyAck",
+  "courtesyWashAdd",
+  "diagBatteryHealthSim",
+  "planMergeDuplicateSku",
+  "laborClockStart",
+  "invBinLocationSet",
+  "reportDailyFlash",
+];
 
 const FLAG_PRESETS = ["rental", "insurance", "fleet", "vip"];
 
@@ -79,6 +99,14 @@ function post(name, data) {
   }).catch(() => {});
 }
 
+function postExtended(op, args) {
+  fetch(`https://${GetParentResourceName()}/spartanExtended`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ op, args: args || {} }),
+  }).catch(() => {});
+}
+
 function showToast(kind, message) {
   const el = document.getElementById("toast");
   el.className = "toast " + (kind === "error" ? "error" : "success") + " show";
@@ -98,6 +126,7 @@ function setTab(id) {
     ops: ["Operações", "Entradas, ajustes, inbound, PO simulado e ferramentas globais."],
     stock: ["Estoque Spartan", "Disponibilidade em tempo real após reservas por OS."],
     audit: ["Auditoria", "Rastreabilidade servidor — reservas, commits e transições."],
+    fiscal: ["Fiscal & NF-e", "Documento simulado para o jogador, rascunho CFOP/itens e 150+ operações nomeadas."],
   };
   const t = titles[id] || titles.orders;
   document.getElementById("page-title").textContent = t[0];
@@ -287,7 +316,7 @@ function fillCrmForm(job) {
 
 function populateSkuSelects() {
   const keys = Object.keys(state.catalog || {}).sort();
-  for (const selId of ["plan-sku", "ops-sku-receive", "ops-sku-po"]) {
+  for (const selId of ["plan-sku", "ops-sku-receive", "ops-sku-po", "fiscal-sku"]) {
     const sel = document.getElementById(selId);
     if (!sel) continue;
     const cur = sel.value;
@@ -301,6 +330,138 @@ function populateSkuSelects() {
     }
     if (cur && keys.includes(cur)) sel.value = cur;
   }
+}
+
+function renderFiscalShop() {
+  const pre = document.getElementById("fiscal-shop-pre");
+  if (!pre) return;
+  const s = state.fiscal_shop;
+  if (!s) {
+    pre.textContent = "—";
+    return;
+  }
+  pre.textContent = [
+    s.trade_name || s.legal_name || "—",
+    "CNPJ: " + (s.cnpj || "—") + "  IE: " + (s.ie || "—"),
+    "Endereço: " + (s.address || "—"),
+    (s.city || "") + " / " + (s.uf || "") + "  CEP: " + (s.cep || "—"),
+  ].join("\n");
+}
+
+function fillFiscalFormFromJob(job) {
+  const doc = document.getElementById("fiscal-doc");
+  if (!doc) return;
+  if (!job) {
+    doc.value = "";
+    document.getElementById("fiscal-email").value = "";
+    document.getElementById("fiscal-terms").value = "";
+    document.getElementById("fiscal-regime").value = "simples";
+    document.getElementById("fiscal-cfop").value = "";
+    document.getElementById("fiscal-discount").value = "0";
+    document.getElementById("fiscal-notes").value = "";
+    return;
+  }
+  doc.value = job.customer_document || "";
+  document.getElementById("fiscal-email").value = job.customer_email || "";
+  document.getElementById("fiscal-terms").value = job.payment_terms || "À vista";
+  document.getElementById("fiscal-regime").value = job.tax_regime || "simples";
+  const d = job.invoice_draft || {};
+  document.getElementById("fiscal-cfop").value = d.cfop || "5933";
+  document.getElementById("fiscal-discount").value = String(d.discount != null ? d.discount : 0);
+  document.getElementById("fiscal-notes").value = d.notes || "";
+}
+
+function fmtMoneyNum(n) {
+  const x = Number(n) || 0;
+  return x.toFixed(2);
+}
+
+function renderFiscalPreview() {
+  const el = document.getElementById("fiscal-preview");
+  if (!el) return;
+  const job = state.selectedId ? jobById(state.selectedId) : null;
+  if (!job || job.state === JOB_STATE.CLOSED) {
+    el.innerHTML = '<span class="fp-head">Nenhuma OS selecionada</span>\nAbra a aba Ordens e clique em uma ordem na fila.';
+    return;
+  }
+  const draft = job.invoice_draft || { lines: [], cfop: "5933", notes: "", discount: 0 };
+  const lines = draft.lines || [];
+  let sub = 0;
+  const linesTxt = lines
+    .map((ln, i) => {
+      const q = ln.qty || 0;
+      const u = ln.unit_price || 0;
+      sub += q * u;
+      return `  ${i + 1}. ${ln.description || ln.sku || "?"} ×${q} @ ${fmtMoneyNum(u)} = ${fmtMoneyNum(q * u)}`;
+    })
+    .join("\n");
+  const disc = Math.max(0, Number(draft.discount) || 0);
+  const base = Math.max(0, sub - disc);
+  const regime = job.tax_regime || "simples";
+  const icmsR = regime === "normal" ? 0.18 : regime === "presumido" ? 0.12 : 0;
+  const icms = Math.round(base * icmsR * 100) / 100;
+  const pis = Math.round(base * 0.0065 * 100) / 100;
+  const cofins = Math.round(base * 0.03 * 100) / 100;
+  const total = Math.round((base + icms + pis + cofins) * 100) / 100;
+  const invs = job.invoices || [];
+  const lastNf =
+    invs.length > 0
+      ? `Última NF: #${invs[invs.length - 1].number} | Total R$ ${fmtMoneyNum(invs[invs.length - 1].total)} | ${invs[invs.length - 1].status || ""}`
+      : "Nenhuma NF emitida ainda.";
+  el.innerHTML =
+    `<span class="fp-head">${job.id} · ${job.plate}</span>\n` +
+    `Cliente: ${job.customer_name || "—"} | Doc: ${job.customer_document || "—"}\n` +
+    `CFOP rascunho: ${draft.cfop || "5933"} | Regime: ${regime}\n` +
+    `--- Linhas (${lines.length}) ---\n` +
+    (linesTxt || "  (vazio)") +
+    `\nSubtotal R$ ${fmtMoneyNum(sub)} | Desc R$ ${fmtMoneyNum(disc)} | Base R$ ${fmtMoneyNum(base)}` +
+    `\nICMS R$ ${fmtMoneyNum(icms)} | PIS R$ ${fmtMoneyNum(pis)} | COFINS R$ ${fmtMoneyNum(cofins)}` +
+    `\n<strong style="color:var(--gold)">Total estimado R$ ${fmtMoneyNum(total)}</strong>\n` +
+    lastNf;
+}
+
+function getExtendedOpList() {
+  const o = state.extended_ops;
+  if (o && o.length) return o;
+  return FALLBACK_EXTENDED_OPS;
+}
+
+function populateExtendedOps() {
+  const sel = document.getElementById("ext-op-select");
+  const cnt = document.getElementById("ext-ops-count");
+  const quick = document.getElementById("ext-op-quick");
+  if (!sel || !quick) return;
+  const list = getExtendedOpList();
+  if (cnt) cnt.textContent = String(list.length);
+  const cur = sel.value;
+  sel.innerHTML = "";
+  for (const op of list) {
+    const o = document.createElement("option");
+    o.value = op;
+    o.textContent = op;
+    sel.appendChild(o);
+  }
+  if (cur && list.includes(cur)) sel.value = cur;
+  quick.innerHTML = "";
+  const shortcuts = list.slice(0, 12);
+  for (const op of shortcuts) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tool-tile";
+    b.textContent = op.length > 22 ? op.slice(0, 20) + "…" : op;
+    b.title = op;
+    b.addEventListener("click", () => {
+      sel.value = op;
+      runExtendedOp(op);
+    });
+    quick.appendChild(b);
+  }
+}
+
+function runExtendedOp(op) {
+  const id = state.selectedId;
+  const args = id ? { jobId: id } : {};
+  postExtended(op, args);
 }
 
 function renderDashboard() {
@@ -356,6 +517,8 @@ function renderDetail() {
   const job = state.selectedId ? jobById(state.selectedId) : null;
   if (!job || job.state === JOB_STATE.CLOSED) {
     card.hidden = true;
+    fillFiscalFormFromJob(null);
+    renderFiscalPreview();
     return;
   }
   card.hidden = false;
@@ -367,6 +530,8 @@ function renderDetail() {
   renderNotes(job);
   renderTasks(job);
   renderFlags(job);
+  fillFiscalFormFromJob(job);
+  renderFiscalPreview();
   if (job.diagnostic) {
     document.getElementById("detail-dtc").textContent = "DTC: " + (job.diagnostic.dtc || []).join(", ");
     document.getElementById("detail-findings").textContent = (job.diagnostic.findings || []).join("\n");
@@ -469,7 +634,11 @@ function applyBootstrap(data) {
   if (data.logs) state.logs = data.logs;
   if (data.dashboard !== undefined) state.dashboard = data.dashboard;
   if (data.tools !== undefined) state.tools = data.tools;
+  if (data.fiscal_shop !== undefined) state.fiscal_shop = data.fiscal_shop;
+  if (data.extended_ops !== undefined) state.extended_ops = data.extended_ops;
   populateSkuSelects();
+  renderFiscalShop();
+  populateExtendedOps();
   renderJobs();
   renderDetail();
   renderInventory();
@@ -552,6 +721,8 @@ document.addEventListener("keydown", (e) => {
 
 setInterval(tickClock, 1000);
 initFamilies();
+populateExtendedOps();
+renderFiscalShop();
 
 document.getElementById("btn-crm-save").addEventListener("click", () => {
   const id = requireSelectedJob();
@@ -712,6 +883,118 @@ document.getElementById("btn-po").addEventListener("click", () => {
   spartanAction("po", { sku, qty });
 });
 
+function fiscalJobArgs() {
+  const id = requireSelectedJob();
+  return id ? { jobId: id } : null;
+}
+
+document.getElementById("btn-fiscal-copy-shop").addEventListener("click", () => {
+  postExtended("exportFiscalShopCard", {});
+});
+document.getElementById("btn-fiscal-save-doc").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("jobSetCustomerDocument", { ...a, doc: document.getElementById("fiscal-doc").value.trim() });
+});
+document.getElementById("btn-fiscal-save-email").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("jobSetCustomerEmail", { ...a, email: document.getElementById("fiscal-email").value.trim() });
+});
+document.getElementById("btn-fiscal-save-terms").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("jobSetPaymentTerms", { ...a, terms: document.getElementById("fiscal-terms").value.trim() });
+});
+document.getElementById("btn-fiscal-save-regime").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("jobSetTaxRegime", { ...a, regime: document.getElementById("fiscal-regime").value });
+});
+document.getElementById("btn-fiscal-cfop").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftSetCfop", { ...a, cfop: document.getElementById("fiscal-cfop").value.trim() });
+});
+document.getElementById("btn-fiscal-discount").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftSetDiscount", { ...a, amount: document.getElementById("fiscal-discount").value });
+});
+document.getElementById("btn-fiscal-notes").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftSetNotes", { ...a, notes: document.getElementById("fiscal-notes").value });
+});
+document.getElementById("btn-fiscal-draft-clear").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  if (confirm("Limpar rascunho fiscal?")) postExtended("nfDraftClear", a);
+});
+document.getElementById("btn-fiscal-add-sku").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftAddSkuLine", {
+    ...a,
+    sku: document.getElementById("fiscal-sku").value,
+    qty: document.getElementById("fiscal-sku-qty").value,
+  });
+});
+document.getElementById("btn-fiscal-add-svc").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftAddServiceLine", {
+    ...a,
+    description: document.getElementById("fiscal-svc-desc").value.trim() || "Serviço",
+    qty: document.getElementById("fiscal-svc-qty").value,
+    unit_price: document.getElementById("fiscal-svc-price").value,
+  });
+});
+document.getElementById("btn-fiscal-import-plan").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftImportFromPartsPlan", a);
+});
+document.getElementById("btn-fiscal-import-labor").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftImportLaborFromEstimate", a);
+});
+document.getElementById("btn-fiscal-import-parts-est").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftImportPartsFromEstimate", a);
+});
+document.getElementById("btn-fiscal-rm-line").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfDraftRemoveLastLine", a);
+});
+document.getElementById("btn-fiscal-issue").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfIssue", a);
+});
+document.getElementById("btn-fiscal-void").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfVoidLast", a);
+});
+document.getElementById("btn-fiscal-copy-last").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("nfExportLastText", a);
+});
+document.getElementById("btn-fiscal-summary-os").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  postExtended("exportJobSummaryText", a);
+});
+document.getElementById("btn-ext-op-run").addEventListener("click", () => {
+  const op = document.getElementById("ext-op-select").value;
+  if (op) runExtendedOp(op);
+});
+
 document.getElementById("global-tool-grid").addEventListener("click", (ev) => {
   const t = ev.target.closest("[data-spartan]");
   if (!t) return;
@@ -742,6 +1025,9 @@ window.__SPARTAN_RECORD__ = {
     renderInventory();
     renderAudit();
     renderDashboard();
+    renderFiscalShop();
+    renderFiscalPreview();
+    populateExtendedOps();
   },
   selectJob(id) {
     state.selectedId = id;

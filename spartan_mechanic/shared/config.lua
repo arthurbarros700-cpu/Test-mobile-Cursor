@@ -17,6 +17,20 @@ Config.Locale = {
     tagline = 'Sistema integrado de ordens de serviço',
 }
 
+-- Loja fiscal (simulado NF-e / documento para jogador)
+Config.FiscalShop = {
+    legal_name = 'Spartan Motorworks Ltda',
+    trade_name = 'Spartan Motorworks',
+    cnpj = '12.345.678/0001-90',
+    ie = '123.456.789.110',
+    im = '9876543',
+    crt = '3',
+    address = 'Av. Industrial, 1500 — Los Santos',
+    city = 'Los Santos',
+    uf = 'SP',
+    cep = '01310-100',
+}
+
 JOB_STATE = {
     INTAKE = 'INTAKE',
     DIAGNOSTIC = 'DIAGNOSTIC',

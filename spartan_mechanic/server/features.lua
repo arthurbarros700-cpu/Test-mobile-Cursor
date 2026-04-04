@@ -383,6 +383,12 @@ local function jobDuplicateDraft(jobId, actor)
         warranty_until = nil,
         vin = src.vin or '',
         flags = {},
+        customer_document = src.customer_document or '',
+        customer_email = src.customer_email or '',
+        payment_terms = src.payment_terms or 'À vista',
+        tax_regime = src.tax_regime or 'simples',
+        invoices = {},
+        invoice_draft = { lines = {}, cfop = '5933', notes = '' },
     }
     Workshop.jobs[id] = j
     audit(2, 'WORKSHOP', 'OS duplicada (rascunho)', { from = jobId, to = id, actor = actor })
@@ -416,6 +422,12 @@ local function seedDemoJobs(actor)
             qc_score = nil,
             vin = '',
             flags = i == 1 and { rental = true } or {},
+            customer_document = '',
+            customer_email = '',
+            payment_terms = 'À vista',
+            tax_regime = 'simples',
+            invoices = {},
+            invoice_draft = { lines = {}, cfop = '5933', notes = '' },
         }
         audit(2, 'WORKSHOP', 'OS demo seed', { job_id = id })
     end
@@ -450,6 +462,10 @@ end
 
 -- ——— enrich NUI ———
 function SME.enrichBroadcast(payload)
+    payload.fiscal_shop = Config.FiscalShop
+    if SME_EXT and SME_EXT.getOpCatalog then
+        payload.extended_ops = SME_EXT.getOpCatalog()
+    end
     payload.dashboard = {
         open_os = openJobsCount(),
         low_stock_lines = lowStockCount(),

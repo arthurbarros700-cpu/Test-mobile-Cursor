@@ -68,6 +68,11 @@ RegisterNUICallback('cancelJob', function(data, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('spartanExtended', function(d, cb)
+    TriggerServerEvent('spartan_mechanic:feat_extended', d.op, d.args or {})
+    cb('ok')
+end)
+
 RegisterNUICallback('spartanAction', function(d, cb)
     local t = d and d.type
     if t == 'note' then

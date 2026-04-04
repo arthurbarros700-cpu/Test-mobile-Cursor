@@ -39,6 +39,10 @@
               <span class="nav-ic">▣</span>
               Estoque
             </button>
+            <button type="button" class="nav-btn" data-tab="fiscal">
+              <span class="nav-ic">⌧</span>
+              Fiscal
+            </button>
             <button type="button" class="nav-btn" data-tab="audit">
               <span class="nav-ic">◎</span>
               Auditoria
@@ -66,6 +70,7 @@
           </header>
 
           <section class="panel tab-panel active" id="tab-orders">
+            <div class="panel-body">
             <div class="grid-2">
               <div class="card glass">
                 <div class="card-head">
@@ -193,9 +198,11 @@
                 </div>
               </div>
             </div>
+            </div>
           </section>
 
           <section class="panel tab-panel" id="tab-dashboard">
+            <div class="panel-body">
             <div class="dash-hero">
               <div>
                 <h2 class="dash-title">Centro de comando</h2>
@@ -220,9 +227,11 @@
                 </table>
               </div>
             </div>
+            </div>
           </section>
 
           <section class="panel tab-panel" id="tab-ops">
+            <div class="panel-body">
             <div class="grid-2 ops-grid">
               <div class="card glass">
                 <div class="card-head"><h2>Inventário &amp; compras</h2><span class="badge">Back-office</span></div>
@@ -265,9 +274,11 @@
                 <p class="ops-hint small">Export CSV envia dados ao clipboard do cliente (FiveM).</p>
               </div>
             </div>
+            </div>
           </section>
 
           <section class="panel tab-panel" id="tab-stock">
+            <div class="panel-body">
             <div class="card glass full">
               <div class="card-head">
                 <h2>Inventário Spartan</h2>
@@ -293,15 +304,99 @@
                 <div id="inbound-list" class="inbound-chips"></div>
               </div>
             </div>
+            </div>
+          </section>
+
+          <section class="panel tab-panel" id="tab-fiscal">
+            <div class="panel-body fiscal-layout">
+              <div class="card glass fiscal-shop-card" id="fiscal-shop-card">
+                <div class="card-head"><h2>Dados da loja (NF-e simulada)</h2><span class="badge">Config</span></div>
+                <pre class="fiscal-pre" id="fiscal-shop-pre">—</pre>
+                <button type="button" class="btn-sm" id="btn-fiscal-copy-shop">Copiar cartão da loja</button>
+              </div>
+              <div class="grid-2 fiscal-grid">
+                <div class="card glass">
+                  <div class="card-head"><h2>Cliente / tributos OS</h2><span class="badge muted">Selecione uma OS</span></div>
+                  <div class="compact-form">
+                    <label class="field"><span>CPF/CNPJ</span><input type="text" id="fiscal-doc" placeholder="000.000.000-00" /></label>
+                    <label class="field"><span>E-mail p/ envio</span><input type="text" id="fiscal-email" placeholder="cliente@email.com" /></label>
+                    <label class="field"><span>Condição pagamento</span><input type="text" id="fiscal-terms" placeholder="À vista / 3x" /></label>
+                    <label class="field"><span>Regime (ICMS)</span>
+                      <select id="fiscal-regime"><option value="simples">Simples</option><option value="presumido">Presumido</option><option value="normal">Normal</option></select>
+                    </label>
+                    <div class="btn-row-tight">
+                      <button type="button" class="btn-sm" id="btn-fiscal-save-doc">Salvar documento</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-save-email">Salvar e-mail</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-save-terms">Salvar condição</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-save-regime">Salvar regime</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="card glass">
+                  <div class="card-head"><h2>Rascunho da nota</h2><span class="badge">CFOP + itens</span></div>
+                  <div class="compact-form">
+                    <label class="field"><span>CFOP</span><input type="text" id="fiscal-cfop" maxlength="6" placeholder="5933" /></label>
+                    <label class="field"><span>Desconto (R$)</span><input type="number" id="fiscal-discount" min="0" step="10" value="0" /></label>
+                    <label class="field field-full"><span>Observações fiscais</span><textarea id="fiscal-notes" rows="2" placeholder="Informações complementares…"></textarea></label>
+                    <div class="btn-row-tight">
+                      <button type="button" class="btn-sm" id="btn-fiscal-cfop">Aplicar CFOP</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-discount">Aplicar desconto</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-notes">Salvar obs.</button>
+                      <button type="button" class="btn-sm btn-danger-soft" id="btn-fiscal-draft-clear">Limpar rascunho</button>
+                    </div>
+                    <hr class="sep" />
+                    <div class="row-2">
+                      <label class="field"><span>SKU (peça)</span><select id="fiscal-sku"></select></label>
+                      <label class="field"><span>Qtd</span><input type="number" id="fiscal-sku-qty" min="1" value="1" /></label>
+                    </div>
+                    <button type="button" class="btn-sm" id="btn-fiscal-add-sku">+ Peça no rascunho</button>
+                    <label class="field mt"><span>Serviço (descrição)</span><input type="text" id="fiscal-svc-desc" placeholder="Mão de obra especializada" /></label>
+                    <div class="row-2">
+                      <label class="field"><span>Qtd</span><input type="number" id="fiscal-svc-qty" min="1" value="1" /></label>
+                      <label class="field"><span>Valor unit.</span><input type="number" id="fiscal-svc-price" min="0" step="10" value="100" /></label>
+                    </div>
+                    <button type="button" class="btn-sm" id="btn-fiscal-add-svc">+ Serviço no rascunho</button>
+                    <div class="btn-row-tight mt">
+                      <button type="button" class="btn-sm btn-accent" id="btn-fiscal-import-plan">Importar plano de peças</button>
+                      <button type="button" class="btn-sm btn-accent" id="btn-fiscal-import-labor">Importar MO orçamento</button>
+                      <button type="button" class="btn-sm btn-accent" id="btn-fiscal-import-parts-est">Importar peças orçamento</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-rm-line">Remover última linha</button>
+                    </div>
+                    <div class="btn-row-tight mt">
+                      <button type="button" class="btn-primary btn-compact" id="btn-fiscal-issue">Emitir NF-e (simulado)</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-void">Cancelar última NF</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-copy-last">Copiar última NF</button>
+                      <button type="button" class="btn-sm" id="btn-fiscal-summary-os">Resumo OS → clipboard</button>
+                    </div>
+                    <p class="ops-hint small">Emissão exige OS em READY ou marcada como paga. Texto completo vai ao clipboard do jogador.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="card glass">
+                <div class="card-head"><h2>Rascunho &amp; NF emitidas</h2><span class="badge muted">Ao vivo</span></div>
+                <div class="fiscal-preview" id="fiscal-preview">Selecione uma OS em Ordens.</div>
+              </div>
+              <div class="card glass">
+                <div class="card-head"><h2>Biblioteca de operações (150+)</h2><span class="badge" id="ext-ops-count">0</span></div>
+                <p class="ops-hint">Executa funções servidor nomeadas (compliance, KPI, estoque, diagnóstico). Use a OS selecionada quando aplicável.</p>
+                <div class="row-2 ext-op-row">
+                  <label class="field field-full"><span>Operação</span><select id="ext-op-select"></select></label>
+                  <button type="button" class="btn-sm align-end" id="btn-ext-op-run">Executar</button>
+                </div>
+                <div class="tool-grid ext-op-quick" id="ext-op-quick"></div>
+              </div>
+            </div>
           </section>
 
           <section class="panel tab-panel" id="tab-audit">
+            <div class="panel-body">
             <div class="card glass full">
               <div class="card-head">
                 <h2>Trilha de auditoria</h2>
                 <span class="badge">Correlacionado à OS</span>
               </div>
               <div class="audit-scroll" id="audit-list"></div>
+            </div>
             </div>
           </section>
         </main>
