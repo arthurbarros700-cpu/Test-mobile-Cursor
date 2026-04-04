@@ -43,8 +43,27 @@ RegisterNetEvent('spartan_mechanic:clipboard', function(text)
     SendNUIMessage({ action = 'clipboard', text = text })
 end)
 
+RegisterNetEvent('spartan_mechanic:nfeShow', function(payload)
+    if type(payload) ~= 'table' then return end
+    SendNUIMessage({ action = 'nfeShow', data = payload })
+end)
+
 RegisterNUICallback('close', function(_, cb)
     setUi(false)
+    cb('ok')
+end)
+
+RegisterNUICallback('getServerId', function(_, cb)
+    cb({ ok = true, id = GetPlayerServerId(PlayerId()) })
+end)
+
+RegisterNUICallback('deliverNfe', function(d, cb)
+    TriggerServerEvent('spartan_mechanic:nfeDeliverToCustomer', d.jobId, d.targetId)
+    cb('ok')
+end)
+
+RegisterNUICallback('closeNfe', function(_, cb)
+    SendNUIMessage({ action = 'nfeClose' })
     cb('ok')
 end)
 

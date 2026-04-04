@@ -1,0 +1,12 @@
+--[[
+  Copie o bloco abaixo para ox_inventory/data/items.lua (ajuste peso/label).
+
+  ['spartan_nfe'] = {
+    label = 'Comprovante NF Spartan',
+    weight = 15,
+    stack = false,
+    close = true,
+    description = 'Documento fiscal simulado — use para abrir a NF.',
+    client = { export = 'spartan_mechanic.useNfeItem' },
+  },
+]]

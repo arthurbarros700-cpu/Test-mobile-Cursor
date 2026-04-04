@@ -716,7 +716,10 @@ window.addEventListener("message", (ev) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") post("close");
+  if (e.key !== "Escape") return;
+  const nfe = document.getElementById("nfe-overlay");
+  if (nfe && !nfe.classList.contains("hidden")) return;
+  post("close");
 });
 
 setInterval(tickClock, 1000);
@@ -989,6 +992,32 @@ document.getElementById("btn-fiscal-summary-os").addEventListener("click", () =>
   const a = fiscalJobArgs();
   if (!a) return;
   postExtended("exportJobSummaryText", a);
+});
+document.getElementById("btn-fiscal-fill-me").addEventListener("click", () => {
+  fetch(`https://${GetParentResourceName()}/getServerId`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  })
+    .then((r) => r.json())
+    .then((d) => {
+      if (d && d.id != null) document.getElementById("fiscal-target-id").value = String(d.id);
+    })
+    .catch(() => {});
+});
+document.getElementById("btn-fiscal-deliver").addEventListener("click", () => {
+  const a = fiscalJobArgs();
+  if (!a) return;
+  const tid = parseInt(document.getElementById("fiscal-target-id").value, 10);
+  if (!tid || tid < 1) {
+    showToast("error", "Informe o ID do servidor do cliente.");
+    return;
+  }
+  fetch(`https://${GetParentResourceName()}/deliverNfe`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jobId: a.jobId, targetId: tid }),
+  }).catch(() => {});
 });
 document.getElementById("btn-ext-op-run").addEventListener("click", () => {
   const op = document.getElementById("ext-op-select").value;

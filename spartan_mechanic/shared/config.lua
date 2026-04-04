@@ -31,6 +31,18 @@ Config.FiscalShop = {
     cep = '01310-100',
 }
 
+--[[
+    Item físico da NF no inventário do jogador (ox_inventory / QBCore).
+    Crie o item no seu framework — ex. ox_inventory/data/items.lua:
+      ['spartan_nfe'] = { label = '...', weight = 10, stack = false, close = true,
+        client = { export = 'spartan_mechanic.useNfeItem' }, ... }
+]]
+Config.NfeItem = {
+    enabled = true,
+    item_name = 'spartan_nfe',
+    label = 'Comprovante NF Spartan',
+}
+
 JOB_STATE = {
     INTAKE = 'INTAKE',
     DIAGNOSTIC = 'DIAGNOSTIC',

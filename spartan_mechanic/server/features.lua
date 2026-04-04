@@ -389,6 +389,7 @@ local function jobDuplicateDraft(jobId, actor)
         tax_regime = src.tax_regime or 'simples',
         invoices = {},
         invoice_draft = { lines = {}, cfop = '5933', notes = '' },
+        last_nfe_token = nil,
     }
     Workshop.jobs[id] = j
     audit(2, 'WORKSHOP', 'OS duplicada (rascunho)', { from = jobId, to = id, actor = actor })
@@ -428,6 +429,7 @@ local function seedDemoJobs(actor)
             tax_regime = 'simples',
             invoices = {},
             invoice_draft = { lines = {}, cfop = '5933', notes = '' },
+            last_nfe_token = nil,
         }
         audit(2, 'WORKSHOP', 'OS demo seed', { job_id = id })
     end

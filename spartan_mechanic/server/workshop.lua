@@ -41,7 +41,13 @@ function availableSku(sku)
     return (Inventory.on_hand[sku] or 0) - reservedTotalSku(sku)
 end
 
-Workshop = { jobs = {}, id_seq = 1000, nf_seq = 88000, fiscal_settings = { default_cfop = '5933' } }
+Workshop = {
+    jobs = {},
+    id_seq = 1000,
+    nf_seq = 88000,
+    fiscal_settings = { default_cfop = '5933' },
+    nfe_tokens = {},
+}
 
 local VALID = {
     [JOB_STATE.INTAKE] = { [JOB_STATE.DIAGNOSTIC] = true },
@@ -160,6 +166,7 @@ function jobDto(job)
         tax_regime = job.tax_regime,
         invoices = job.invoices,
         invoice_draft = job.invoice_draft,
+        last_nfe_token = job.last_nfe_token,
     }
 end
 
@@ -257,6 +264,7 @@ RegisterNetEvent('spartan_mechanic:createJob', function(plate, family, mileage)
         tax_regime = 'simples',
         invoices = {},
         invoice_draft = { lines = {}, cfop = '5933', notes = '' },
+        last_nfe_token = nil,
     }
     Workshop.jobs[id] = job
     audit(2, 'WORKSHOP', 'OS aberta', { job_id = id, plate = job.plate, actor = name })

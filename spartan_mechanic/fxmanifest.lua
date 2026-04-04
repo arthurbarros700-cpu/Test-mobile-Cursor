@@ -14,12 +14,14 @@ shared_scripts {
 
 client_scripts {
     'client/main.lua',
+    'client/nfe_bridge.lua',
 }
 
 server_scripts {
     'server/workshop.lua',
     'server/features.lua',
     'server/feat_extended.lua',
+    'server/nfe_item.lua',
 }
 
 ui_page 'html/index.html'
@@ -28,4 +30,6 @@ files {
     'html/index.html',
     'html/css/app.css',
     'html/js/app.js',
+    'html/css/nfe.css',
+    'html/js/nfe.js',
 }

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/nfe.css" />
   </head>
   <body>
     <div id="app" class="hidden">
@@ -368,7 +369,15 @@
                       <button type="button" class="btn-sm" id="btn-fiscal-copy-last">Copiar última NF</button>
                       <button type="button" class="btn-sm" id="btn-fiscal-summary-os">Resumo OS → clipboard</button>
                     </div>
-                    <p class="ops-hint small">Emissão exige OS em READY ou marcada como paga. Texto completo vai ao clipboard do jogador.</p>
+                    <hr class="sep" />
+                    <h3 class="micro-title">Entregar ao cliente (inventário)</h3>
+                    <p class="ops-hint small">Gera a NF, registra token no servidor e tenta dar o item <code>spartan_nfe</code> (ox_inventory / QBCore). O cliente vê o documento em HTML ao receber ou ao usar o item.</p>
+                    <div class="row-2">
+                      <label class="field"><span>ID servidor do cliente</span><input type="number" id="fiscal-target-id" min="1" placeholder="ex.: 12" /></label>
+                      <button type="button" class="btn-sm align-end" id="btn-fiscal-fill-me">Usar meu ID</button>
+                    </div>
+                    <button type="button" class="btn-primary btn-compact" id="btn-fiscal-deliver">Gerar NF e entregar ao cliente</button>
+                    <p class="ops-hint small">Requisitos: OS <strong>READY</strong> ou <strong>paga</strong>, rascunho com linhas. Mecânico recebe cópia no clipboard. Cliente: item no inventário (se configurado) + documento HTML na tela.</p>
                   </div>
                 </div>
               </div>
@@ -404,7 +413,30 @@
 
       <div id="toast" class="toast hidden"></div>
     </div>
+
+    <div id="nfe-overlay" class="nfe-overlay hidden" aria-hidden="true">
+      <div class="nfe-backdrop"></div>
+      <div class="nfe-modal">
+        <header class="nfe-head">
+          <div class="nfe-brand">
+            <span class="nfe-mark">Σ</span>
+            <div>
+              <h1 id="nfe-title">Documento fiscal</h1>
+              <p class="nfe-sub" id="nfe-subtitle">Spartan Motorworks</p>
+            </div>
+          </div>
+          <button type="button" class="nfe-close" id="nfe-btn-close" aria-label="Fechar">✕</button>
+        </header>
+        <div class="nfe-body" id="nfe-body"></div>
+        <footer class="nfe-foot">
+          <span class="nfe-foot-hint">Documento simulado para roleplay · sem validade fiscal</span>
+          <button type="button" class="nfe-btn-print" id="nfe-btn-print">Imprimir / PDF (janela)</button>
+        </footer>
+      </div>
+    </div>
+
     <script src="js/app.js"></script>
+    <script src="js/nfe.js"></script>
     <script src="extended_ops_demo.js"></script>
     <script src="record_demo.js"></script>
     <script>

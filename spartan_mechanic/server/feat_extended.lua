@@ -72,6 +72,126 @@ local function randomAccessKey()
     return s
 end
 
+local function randomNfeToken()
+    local t = ''
+    for i = 1, 32 do
+        local r = math.random(1, 16)
+        t = t .. (r <= 10 and string.char(48 + r - 1) or string.char(87 + r))
+    end
+    return t
+end
+
+--- Cria NF a partir do rascunho, anexa na OS, retorna tabela inv ou nil, err
+local function appendInvoiceFromDraft(j, actor)
+    if not (j.paid or j.state == JOB_STATE.READY) then return nil, 'nf_requires_ready_or_paid' end
+    jobEnsureFiscal(j)
+    if #j.invoice_draft.lines < 1 then return nil, 'empty_draft' end
+    Workshop.nf_seq = (Workshop.nf_seq or 88000) + 1
+    local t = draftTotals(j)
+    local linesCopy = {}
+    for _, ln in ipairs(j.invoice_draft.lines) do
+        linesCopy[#linesCopy + 1] = {
+            kind = ln.kind,
+            sku = ln.sku,
+            description = ln.description,
+            ncm = ln.ncm,
+            qty = ln.qty,
+            unit_price = ln.unit_price,
+        }
+    end
+    local inv = {
+        number = Workshop.nf_seq,
+        series = 1,
+        cfop = j.invoice_draft.cfop or '5933',
+        ts = os.time(),
+        lines = linesCopy,
+        subtotal = t.subtotal,
+        discount = t.discount,
+        icms = t.icms,
+        pis = t.pis,
+        cofins = t.cofins,
+        total = t.total,
+        notes = j.invoice_draft.notes or '',
+        access_key = randomAccessKey(),
+        status = 'authorized',
+        issuer = actor,
+    }
+    j.invoices = j.invoices or {}
+    j.invoices[#j.invoices + 1] = inv
+    audit(2, 'FISCAL', 'NF-e emitida (simulado)', { job_id = j.id, nf = inv.number, total = inv.total, actor = actor })
+    return inv, nil
+end
+
+local function nfePayloadForClient(inv, j)
+    local shop = Config.FiscalShop or {}
+    return {
+        shop = {
+            legal_name = shop.legal_name,
+            trade_name = shop.trade_name,
+            cnpj = shop.cnpj,
+            ie = shop.ie,
+            address = shop.address,
+            city = shop.city,
+            uf = shop.uf,
+            cep = shop.cep,
+        },
+        job = {
+            id = j.id,
+            plate = j.plate,
+            family = j.family,
+            mileage_km = j.mileage_km,
+            vin = j.vin,
+            customer_name = j.customer_name,
+            customer_document = j.customer_document,
+            customer_email = j.customer_email,
+            customer_phone = j.customer_phone,
+            payment_terms = j.payment_terms,
+            tax_regime = j.tax_regime,
+        },
+        invoice = inv,
+    }
+end
+
+--- Entrega item com metadados (ox / qb). Retorna ok, err_code
+local function giveNfeItemToPlayer(targetSrc, token, inv, j, label)
+    local cfg = Config.NfeItem
+    if not cfg or not cfg.enabled or not cfg.item_name or cfg.item_name == '' then
+        return false, 'nfe_item_disabled'
+    end
+    local meta = {
+        nfe_token = token,
+        nf_number = inv.number,
+        description = label or (('NF Spartan #%s'):format(inv.number)),
+    }
+    local ok = false
+    if GetResourceState('ox_inventory') == 'started' then
+        local s, r = pcall(function()
+            return exports.ox_inventory:AddItem(targetSrc, cfg.item_name, 1, meta)
+        end)
+        ok = s and r ~= false and r ~= nil
+    end
+    if not ok and GetResourceState('qb-inventory') == 'started' then
+        local s, r = pcall(function()
+            return exports['qb-inventory']:AddItem(targetSrc, cfg.item_name, 1, false, meta)
+        end)
+        ok = s and r ~= false and r ~= nil
+    end
+    if not ok and GetResourceState('qb-core') == 'started' then
+        local s, QBCore = pcall(function() return exports['qb-core']:GetCoreObject() end)
+        if s and QBCore then
+            local tPlayer = QBCore.Functions.GetPlayer(targetSrc)
+            if tPlayer then
+                local ar = tPlayer.Functions.AddItem(cfg.item_name, 1, false, meta)
+                ok = ar == true or ar == nil
+            end
+        end
+    end
+    if not ok then
+        return false, 'nfe_no_inventory'
+    end
+    return true, nil
+end
+
 -- ——— 150 operações: tabela OPS[ nome ] = function(args, actor) return ok, err? end ———
 local OPS = {}
 
@@ -238,30 +358,8 @@ end
 OPS.nfIssue = function(a, actor, src)
     local j, e = assertOpen(a.jobId)
     if not j then return false, e end
-    if not (j.paid or j.state == JOB_STATE.READY) then return false, 'nf_requires_ready_or_paid' end
-    jobEnsureFiscal(j)
-    if #j.invoice_draft.lines < 1 then return false, 'empty_draft' end
-    Workshop.nf_seq = (Workshop.nf_seq or 88000) + 1
-    local t = draftTotals(j)
-    local inv = {
-        number = Workshop.nf_seq,
-        series = 1,
-        cfop = j.invoice_draft.cfop or '5933',
-        ts = os.time(),
-        lines = j.invoice_draft.lines,
-        subtotal = t.subtotal,
-        discount = t.discount,
-        icms = t.icms,
-        pis = t.pis,
-        cofins = t.cofins,
-        total = t.total,
-        notes = j.invoice_draft.notes or '',
-        access_key = randomAccessKey(),
-        status = 'authorized',
-        issuer = actor,
-    }
-    j.invoices[#j.invoices + 1] = inv
-    audit(2, 'FISCAL', 'NF-e emitida (simulado)', { job_id = a.jobId, nf = inv.number, total = inv.total, actor = actor })
+    local inv, err = appendInvoiceFromDraft(j, actor)
+    if not inv then return false, err end
     local txt = formatInvoiceText(inv, j)
     if src then TriggerClientEvent('spartan_mechanic:clipboard', src, txt) end
     TriggerClientEvent('spartan_mechanic:notify', src, 'success', 'NF-e ' .. inv.number .. ' gerada — texto no clipboard.')
@@ -1183,6 +1281,120 @@ function SME_EXT.getOpCatalog()
 end
 
 SME_EXT._ops_count = countOps()
+
+local function deepCopyInv(inv)
+    local lines = {}
+    for _, ln in ipairs(inv.lines or {}) do
+        lines[#lines + 1] = {
+            kind = ln.kind,
+            sku = ln.sku,
+            description = ln.description,
+            ncm = ln.ncm,
+            qty = ln.qty,
+            unit_price = ln.unit_price,
+        }
+    end
+    return {
+        number = inv.number,
+        series = inv.series,
+        cfop = inv.cfop,
+        ts = inv.ts,
+        lines = lines,
+        subtotal = inv.subtotal,
+        discount = inv.discount,
+        icms = inv.icms,
+        pis = inv.pis,
+        cofins = inv.cofins,
+        total = inv.total,
+        notes = inv.notes,
+        access_key = inv.access_key,
+        status = inv.status,
+        issuer = inv.issuer,
+    }
+end
+
+local function jobSnapshotForNfe(j)
+    return {
+        id = j.id,
+        plate = j.plate,
+        family = j.family,
+        mileage_km = j.mileage_km,
+        vin = j.vin,
+        customer_name = j.customer_name,
+        customer_document = j.customer_document,
+        customer_email = j.customer_email,
+        customer_phone = j.customer_phone,
+        payment_terms = j.payment_terms,
+        tax_regime = j.tax_regime,
+    }
+end
+
+--- Mecânico: emite NF e entrega item (ou abre HTML) ao cliente alvo
+RegisterNetEvent('spartan_mechanic:nfeDeliverToCustomer', function(jobId, targetServerId)
+    local src = source
+    if not canOpen(src) then return end
+    local j, e = assertOpen(jobId)
+    if not j then
+        TriggerClientEvent('spartan_mechanic:actionResult', src, false, e)
+        return
+    end
+    local inv, err = appendInvoiceFromDraft(j, GetPlayerName(src) or 'mechanic')
+    if not inv then
+        TriggerClientEvent('spartan_mechanic:actionResult', src, false, err)
+        return
+    end
+    local token = randomNfeToken()
+    Workshop.nfe_tokens = Workshop.nfe_tokens or {}
+    Workshop.nfe_tokens[token] = {
+        job = jobSnapshotForNfe(j),
+        invoice = deepCopyInv(inv),
+        created_ts = os.time(),
+    }
+    j.last_nfe_token = token
+    local tgt = tonumber(targetServerId) or src
+    if not GetPlayerName(tgt) then
+        TriggerClientEvent('spartan_mechanic:actionResult', src, false, 'invalid_target')
+        broadcastUi()
+        return
+    end
+    local label = (Config.NfeItem and Config.NfeItem.label) or 'Comprovante NF Spartan'
+    local gave, ierr = giveNfeItemToPlayer(tgt, token, inv, j, label)
+    TriggerClientEvent('spartan_mechanic:nfeShow', tgt, nfePayloadForClient(inv, j))
+    if gave then
+        TriggerClientEvent('spartan_mechanic:notify', tgt, 'success', 'Você recebeu o comprovante fiscal (NF ' .. tostring(inv.number) .. ').')
+        TriggerClientEvent('spartan_mechanic:notify', src, 'success', 'NF entregue ao jogador.')
+    elseif ierr == 'nfe_item_disabled' then
+        TriggerClientEvent('spartan_mechanic:notify', src, 'success', 'NF gerada — painel HTML aberto no cliente (item desativado em config).')
+    else
+        TriggerClientEvent('spartan_mechanic:notify', src, 'success', 'NF gerada — inventário externo não detectado; cliente viu o documento na tela.')
+        TriggerClientEvent('spartan_mechanic:notify', tgt, 'info', 'Sem item de inventário configurado — documento exibido na tela.')
+    end
+    local txt = formatInvoiceText(inv, j)
+    TriggerClientEvent('spartan_mechanic:clipboard', src, txt)
+    TriggerClientEvent('spartan_mechanic:actionResult', src, true, nil)
+    broadcastUi()
+end)
+
+function SME_EXT.resolveAndShowNfe(src, token)
+    token = tostring(token or ''):gsub('%s+', '')
+    if #token < 8 then
+        TriggerClientEvent('spartan_mechanic:notify', src, 'error', 'Token inválido.')
+        return false
+    end
+    Workshop.nfe_tokens = Workshop.nfe_tokens or {}
+    local row = Workshop.nfe_tokens[token]
+    if not row or not row.invoice then
+        TriggerClientEvent('spartan_mechanic:notify', src, 'error', 'Documento não encontrado ou expirado.')
+        return false
+    end
+    local fakeJob = row.job or {}
+    TriggerClientEvent('spartan_mechanic:nfeShow', src, nfePayloadForClient(row.invoice, fakeJob))
+    return true
+end
+
+RegisterNetEvent('spartan_mechanic:nfeValidateToken', function(token)
+    SME_EXT.resolveAndShowNfe(source, token)
+end)
 
 RegisterNetEvent('spartan_mechanic:feat_extended', function(op, args)
     local src = source
